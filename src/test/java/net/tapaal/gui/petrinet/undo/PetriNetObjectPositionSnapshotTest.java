@@ -1,6 +1,7 @@
 package net.tapaal.gui.petrinet.undo;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pipe.gui.canvas.Grid;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
@@ -10,6 +11,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PetriNetObjectPositionSnapshotTest {
+    @BeforeEach
+    void startWithGridDisabled() {
+        Grid.disableGrid();
+    }
+
     @AfterEach
     void disableGrid() {
         Grid.disableGrid();
