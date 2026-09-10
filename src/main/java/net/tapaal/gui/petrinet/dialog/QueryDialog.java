@@ -2956,6 +2956,7 @@ public class QueryDialog extends JPanel {
         if (undoButton != null) undoButton.setEnabled(false);
         if (redoButton != null) redoButton.setEnabled(false);
 
+        refreshTarjan();
         updateSelection(newProperty);
 
         setEnabledOptionsAccordingToCurrentReduction();
