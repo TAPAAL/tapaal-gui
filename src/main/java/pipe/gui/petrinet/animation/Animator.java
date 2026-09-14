@@ -969,6 +969,7 @@ public class Animator {
 
             updateColoredMarking();
             refreshAnimation();
+            reportBlockingPlaces();
         }
     }
 

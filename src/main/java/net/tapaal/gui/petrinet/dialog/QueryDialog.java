@@ -1838,11 +1838,7 @@ public class QueryDialog extends JPanel {
                 hasForcedDisabledStubbornReduction = false;
                 useStubbornReduction.setSelected(true);
             }
-            if(queryType.getSelectedIndex() == 2) {
-                useStubbornReduction.setEnabled(false);
-            } else {
-                useStubbornReduction.setEnabled(true);
-            }
+            useStubbornReduction.setEnabled(true);
         }
 
         if(useGCD != null){
@@ -6874,10 +6870,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshStubbornReduction(){
-        if(queryType.getSelectedIndex() == 2) {
-            useStubbornReduction.setSelected(false);
-            useStubbornReduction.setEnabled(false);
-        } else if(useTimeDarts.isSelected()) {
+        if(useTimeDarts.isSelected()) {
             useStubbornReduction.setSelected(false);
             useStubbornReduction.setEnabled(false);
         } else {

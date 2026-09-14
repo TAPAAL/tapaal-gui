@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
 
 public class AnimationHistorySidePanel extends JPanel {
 
@@ -34,6 +35,21 @@ public class AnimationHistorySidePanel extends JPanel {
         setLayout(new BorderLayout());
 
         animBox = new AnimationHistoryList();
+        var inputMap = animBox.getInputMap(JComponent.WHEN_FOCUSED);
+        inputMap.put(KeyStroke.getKeyStroke("UP"), "simulator.previousComponent");
+        inputMap.put(KeyStroke.getKeyStroke("DOWN"), "simulator.nextComponent");
+        animBox.getActionMap().put("simulator.previousComponent", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                TAPAALGUI.getCurrentTab().previousComponent();
+            }
+        });
+        animBox.getActionMap().put("simulator.nextComponent", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                TAPAALGUI.getCurrentTab().nextComponent();
+            }
+        });
         animBox.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
