@@ -104,12 +104,12 @@ public class VerifyTAPNMarkingParser {
             if (tokenNodes.getLength() > 0) {
                 for (int t = 0; t < tokenNodes.getLength(); ++t) {
                     var tokenElem = (Element)tokenNodes.item(t);
-                    int age = Integer.parseInt(tokenElem.getAttribute("age"));
+                    BigDecimal age = new BigDecimal(tokenElem.getAttribute("age"));
                     int count = Integer.parseInt(tokenElem.getAttribute("count"));
                     var color = resolveColorString(tokenElem.getAttribute("color"), place.getColorType());
 
                     for (int c = 0; c < count; ++c) {
-                        var token = new TimedToken(place, new BigDecimal(age), color);
+                        var token = new TimedToken(place, age, color);
                         tokenConsumer.accept(place, token);
                     }
                 }

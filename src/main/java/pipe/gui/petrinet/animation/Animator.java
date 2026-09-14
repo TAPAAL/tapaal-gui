@@ -1284,6 +1284,7 @@ public class Animator {
         removeSetTrace(false);
         markings.add(initialMarking);
         tab.network().setMarking(initialMarking);
+        tab.getAnimationHistorySidePanel().setLastShown(TraceType.NOT_EG);
     }
 
     public void reset(boolean keepInitial){
