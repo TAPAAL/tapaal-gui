@@ -6636,7 +6636,6 @@ public class QueryDialog extends JPanel {
         if (lens.isTimed()) {
             boolean canMap = lens.isColored() && supportsUnfoldedTraceInOriginalNet();
             traceInOriginalNet.setEnabled(canMap);
-            if (!canMap) traceInUnfoldedNet.setSelected(true);
         } else {
             if (canUseExplicitSearch()) {
                 useExplicitSearch.setSelected(oldExplicitSearchState);

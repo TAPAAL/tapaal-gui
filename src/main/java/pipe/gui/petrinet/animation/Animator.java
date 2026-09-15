@@ -64,6 +64,7 @@ import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTACPNExporter;
 import dk.aau.cs.verification.VerifyTAPN.InteractiveHandle;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import dk.aau.cs.model.tapn.TimeInterval;
 
 public class Animator {
     private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -362,6 +363,18 @@ public class Animator {
 
     private boolean isColoredTransitionDelayEnabled(TimedTransition transition) {
         return isColoredTransitionInMap(transition, delayEnabledBindingsMap);
+    }
+
+    public TimeInterval getColoredTransitionInterval(TimedTransition transition) {
+        if (!isUsingInteractiveEngine) return null;
+        List<Map<Variable, Color>> bindings = new ArrayList<>();
+        var members = transition.isShared() ? transition.sharedTransition().transitions() : List.of(transition);
+        for (var member : members) {
+            if (validBindingsMap != null) bindings.addAll(validBindingsMap.getOrDefault(member, List.of()));
+            if (delayEnabledBindingsMap != null) bindings.addAll(delayEnabledBindingsMap.getOrDefault(member, List.of()));
+        }
+
+        return ColoredTransitionIntervals.calculate(transition, bindings, isUrgentTransitionEnabled());
     }
 
     private void updateFireableTransitionsColored(TransitionFiringComponent transFireComponent) {
