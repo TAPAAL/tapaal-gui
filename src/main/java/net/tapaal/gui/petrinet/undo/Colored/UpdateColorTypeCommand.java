@@ -62,11 +62,14 @@ public class UpdateColorTypeCommand implements Command {
                     }
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(targetType);
+                    List<TimedToken> newTokens = new ArrayList<>();
                     for (TimedToken token : oldTokens) {
                         if (targetType.contains(token.getColor())) {
-                            place.addToken(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
+                            newTokens.add(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
                         }
                     }
+                    
+                    place.updateTokens(newTokens, place.getTokensAsExpression());
                 } else if (isModifiedProductType) {
                     if (place.getTokensAsExpression() != null) {
                         place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));

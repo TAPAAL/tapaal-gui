@@ -10,7 +10,7 @@ import java.util.Map;
 public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
     private final TimedTransition transition;
     private final Map<Variable, Color> bindings;
-    private final NetworkMarking marking;
+    private NetworkMarking marking;
 
     public TAPNNetworkColoredTransitionStep(TimedTransition transition, Map<Variable, Color> bindings, NetworkMarking marking) {
         this.transition = transition;
@@ -28,6 +28,10 @@ public class TAPNNetworkColoredTransitionStep extends TAPNNetworkTraceStep  {
 
     public NetworkMarking getMarking() {
         return marking;
+    }
+
+    public void setMarking(NetworkMarking marking) {
+        this.marking = marking;
     }
 
     @Override

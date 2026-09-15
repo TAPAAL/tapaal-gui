@@ -21,6 +21,8 @@ public class VerifyPNEngineOptions extends EngineSupportOptions {
                 EngineFeature.NESTED_QUANTIFICATIONS,
                 EngineFeature.COLORED,
                 EngineFeature.ONLY_UNTIMED,
+                EngineFeature.UNFOLDED_TRACE_IN_ORIGINAL_NET,
+                EngineFeature.EXPLICIT_SEARCH,
                 EngineFeature.COLORED_PLACE_QUERIES
             )
         );

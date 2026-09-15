@@ -268,7 +268,10 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 		    result.append(" --trace-abstraction ");
         }
 
-		if (colored) {
+        if (colored) {
+            if (traceInOriginalNet) {
+                result.append(" --trace-original-net ");
+            }
             if (!this.partition) {
                 result.append(" --disable-partitioning ");
             }
@@ -300,5 +303,9 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 
     public boolean useExplicitSearch() {
         return useExplicitSearch;
+    }
+
+    public void setTraceInOriginalNet(boolean traceInOriginalNet) {
+        this.traceInOriginalNet = traceInOriginalNet;
     }
 }

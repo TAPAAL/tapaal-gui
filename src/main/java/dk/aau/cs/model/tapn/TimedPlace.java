@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Pattern;
-import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.tapn.event.TimedPlaceEvent;
 import dk.aau.cs.model.tapn.event.TimedPlaceListener;
@@ -63,6 +64,21 @@ public abstract class TimedPlace {
 
     public TimeInvariant invariant(){
         return invariant;
+    }
+
+    public TimeInvariant invariantFor(Color color) {
+        TimeInvariant result = invariant();
+        for (ColoredTimeInvariant colorInvariant : getCtiList()) {
+            if (colorInvariant.getColor().equals(color)) {
+                return colorInvariant;
+            }
+
+            if (colorInvariant.getColor().equals(Color.STAR_COLOR)) {
+                result = colorInvariant;
+            }
+        }
+        
+        return result;
     }
 
     public List<TimedToken> tokens() {

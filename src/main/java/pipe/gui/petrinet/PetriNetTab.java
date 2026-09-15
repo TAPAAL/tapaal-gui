@@ -462,6 +462,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private QueryPane queries;
 	private ConstantsPane constantsPanel;
 	private TemplateExplorer templateExplorer;
+	private TemplateExplorer simulatorTemplateExplorer;
 	private SharedPlacesAndTransitionsPanel sharedPTPanel;
 
 	private static final String constantsName = "constants";
@@ -842,9 +843,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		}
 
 		//Add the templateExplorer
-        var t = new TemplateExplorer(this);
-        t.switchToAnimationMode();
-		animatorSplitPane.add(t, templateExplorerName);
+		simulatorTemplateExplorer = new TemplateExplorer(this);
+		simulatorTemplateExplorer.switchToAnimationMode();
+		animatorSplitPane.add(simulatorTemplateExplorer, templateExplorerName);
 
 		this.setLeftComponent(animatorSplitPaneScroller);
 
@@ -1134,12 +1135,16 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 	@Override
 	public void previousComponent() {
-		getTemplateExplorer().selectPrevious();
+		getActiveTemplateExplorer().selectPrevious();
 	}
 
 	@Override
 	public void nextComponent() {
-		getTemplateExplorer().selectNext();
+		getActiveTemplateExplorer().selectNext();
+	}
+
+	private TemplateExplorer getActiveTemplateExplorer() {
+		return animationmode ? simulatorTemplateExplorer : templateExplorer;
 	}
 
 	@Override
@@ -1467,7 +1472,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 				// Set a light blue backgound color for animation mode
 				drawingSurface().setBackground(Constants.ANIMATION_BACKGROUND_COLOR);
-				getAnimationController().requestFocusInWindow();
+				SwingUtilities.invokeLater(() -> getAnimationHistorySidePanel().requestFocusInWindow());
 
 				if (templateWasActiveBeforeSimulationMode()) {
 					restoreSelectedTemplate();

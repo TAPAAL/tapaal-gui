@@ -82,7 +82,7 @@ public class RunVerification extends RunVerificationBase {
 
                 if ((options.traceOption() != TAPNQuery.TraceOption.NONE || (lens != null && lens.isStochastic() && options.isSimulate())) && isNetDrawable) {
                     if (!reducedNetOpened && nonNull(result.getTrace()) && nonNull(TAPAALGUI.getAnimator())) {
-                        if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch()) {
+                        if (((lens != null && lens.isColored()) || model.isColored()) && !options.useExplicitSearch() && !options.traceInOriginalNet()) {
                             int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "There is a trace that will be displayed in a new tab on the unfolded net/query.", "Open trace", JOptionPane.OK_CANCEL_OPTION);
                             if (dialogResult == JOptionPane.OK_OPTION) {
                                 TAPAALGUI.openNewTabFromStream(result.getUnfoldedTab());
