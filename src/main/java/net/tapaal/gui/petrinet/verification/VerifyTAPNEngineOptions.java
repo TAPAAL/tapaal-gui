@@ -6,7 +6,7 @@ public class VerifyTAPNEngineOptions extends EngineSupportOptions {
 
     public VerifyTAPNEngineOptions() {
         super(
-            "TAPAAL: Continuous Engine (verifytapn)",
+            CONTINUOUS_ENGINE_NAME,
             EnumSet.of(
                 EngineFeature.INHIBITOR_ARCS,
                 EngineFeature.COLORED_INHIBITOR_ARCS,

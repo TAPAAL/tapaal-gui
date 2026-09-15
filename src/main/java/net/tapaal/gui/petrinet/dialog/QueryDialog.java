@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
-import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Optional;
@@ -200,6 +199,7 @@ import net.tapaal.gui.petrinet.Template;
 import net.tapaal.gui.petrinet.undo.AddQueryCommand;
 import net.tapaal.gui.petrinet.verification.ChooseInclusionPlacesDialog;
 import net.tapaal.gui.petrinet.verification.EngineFeature;
+import net.tapaal.gui.petrinet.verification.EngineEligibility;
 import net.tapaal.gui.petrinet.verification.EngineSupportOptions;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
@@ -478,14 +478,14 @@ public class QueryDialog extends JPanel {
     private JButton addConstantButton;
     private Component constantRowStrut;
 
-    private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
+    private static final String name_verifyTAPN = EngineSupportOptions.CONTINUOUS_ENGINE_NAME;
 	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
 	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimized Standard Reduction";
 	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
 	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
 	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
 	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+    private static final String name_UNTIMED = EngineSupportOptions.UNTIMED_ENGINE_NAME;
 	private boolean userChangedAtomicPropSelection = true;
 	private boolean updatingQueryControls;
 
@@ -932,36 +932,30 @@ public class QueryDialog extends JPanel {
             return;
         }
 
-        if (lens.isGame()) {
-            fastestTraceRadioButton.setEnabled(false);
-            someTraceRadioButton.setEnabled(false);
-            noTraceRadioButton.setEnabled(true);
-        } else if (lens.isTimed()) {
-            fastestTraceRadioButton.setEnabled(tapnNetwork.isNonStrict() && !queryHasDeadlock() &&
-                !(newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode));
-            someTraceRadioButton.setEnabled(true);
-            noTraceRadioButton.setEnabled(true);
-        } else if (queryIsReachability() || queryType.getSelectedIndex() == 1 || queryType.getSelectedIndex() == 2) {
-            fastestTraceRadioButton.setEnabled(false);
-            someTraceRadioButton.setEnabled(true);
-            noTraceRadioButton.setEnabled(true);
-        } else {
-            fastestTraceRadioButton.setEnabled(false);
-            someTraceRadioButton.setEnabled(false);
-            noTraceRadioButton.setEnabled(false);
-            noTraceRadioButton.setSelected(true);
-        }
+        EngineEligibility.TraceDecision decision = EngineEligibility.traceDecision(
+            new EngineEligibility.TraceContext(
+                lens.isGame(),
+                lens.isTimed(),
+                tapnNetwork.isNonStrict(),
+                queryHasDeadlock(),
+                newProperty instanceof TCTLEGNode || newProperty instanceof TCTLAFNode,
+                queryIsReachability(),
+                queryType.getSelectedIndex() == 1 || queryType.getSelectedIndex() == 2,
+                getTraceOption()
+            )
+        );
 
-		if (getTraceOption() == TraceOption.FASTEST) {
-			if (fastestTraceRadioButton.isEnabled()) {
-				fastestTraceRadioButton.setSelected(true);
-			} else if (someTraceRadioButton.isEnabled()) {
-                someTraceRadioButton.setSelected(true);
-            } else {
-                noTraceRadioButton.setSelected(true);
+        fastestTraceRadioButton.setEnabled(decision.isEnabled(TraceOption.FASTEST));
+        someTraceRadioButton.setEnabled(decision.isEnabled(TraceOption.SOME));
+        noTraceRadioButton.setEnabled(decision.isEnabled(TraceOption.NONE));
+        if (decision.selected() != getTraceOption()) {
+            switch (decision.selected()) {
+                case FASTEST -> fastestTraceRadioButton.setSelected(true);
+                case SOME -> someTraceRadioButton.setSelected(true);
+                case NONE -> noTraceRadioButton.setSelected(true);
             }
-		}
-	}
+        }
+    }
 
     private void updateSMCSettings() {
         DecimalFormatSymbols decimalFormatSymbols = DecimalFormatSymbols.getInstance();
@@ -1791,27 +1785,26 @@ public class QueryDialog extends JPanel {
         ArrayList<String> options = new ArrayList<String>();
 
         disableSymmetryUpdate = true;
-        EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
-        if (fastestTraceRadioButton.isSelected()) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
-        if (queryHasDeadlock() && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) && highestNetDegree <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
-        if (queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))) requiredFeatures.add(EngineFeature.DEADLOCK_EG_OR_AF);
-        if (queryHasDeadlock() && hasInhibitorArcs) requiredFeatures.add(EngineFeature.DEADLOCK_WITH_INHIB);
-        if (tapnNetwork.hasWeights()) requiredFeatures.add(EngineFeature.WEIGHTS);
-        if (hasInhibitorArcs) requiredFeatures.add(EngineFeature.INHIBITOR_ARCS);
-        if (tapnNetwork.hasColoredInhibitorArcs()) requiredFeatures.add(EngineFeature.COLORED_INHIBITOR_ARCS);
-        if (tapnNetwork.hasUrgentTransitions()) requiredFeatures.add(EngineFeature.URGENT_TRANSITIONS);
-        if (newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) requiredFeatures.add(EngineFeature.EG_OR_AF);
-        if (!tapnNetwork.isNonStrict()) requiredFeatures.add(EngineFeature.STRICT_NETS);
-        if (lens.isTimed()) requiredFeatures.add(EngineFeature.TIMED_NETS);
-        if (queryHasDeadlock() && highestNetDegree > 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_GREATER_THAN_2);
-        if (lens.isGame()) requiredFeatures.add(EngineFeature.GAMES);
-        if ((newProperty.toString().contains("EG") || newProperty.toString().contains("AF")) && highestNetDegree > 2) requiredFeatures.add(EngineFeature.EG_OR_AF_WITH_NET_DEGREE_GREATER_THAN_2);
-        if (newProperty.hasNestedPathQuantifiers()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
-        if (lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
-        if (lens.isColored() && !lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);
-        if (lens.isStochastic()) requiredFeatures.add(EngineFeature.SMC);
-        if (hasColorSpecificPlaces(newProperty)) requiredFeatures.add(EngineFeature.COLORED_PLACE_QUERIES);
-        if (hasNonzeroInitialTokenAges()) requiredFeatures.add(EngineFeature.NONZERO_INITIAL_TOKEN_AGES);
+        String queryText = newProperty.toString();
+        EngineEligibility.Context eligibilityContext = new EngineEligibility.Context(
+            lens.isTimed(),
+            lens.isStochastic(),
+            lens.isGame(),
+            lens.isColored(),
+            !tapnNetwork.isNonStrict(),
+            tapnNetwork.hasWeights(),
+            hasInhibitorArcs,
+            tapnNetwork.hasColoredInhibitorArcs(),
+            tapnNetwork.hasUrgentTransitions(),
+            highestNetDegree > 2,
+            hasNonzeroInitialTokenAges(),
+            fastestTraceRadioButton.isSelected(),
+            queryHasDeadlock(),
+            queryText.contains("EF") || queryText.contains("AG"),
+            queryText.contains("EG") || queryText.contains("AF"),
+            newProperty.hasNestedPathQuantifiers(),
+            hasColorSpecificPlaces(newProperty)
+        );
 
 
         if(useTimeDarts != null){
@@ -1856,15 +1849,10 @@ public class QueryDialog extends JPanel {
             }
         }
         if (lens.isTimed()) {
-            for (EngineSupportOptions engine : engineSupportOptions) {
-                if (engine.areOptionsSupported(requiredFeatures)) {
-                    if (engine.getNameString().equals(name_verifyTAPN) && lens.isStochastic()) {
-                        continue;
-                    }
-
-                    options.add(engine.getNameString());
-                }
-            }
+            options.addAll(EngineEligibility.compatibleEngines(eligibilityContext, Arrays.asList(engineSupportOptions))
+                .stream()
+                .map(EngineSupportOptions::getNameString)
+                .toList());
         } else {
             options.add(name_UNTIMED);
         }
@@ -1901,63 +1889,40 @@ public class QueryDialog extends JPanel {
             return;
         }
 
-		JRadioButton currentSelected;
-		if (heuristicSearch.isSelected()) {
-			currentSelected = heuristicSearch;
-		} else if(breadthFirstSearch.isSelected()) {
-			currentSelected = breadthFirstSearch;
-		} else if(depthFirstSearch.isSelected()) {
-			currentSelected = depthFirstSearch;
-		} else {
-			currentSelected = randomSearch;
-		}
-
-        if (queryType.getSelectedIndex() == 2) {
-            breadthFirstSearch.setEnabled(false);
-            heuristicSearch.setEnabled(false);
-            randomSearch.setEnabled(false);
-        }
-        else if (fastestTraceRadioButton.isSelected()) {
-            breadthFirstSearch.setEnabled(false);
-            depthFirstSearch.setEnabled(false);
-            heuristicSearch.setEnabled(false);
-            randomSearch.setEnabled(false);
-            return;
-        } else if (queryType.getSelectedIndex() == 1) {
-            breadthFirstSearch.setEnabled(false);
-            heuristicSearch.setEnabled(true);
-            depthFirstSearch.setEnabled(true);
-            randomSearch.setEnabled(true);
-
-            if (!useTarjan.isSelected() && someTraceRadioButton.isSelected()) {
-                randomSearch.setEnabled(false);
-            }
-        } else {
-            breadthFirstSearch.setEnabled(true);
-            depthFirstSearch.setEnabled(true);
-            heuristicSearch.setEnabled(true);
-            randomSearch.setEnabled(true);
-        }
-
         String reductionOptionString = getReductionOptionAsString();
-        if (lens.isGame()) {
-            heuristicSearch.setEnabled(false);
-        } else if (lens.isTimed() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))) {
-            breadthFirstSearch.setEnabled(false);
-            if (!(reductionOptionString.equals(name_verifyTAPN) || reductionOptionString.equals(name_DISCRETE))) {
-                heuristicSearch.setEnabled(false);
-            }
-        }
+		EngineEligibility.SearchStrategy selected = heuristicSearch.isSelected()
+			? EngineEligibility.SearchStrategy.HEURISTIC
+			: breadthFirstSearch.isSelected()
+				? EngineEligibility.SearchStrategy.BFS
+				: depthFirstSearch.isSelected()
+					? EngineEligibility.SearchStrategy.DFS
+					: EngineEligibility.SearchStrategy.RANDOM;
+		EngineEligibility.SearchDecision decision = EngineEligibility.searchDecision(
+			new EngineEligibility.SearchContext(
+				queryType.getSelectedIndex() == 2,
+				fastestTraceRadioButton.isSelected(),
+				queryType.getSelectedIndex() == 1,
+				lens.isGame(),
+				lens.isTimed(),
+				newProperty.toString().contains("EG") || newProperty.toString().contains("AF"),
+				name_verifyTAPN.equals(reductionOptionString) || name_DISCRETE.equals(reductionOptionString),
+				useTarjan.isSelected(),
+				someTraceRadioButton.isSelected(),
+				isReachabilityQuery(),
+				useExplicitSearch.isSelected(),
+				selected
+			)
+		);
 
-		if (!currentSelected.isEnabled()) {
-			if (heuristicSearch.isEnabled()) {
-				heuristicSearch.setSelected(true);
-			} else {
-				depthFirstSearch.setSelected(true);
-			}
+		breadthFirstSearch.setEnabled(decision.isEnabled(EngineEligibility.SearchStrategy.BFS));
+		depthFirstSearch.setEnabled(decision.isEnabled(EngineEligibility.SearchStrategy.DFS));
+		randomSearch.setEnabled(decision.isEnabled(EngineEligibility.SearchStrategy.RANDOM));
+		heuristicSearch.setEnabled(decision.isEnabled(EngineEligibility.SearchStrategy.HEURISTIC));
+		if (!fastestTraceRadioButton.isSelected() && selected != decision.selected()) {
+			if (decision.selected() == EngineEligibility.SearchStrategy.HEURISTIC) heuristicSearch.setSelected(true);
+			else depthFirstSearch.setSelected(true);
 		}
-
-		refreshHeuristicButtonText();
+		heuristicSearch.setText(decision.label());
     }
 
     private void refreshHeuristicButtonText() {
@@ -6564,50 +6529,39 @@ public class QueryDialog extends JPanel {
 
 	private void refreshTraceRefinement() {
 	    ReductionOption reduction = getReductionOption();
-
-        if (queryType.getSelectedIndex() == 0 && !lens.isGame() &&
-            reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
-            (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
-            !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
-	        useTraceRefinement.setEnabled(true);
-        } else {
-            useTraceRefinement.setEnabled(false);
-        }
+        useTraceRefinement.setEnabled(EngineEligibility.traceRefinementEnabled(
+            new EngineEligibility.TraceRefinementContext(
+                queryType.getSelectedIndex() == 0,
+                lens.isGame(),
+                reduction == ReductionOption.VerifyPN,
+                newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF"),
+                hasInhibitorArcs,
+                newProperty.hasNestedPathQuantifiers()
+            )
+        ));
     }
 
     private void refreshTarjan() {
-        int selectedIndex = queryType.getSelectedIndex();
-        switch (selectedIndex) {
-            case 1:
-                useTarjan.setVisible(true);
-                useTarjan.setEnabled(true);
-                break;
-            case 2:
-                useTarjan.setVisible(true);
-                useTarjan.setEnabled(false);
-                useTarjan.setSelected(false);
-                break;
-            default:
-                useTarjan.setVisible(false);
-                useTarjan.setEnabled(false);
-                break;
+        EngineEligibility.TarjanDecision decision = EngineEligibility.tarjanDecision(queryType.getSelectedIndex());
+        useTarjan.setVisible(decision.visible());
+        useTarjan.setEnabled(decision.enabled());
+        if (decision.clearSelection()) {
+            useTarjan.setSelected(false);
         }
     }
 
     private boolean oldExplicitSearchState;
 
     private void refreshExplicitSearch() {
-        if (canUseExplicitSearch()) {
-            useExplicitSearch.setSelected(oldExplicitSearchState);
-            useExplicitSearch.setEnabled(true);
-        } else {
-            if (useExplicitSearch.isEnabled()) {
-                oldExplicitSearchState = useExplicitSearch.isSelected();
-            }
-            
-            useExplicitSearch.setSelected(false);
-            useExplicitSearch.setEnabled(false);
-        }
+        EngineEligibility.ExplicitSearchDecision decision = EngineEligibility.explicitSearchDecision(
+            canUseExplicitSearch(),
+            useExplicitSearch.isEnabled(),
+            useExplicitSearch.isSelected(),
+            oldExplicitSearchState
+        );
+        oldExplicitSearchState = decision.rememberedState();
+        useExplicitSearch.setSelected(decision.selected());
+        useExplicitSearch.setEnabled(decision.enabled());
     }
 
     private void setComponentEnabledRecursively(Component component, boolean enabled) {
@@ -6633,29 +6587,21 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshColoredReduction() {
-	    useColoredReduction.setEnabled(someTraceRadioButton.isSelected());
-	    if (someTraceRadioButton.isSelected() || lens.isGame()) {
-	        useColoredReduction.setEnabled(false);
+	    boolean enabled = EngineEligibility.coloredReductionEnabled(
+            someTraceRadioButton.isSelected(), lens.isGame());
+	    useColoredReduction.setEnabled(enabled);
+	    if (!enabled) {
 	        useColoredReduction.setSelected(false);
-        } else {
-	        useColoredReduction.setEnabled(true);
         }
     }
 
 	private void refreshDiscreteInclusion() {
 		ReductionOption reduction = getReductionOption();
-		if(reduction == null){
-			discreteInclusion.setVisible(false);
-			selectInclusionPlacesButton.setVisible(false);
-		}
-		else if(reduction.equals(ReductionOption.VerifyTAPN)){
-			discreteInclusion.setVisible(true);
-			selectInclusionPlacesButton.setVisible(true);
-			//queryChanged(); // This ensures the checkbox is disabled if query is not upward closed
-		}else{
-			discreteInclusion.setVisible(false);
-			selectInclusionPlacesButton.setVisible(false);
-		}
+		EngineEligibility.DiscreteInclusionDecision decision =
+			EngineEligibility.discreteInclusionDecision(reduction == ReductionOption.VerifyTAPN);
+		discreteInclusion.setVisible(decision.visible());
+		selectInclusionPlacesButton.setVisible(decision.selectPlacesVisible());
+		// queryChanged() ensures the checkbox is disabled if the query is not upward closed.
 	}
 
     private void refreshExportButtonText() {
@@ -6707,29 +6653,22 @@ public class QueryDialog extends JPanel {
         if(disableSymmetryUpdate){
             return;
         }
-        else if(reductionOption.getSelectedItem() == null){
-            symmetryReduction.setVisible(false);
-        }
-        else if(reductionOption.getSelectedItem().equals(name_DISCRETE) || reductionOption.getSelectedItem().equals(name_UNTIMED)) {
-            symmetryReduction.setVisible(true);
-            symmetryReduction.setEnabled(false);
-        }
-        else if((reductionOption.getSelectedItem().equals(name_COMBI) ||
-            reductionOption.getSelectedItem().equals(name_OPTIMIZEDSTANDARD) ||
-            reductionOption.getSelectedItem().equals(name_STANDARD) ||
-            reductionOption.getSelectedItem().equals(name_BROADCAST) ||
-            reductionOption.getSelectedItem().equals(name_BROADCASTDEG2)) &&
-            (!noApproximationEnable.isSelected() ||
-                someTraceRadioButton.isSelected())
-        ){
-            symmetryReduction.setVisible(true);
-            symmetryReduction.setSelected(false);
-            symmetryReduction.setEnabled(false);
-        } else {
-            symmetryReduction.setVisible(true);
-            if(!symmetryReduction.isEnabled())	symmetryReduction.setSelected(true);
-            symmetryReduction.setEnabled(true);
-        }
+        String selectedEngine = (String) reductionOption.getSelectedItem();
+        boolean approximationEngine = name_COMBI.equals(selectedEngine)
+            || name_OPTIMIZEDSTANDARD.equals(selectedEngine)
+            || name_STANDARD.equals(selectedEngine)
+            || name_BROADCAST.equals(selectedEngine)
+            || name_BROADCASTDEG2.equals(selectedEngine);
+        EngineEligibility.SymmetryDecision decision = EngineEligibility.symmetryDecision(
+            selectedEngine != null,
+            name_DISCRETE.equals(selectedEngine) || name_UNTIMED.equals(selectedEngine),
+            approximationEngine && (!noApproximationEnable.isSelected() || someTraceRadioButton.isSelected()),
+            symmetryReduction.isEnabled(),
+            symmetryReduction.isSelected()
+        );
+        symmetryReduction.setVisible(decision.visible());
+        symmetryReduction.setEnabled(decision.enabled());
+        symmetryReduction.setSelected(decision.selected());
     }
 
     private void refreshOverApproximationOption() {
@@ -6737,34 +6676,21 @@ public class QueryDialog extends JPanel {
             return;
         }
 
-        if (queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
-            skeletonAnalysis.setSelected(false);
-            skeletonAnalysis.setEnabled(false);
-        } else {
-            if(!skeletonAnalysis.isEnabled()){
-                skeletonAnalysis.setSelected(true);
-            }
-            skeletonAnalysis.setEnabled(true);
-        }
-
-        if (lens.isGame()) {
-            noApproximationEnable.setEnabled(true);
-            overApproximationEnable.setEnabled(false);
-            underApproximationEnable.setEnabled(false);
-            overApproximationDenominator.setEnabled(false);
-        } else if(fastestTraceRadioButton.isSelected()){
-            noApproximationEnable.setEnabled(true);
-            noApproximationEnable.setSelected(true);
-            overApproximationEnable.setEnabled(false);
-            underApproximationEnable.setEnabled(false);
-            overApproximationDenominator.setEnabled(false);
-        }
-        else{
-            noApproximationEnable.setEnabled(true);
-            overApproximationEnable.setEnabled(true);
-            underApproximationEnable.setEnabled(true);
-            overApproximationDenominator.setEnabled(true);
-        }
+        EngineEligibility.ApproximationDecision decision = EngineEligibility.approximationDecision(
+            queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF"),
+            lens.isGame(),
+            fastestTraceRadioButton.isSelected(),
+            skeletonAnalysis.isEnabled(),
+            skeletonAnalysis.isSelected(),
+            noApproximationEnable.isSelected()
+        );
+        skeletonAnalysis.setSelected(decision.skeletonSelected());
+        skeletonAnalysis.setEnabled(decision.skeletonEnabled());
+        noApproximationEnable.setEnabled(decision.noApproximationEnabled());
+        noApproximationEnable.setSelected(decision.noApproximationSelected());
+        overApproximationEnable.setEnabled(decision.overApproximationEnabled());
+        underApproximationEnable.setEnabled(decision.underApproximationEnabled());
+        overApproximationDenominator.setEnabled(decision.denominatorEnabled());
     }
 
     private void refreshDiscreteOptions(){
@@ -6776,39 +6702,48 @@ public class QueryDialog extends JPanel {
             useStubbornReduction.setVisible(false);
             useTimeDarts.setVisible(false);
         }
-        else if(reductionOption.getSelectedItem().equals(name_DISCRETE)) {
-            useGCD.setVisible(true);
-            usePTrie.setVisible(true);
-            useStubbornReduction.setVisible(true);
-            useTimeDarts.setVisible(true);
+		else if(reductionOption.getSelectedItem().equals(name_DISCRETE)) {
+			useGCD.setVisible(true);
+			usePTrie.setVisible(true);
+			useStubbornReduction.setVisible(true);
+			useTimeDarts.setVisible(true);
 
-            if(tapnNetwork.hasUrgentTransitions() || fastestTraceRadioButton.isSelected() || lens.isGame()){
-                hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
-                useTimeDarts.setSelected(false);
-                useTimeDarts.setEnabled(false);
-            }
+			boolean liveQuery = newProperty.toString().contains("EG") || newProperty.toString().contains("AF");
+			EngineEligibility.DiscreteDecision decision = EngineEligibility.discreteDecision(
+				true,
+				tapnNetwork.isNonStrict(),
+				tapnNetwork.hasUrgentTransitions(),
+				fastestTraceRadioButton.isSelected(),
+				lens.isGame(),
+				queryHasDeadlock(),
+				liveQuery
+			);
 
-            // Disable GCD calculation for EG/AF or deadlock queries
-            if(queryHasDeadlock() || newProperty.toString().contains("EG") || newProperty.toString().contains("AF") ||
-                lens.isGame()){
-                if(useGCD.isSelected())	hasForcedDisabledGCD = true;
-                useGCD.setSelected(false);
-                useGCD.setEnabled(false);
-            }
+			if(decision.timeDartsForcedOff()){
+				if (useTimeDarts.isEnabled()) {
+					hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
+				}
+				useTimeDarts.setSelected(false);
+				useTimeDarts.setEnabled(false);
+			}
 
-            // Disable time darts for EG/AF with deadlock
-            if(queryHasDeadlock() && (newProperty.toString().contains("EG") || newProperty.toString().contains("AF"))){
-                hasForcedDisabledTimeDarts = useTimeDarts.isSelected();
-                useTimeDarts.setSelected(false);
-                useTimeDarts.setEnabled(false);
-                symmetryReduction.setSelected(false);
-                symmetryReduction.setEnabled(false);
-            }
+			// Disable GCD calculation for EG/AF or deadlock queries
+			if(decision.gcdForcedOff()){
+				if(useGCD.isSelected())	hasForcedDisabledGCD = true;
+				useGCD.setSelected(false);
+				useGCD.setEnabled(false);
+			}
 
-            // Disable stubborn reduction for EG/AF queries
-            if(newProperty.toString().contains("EG") || newProperty.toString().contains("AF")){
-                if(useStubbornReduction.isSelected())	hasForcedDisabledStubbornReduction = true;
-                useStubbornReduction.setSelected(false);
+			// Disable time darts for EG/AF with deadlock
+			if(decision.symmetryForcedOff()){
+				symmetryReduction.setSelected(false);
+				symmetryReduction.setEnabled(false);
+			}
+
+			// Disable stubborn reduction for EG/AF queries
+			if(decision.stubbornForcedOff()){
+				if(useStubbornReduction.isSelected())	hasForcedDisabledStubbornReduction = true;
+				useStubbornReduction.setSelected(false);
                 useStubbornReduction.setEnabled(false);
             }
         } else {
@@ -6820,14 +6755,13 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshStubbornReduction(){
-        if(queryType.getSelectedIndex() == 2) {
+        boolean enabled = EngineEligibility.stubbornReductionEnabled(
+            queryType.getSelectedIndex() == 2,
+            useTimeDarts.isSelected()
+        );
+        useStubbornReduction.setEnabled(enabled);
+        if (!enabled) {
             useStubbornReduction.setSelected(false);
-            useStubbornReduction.setEnabled(false);
-        } else if(useTimeDarts.isSelected()) {
-            useStubbornReduction.setSelected(false);
-            useStubbornReduction.setEnabled(false);
-        } else {
-            useStubbornReduction.setEnabled(true);
         }
     }
 
