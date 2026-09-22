@@ -6,7 +6,6 @@ import javax.swing.JSpinner;
 import com.sun.jna.Platform;
 
 import net.tapaal.gui.petrinet.TAPNLens;
-import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
 import pipe.gui.petrinet.dataLayer.DataLayer;
@@ -219,9 +218,6 @@ public class Verifier {
         if (timedArcPetriNetNetwork != null) {
             RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
             RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
-            if(timedArcPetriNetNetwork.isColored() && input.getTraceOption() != TAPNQuery.TraceOption.NONE){
-                SmartDrawDialog.setupWorkerListener(thread);
-            }
             thread.execute(
                 verifytaOptions,
                 timedArcPetriNetNetwork,
@@ -278,9 +274,6 @@ public class Verifier {
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
-            if (isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
-                SmartDrawDialog.setupWorkerListener(thread);
-            }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
             dialog.setVisible(true);
         } else {
@@ -433,9 +426,6 @@ public class Verifier {
                 thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
             }
 
-            if (isColored && query.getTraceOption() != TAPNQuery.TraceOption.NONE) {
-                SmartDrawDialog.setupWorkerListener(thread);
-            }
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);
             return thread;
         } else {

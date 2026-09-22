@@ -1402,10 +1402,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         appTab.remove(tab);
 
         if (appTab.getTabCount() == 0) {
-           for (GuiAction action : tab.getAvailableToolActions()) {
+            for (var action : tab.getAvailableToolActions()) {
                 action.setEnabled(false);
             }
             setGUIMode(GUIMode.noNet);
+            setTitle(null);
         }
     }
 
