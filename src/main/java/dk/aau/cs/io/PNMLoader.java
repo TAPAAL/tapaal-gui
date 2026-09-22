@@ -193,7 +193,9 @@ public class PNMLoader {
             name = new Name(nameGenerator.getNewPlaceName(template.model()));
         }
         Point position = parseGraphics(getFirstDirectChild(node, "graphics"), GraphicsType.Position);
-        String id = NamePurifier.purify(((Element) node).getAttribute("id"));
+        String originalId = ((Element)node).getAttribute("id");
+        String id = NamePurifier.purify(originalId);
+        checkUniqueNodeId(originalId, id);
         ArcExpression colorMarking = null;
         TimedPlace place;
         InitialMarking marking = parseMarking(getFirstDirectChild(node, "initialMarking"));
@@ -216,8 +218,7 @@ public class PNMLoader {
         }
         place = new LocalTimedPlace(id, colorType);
 
-        Require.that(places.put(id, place) == null && !transitions.containsKey(id),
-            "The name: " + id + ", was already used");
+        places.put(id, place);
         tapn.add(place);
 
         //We parse the id as both the name and id as in tapaal name = id, and name/id has to be unique
@@ -287,7 +288,9 @@ public class PNMLoader {
         if(name == null){
             name = new Name(nameGenerator.getNewTransitionName(template.model()));
         }
-        String id = NamePurifier.purify(((Element) node).getAttribute("id"));
+        String originalId = ((Element)node).getAttribute("id");
+        String id = NamePurifier.purify(originalId);
+        checkUniqueNodeId(originalId, id);
 
         GuardExpression guardExpression = null;
         Node conditionNode = getFirstDirectChild(node, "condition");
@@ -296,8 +299,7 @@ public class PNMLoader {
         }
 
         TimedTransition transition = new TimedTransition(id, guardExpression);
-        Require.that(transitions.put(id, transition) == null && !places.containsKey(id),
-            "The id: " + id + ", was already used");
+        transitions.put(id, transition);
         tapn.add(transition);
 
         TimedTransitionComponent transitionComponent =
@@ -307,6 +309,12 @@ public class PNMLoader {
         template.guiModel().addPetriNetObject(transitionComponent);
         
         idResolver.add(tapn.name(), id, id);
+    }
+
+    private void checkUniqueNodeId(String originalId, String purifiedId) throws FormatException {
+        if (places.containsKey(purifiedId) || transitions.containsKey(purifiedId)) {
+            throw new FormatException("PNML id '" + originalId + "' conflicts with another node after name conversion to '" + purifiedId + "'");
+        }
     }
 
     private void parseArc(Node node, Template template) throws FormatException {

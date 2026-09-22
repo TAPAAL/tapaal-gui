@@ -306,6 +306,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
     }
 
     public void setTraceInOriginalNet(boolean traceInOriginalNet) {
-        this.traceInOriginalNet = traceInOriginalNet;
+        this.traceInOriginalNet = colored && traceInOriginalNet;
     }
 }

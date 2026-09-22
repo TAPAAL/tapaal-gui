@@ -32,17 +32,33 @@ public class TupleExpression extends ColorExpression {
     }
 
     public List<Color> eval(ExpressionContext context) {
-        Vector<Color> colors = new Vector<>();
+        List<Vector<Color>> tuples = new ArrayList<>();
+        tuples.add(new Vector<>());
         Vector<ColorType> colorTypes = new Vector<>();
 
         for (ColorExpression ce : this.colors) {
-            List<Color> color = ce.eval(context);
-            colors.addAll(color);
-            colorTypes.add(color.get(0).getColorType());
+            List<Color> componentColors = ce.eval(context);
+            if (componentColors.isEmpty()) return Collections.emptyList();
+            colorTypes.add(componentColors.get(0).getColorType());
+            List<Vector<Color>> expanded = new ArrayList<>();
+            for (var tuple : tuples) {
+                for (Color color : componentColors) {
+                    var next = new Vector<>(tuple);
+                    next.add(color);
+                    expanded.add(next);
+                }
+            }
+
+            tuples = expanded;
         }
 
-        ProductType pt = context.findProductColorType(colorTypes);
-        return Collections.singletonList(pt.getColor(colors));
+        var pt = context.findProductColorType(colorTypes);
+        List<Color> result = new ArrayList<>();
+        for (var tuple : tuples) {
+            result.add(pt.getColor(tuple));
+        }
+
+        return result;
     }
 
     @Override
