@@ -15,6 +15,8 @@ public interface GuiFrameControllerActions {
     //XXX 2018-05-23 kyrke, implementation close to undoAddTab, needs refactoring
     void closeTab(PetriNetTab tab);
 
+    void reorderTab(PetriNetTab tab, int newIndex);
+
     //TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
     //XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
     void changeToTab(PetriNetTab tab);

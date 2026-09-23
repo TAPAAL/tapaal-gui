@@ -27,6 +27,7 @@ public class UndoManager {
     private int normalSizeOfBuffer = 0;
     private int normalStartOfBuffer = 0;
     private int normalUndoneEdits = 0;
+    private boolean normalHistoryWasTruncated = false;
     private final ArrayList<ArrayList<Command>> normalEdits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
     // Animation mode undo stack
@@ -121,6 +122,7 @@ public class UndoManager {
             setUndoneEdits(getUndoneEdits() - 1);
         }
 
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
@@ -150,7 +152,22 @@ public class UndoManager {
             }
         }
 
+        updateTabChangedState();
         setUndoRedoStatus();
+    }
+
+    private void updateTabChangedState() {
+        if (tab != null && !tab.isInAnimationMode()) {
+            tab.updateNetChangedFromUndoManager();
+        }
+    }
+
+    /**
+     * Returns whether the normal editing history still contains changes made
+     * since the last clear (normally the last save).
+     */
+    public boolean hasAppliedNormalEdits() {
+        return normalSizeOfBuffer > 0 || normalHistoryWasTruncated;
     }
 
     public void clear() {
@@ -164,6 +181,7 @@ public class UndoManager {
             normalSizeOfBuffer = 0;
             normalStartOfBuffer = 0;
             normalUndoneEdits = 0;
+            normalHistoryWasTruncated = false;
         }
 
         setUndoRedoStatus();
@@ -198,20 +216,19 @@ public class UndoManager {
 
         setUndoneEdits(0);
 
-        //XXX this is properly not the place to set net changed, can be null as also used in batch processor undo/redo
-        if (tab != null) {
-            tab.setNetChanged(true);
-        }
-
         ArrayList<Command> compoundEdit = new ArrayList<Command>();
         getEdits().set(getIndexOfNextAdd(), compoundEdit);
         setIndexOfNextAdd((getIndexOfNextAdd() + 1) % UNDO_BUFFER_CAPACITY);
         if (getSizeOfBuffer() < UNDO_BUFFER_CAPACITY) {
             setSizeOfBuffer(getSizeOfBuffer() + 1);
         } else {
+            if (tab == null || !tab.isInAnimationMode()) {
+                normalHistoryWasTruncated = true;
+            }
             setStartOfBuffer((getStartOfBuffer() + 1) % UNDO_BUFFER_CAPACITY);
         }
 
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
@@ -240,6 +257,7 @@ public class UndoManager {
             setSizeOfBuffer(getSizeOfBuffer() - 1);
             setIndexOfNextAdd(getIndexOfNextAdd() - 1);
         }
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
@@ -252,7 +270,7 @@ public class UndoManager {
         if (getUndoneEdits() > 0) {
             setUndoneEdits(getUndoneEdits() - 1);
         }
-        
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 

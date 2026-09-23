@@ -7095,7 +7095,9 @@ public class QueryDialog extends JPanel {
                     if (checkIfSomeReductionOption()) {
                         querySaved = true;
                         // Now if a query is saved, the net is marked as modified
-                        tab.setNetChanged(true);
+						if (!isNewQuery) {
+							tab.markNonUndoableChange();
+						}
                         exit();
                         TAPNQuery query = getQuery();
                         if (isNewQuery) {
@@ -7116,7 +7118,9 @@ public class QueryDialog extends JPanel {
 
                     querySaved = true;
                     // Now if a query is saved and verified, the net is marked as modified
-                    tab.setNetChanged(true);
+					if (!isNewQuery) {
+						tab.markNonUndoableChange();
+					}
                     exit();
                     TAPNQuery query = getQuery();
                     if (isNewQuery) {
@@ -7244,7 +7248,7 @@ public class QueryDialog extends JPanel {
                 if (checkIfSomeReductionOption()) {
                     querySaved = true;
                     // Now if a query is saved and verified, the net is marked as modified
-                    tab.setNetChanged(true);
+                    tab.markNonUndoableChange();
 
                     TAPNQuery query = getQuery();
                     if (query.getReductionOption() != ReductionOption.VerifyPN) {

@@ -22,6 +22,44 @@ public abstract class ExtendedJTabbedPane<T extends Component> extends JTabbedPa
 
     public abstract Component generator();
 
+    /**
+     * Moves a tab while preserving its content, header, metadata and selection.
+     *
+     * @return true when the tab was moved
+     */
+    @SuppressWarnings("unchecked")
+    public boolean moveTab(int fromIndex, int toIndex) {
+        if (fromIndex < 0 || fromIndex >= getTabCount()
+            || toIndex < 0 || toIndex >= getTabCount()
+            || fromIndex == toIndex) {
+            return false;
+        }
+
+        Component tab = getComponentAt(fromIndex);
+        Component selectedTab = getSelectedComponent();
+        Component tabHeader = getTabComponentAt(fromIndex);
+        String title = getTitleAt(fromIndex);
+        Icon icon = getIconAt(fromIndex);
+        String tooltip = getToolTipTextAt(fromIndex);
+
+        removeTabAt(fromIndex);
+        insertTab(title, icon, tab, tooltip, toIndex);
+        setTabComponentAt(toIndex, tabHeader);
+
+        if (selectedTab != null) {
+            setSelectedComponent(selectedTab);
+        }
+
+        tabOrderChanged((T) tab, fromIndex, toIndex);
+        return true;
+    }
+
+    /**
+     * Hook for owners that maintain an order separate from the Swing pane.
+     */
+    protected void tabOrderChanged(T tab, int oldIndex, int newIndex) {
+    }
+
 
     private void setTabComponent(Component component) {
         int index = indexOfComponent(component);

@@ -541,6 +541,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
                     }
                 };
             }
+
+            @Override
+            protected void tabOrderChanged(PetriNetTab tab, int oldIndex, int newIndex) {
+                guiFrameController.ifPresent(o -> o.reorderTab(tab, newIndex));
+            }
         };
         getContentPane().add(appTab);
         setChangeListenerOnTab(); // sets Tab properties
@@ -1381,6 +1386,9 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     @Override
     public void updatedTabName(PetriNetTab tab) {
         int index = appTab.indexOfComponent(tab);
+		if (index < 0) {
+			return;
+		}
 
         appTab.setTitleAt(index, tab.getTabTitle());
 
@@ -1393,8 +1401,22 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
     }
 
     @Override
+    public void updatedTabState(PetriNetTab tab) {
+        int index = appTab.indexOfComponent(tab);
+		if (index < 0) {
+			return;
+		}
+
+		Component tabComponent = appTab.getTabComponentAt(index);
+		if (tabComponent instanceof TabComponent header) {
+			header.setChanged(tab.getNetChanged());
+		}
+	}
+
+    @Override
     public void attachTabToGuiFrame(PetriNetTab tab) {
         appTab.addTab(tab.getTabTitle(), tab);
+		updatedTabState(tab);
     }
 
     @Override
