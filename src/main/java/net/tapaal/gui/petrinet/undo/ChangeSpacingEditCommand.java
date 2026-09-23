@@ -4,23 +4,25 @@ import pipe.gui.petrinet.PetriNetTab;
 
 public class ChangeSpacingEditCommand implements Command {
 
-	private final double factor;
+	private final PetriNetObjectPositionSnapshot before;
+	private final PetriNetObjectPositionSnapshot after;
 	private final PetriNetTab tab;
 
-    public ChangeSpacingEditCommand(double factor, PetriNetTab tabContent) {
+    public ChangeSpacingEditCommand(PetriNetObjectPositionSnapshot before, PetriNetObjectPositionSnapshot after, PetriNetTab tabContent) {
         super();
-        this.factor = factor;
+		this.before = before;
+		this.after = after;
         this.tab = tabContent;
     }
 
     @Override
 	public void redo() {
-		tab.changeSpacing(factor);
+		tab.restoreGuiObjectLocations(after);
 	}
 
 	@Override
 	public void undo() {
-		tab.changeSpacing(1/factor);
+		tab.restoreGuiObjectLocations(before);
 	}
 
 }
