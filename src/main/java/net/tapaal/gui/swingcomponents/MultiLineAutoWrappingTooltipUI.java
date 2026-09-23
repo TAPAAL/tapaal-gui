@@ -8,7 +8,6 @@ import javax.swing.CellRendererPane;
 import javax.swing.JComponent;
 import javax.swing.JTextArea;
 import javax.swing.JToolTip;
-import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicToolTipUI;
 
@@ -41,7 +40,8 @@ public class MultiLineAutoWrappingTooltipUI extends BasicToolTipUI {
 	
 	public void paint(Graphics g, JComponent c) {
 	    Dimension size = c.getSize();
-	    textArea.setBackground(new ColorUIResource(255, 247, 200));
+	    textArea.setBackground(c.getBackground());
+	    textArea.setForeground(c.getForeground());
 		rendererPane.paintComponent(g, textArea, c, 1, 1, size.width - 1, size.height - 1, true);
 	}
 	
