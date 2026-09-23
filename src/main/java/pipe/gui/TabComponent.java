@@ -41,12 +41,16 @@ import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTabbedPane;
 
 import dk.aau.cs.util.Require;
@@ -85,9 +89,11 @@ public abstract class TabComponent extends JPanel {
 
 		add(label);
 		label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+		label.addMouseListener(tabMouseListener);
 
 		JButton button = new TabButton();
 		add(button);
+		addMouseListener(tabMouseListener);
 		setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
 	}
 
@@ -103,10 +109,10 @@ public abstract class TabComponent extends JPanel {
 			setBorder(BorderFactory.createEtchedBorder());
 			setBorderPainted(false);
 			addMouseListener(buttonMouseListener);
+			addMouseListener(tabMouseListener);
 			setRolloverEnabled(true);
 			addActionListener(arg0 -> {
-				int index = pane.indexOfTabComponent(TabComponent.this);
-				closeTab((PetriNetTab) pane.getComponentAt(index));
+				closeTab();
 			});
 		}
 
@@ -132,7 +138,99 @@ public abstract class TabComponent extends JPanel {
 
 	}
 
+	private void closeTab() {
+		int index = pane.indexOfTabComponent(TabComponent.this);
+		if (index != -1) {
+			closeTab(tabAt(index));
+		}
+	}
+
+	private PetriNetTab tabAt(int index) {
+		return (PetriNetTab) pane.getComponentAt(index);
+	}
+
+	private List<PetriNetTab> tabsMatching(TabPredicate predicate) {
+		List<PetriNetTab> matchingTabs = new ArrayList<>();
+		for (int i = 0; i < pane.getTabCount(); i++) {
+			PetriNetTab tab = tabAt(i);
+			if (predicate.matches(i, tab)) {
+				matchingTabs.add(tab);
+			}
+		}
+		return matchingTabs;
+	}
+
+	private void closeTabs(List<PetriNetTab> tabs) {
+		tabs.forEach(this::closeTab);
+	}
+
+	private JPopupMenu createContextMenu() {
+		JPopupMenu menu = new JPopupMenu();
+		addMenuItem(menu, "Close", this::closeTab);
+		addMenuItem(menu, "Close All", () -> closeTabs(tabsMatching((index, tab) -> true)));
+		addMenuItem(menu, "Close Other", () -> {
+			int currentIndex = pane.indexOfTabComponent(TabComponent.this);
+			closeTabs(tabsMatching((index, tab) -> index != currentIndex));
+		});
+		addMenuItem(menu, "Close Unmodified Tabs",
+			() -> closeTabs(tabsMatching((index, tab) -> !tab.getNetChanged())));
+		addMenuItem(menu, "Close Tabs to the Left", () -> {
+			int currentIndex = pane.indexOfTabComponent(TabComponent.this);
+			closeTabs(tabsMatching((index, tab) -> index < currentIndex));
+		});
+		addMenuItem(menu, "Close Tabs to the Right", () -> {
+			int currentIndex = pane.indexOfTabComponent(TabComponent.this);
+			closeTabs(tabsMatching((index, tab) -> index > currentIndex));
+		});
+		return menu;
+	}
+
+	private void addMenuItem(JPopupMenu menu, String label, Runnable action) {
+		JMenuItem menuItem = new JMenuItem(label);
+		menuItem.addActionListener(e -> action.run());
+		menu.add(menuItem);
+	}
+
+	private void showContextMenu(MouseEvent e) {
+		if (e.isPopupTrigger()) {
+			createContextMenu().show(e.getComponent(), e.getX(), e.getY());
+		}
+	}
+
 	protected abstract void closeTab(PetriNetTab tab);
+
+	@FunctionalInterface
+	private interface TabPredicate {
+		boolean matches(int index, PetriNetTab tab);
+	}
+
+	private final MouseListener tabMouseListener = new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			showContextMenu(e);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			showContextMenu(e);
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON2) {
+				closeTab();
+			} else if (e.getButton() == MouseEvent.BUTTON1) {
+				selectTab();
+			}
+		}
+	};
+
+	private void selectTab() {
+		int index = pane.indexOfTabComponent(TabComponent.this);
+		if (index != -1) {
+			pane.setSelectedIndex(index);
+		}
+	}
 
 	private static final MouseListener buttonMouseListener = new MouseAdapter() {
 		@Override
