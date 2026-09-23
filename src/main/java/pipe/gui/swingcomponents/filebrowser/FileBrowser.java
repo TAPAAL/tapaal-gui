@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class FileBrowser {
     static String lastOpenPath = ".";
 
     protected final FileDialog fileDialog;
+    private final JFileChooser multiFileChooser;
     private final String[] fileExtensions;
     protected String specifiedPath;
 
@@ -28,6 +30,9 @@ public class FileBrowser {
         fileDialog = new FileDialog(TAPAALGUI.getApp(), filetype);
         this.fileExtensions = extensions;
         this.specifiedPath = path;
+        this.multiFileChooser = useSwingMultiFileChooser(System.getProperty("os.name"))
+                ? createMultiFileChooser(filetype)
+                : null;
 
         // Setup filter if extension specified used on Linux and MacOS
         if (fileExtensions.length > 0) {
@@ -81,6 +86,29 @@ public class FileBrowser {
 
     public File[] openFiles() {
         if (specifiedPath == null) specifiedPath = Preferences.getInstance().getFileBrowserLocation();
+
+        // AWT's native FileDialog on macOS does not reliably handle Cmd-A in
+        // multiple-selection mode. JFileChooser keeps selection handling in
+        // Swing and supports the standard macOS Select All shortcut.
+        if (multiFileChooser != null) {
+            if (specifiedPath != null) {
+                File directory = new File(specifiedPath);
+                if (directory.isDirectory()) {
+                    multiFileChooser.setCurrentDirectory(directory);
+                }
+            }
+
+            int result = multiFileChooser.showOpenDialog(TAPAALGUI.getApp());
+            File[] selectedFiles = result == JFileChooser.APPROVE_OPTION
+                    ? multiFileChooser.getSelectedFiles()
+                    : new File[0];
+            File directory = multiFileChooser.getCurrentDirectory();
+            if (directory != null) {
+                Preferences.getInstance().setFileBrowserLocation(directory.getAbsolutePath() + File.separator);
+            }
+            return selectedFiles;
+        }
+
         fileDialog.setDirectory(specifiedPath);
         //This is needed for Windows
 
@@ -90,6 +118,34 @@ public class FileBrowser {
         File[] selectedFiles = fileDialog.getFiles();
         Preferences.getInstance().setFileBrowserLocation(fileDialog.getDirectory());
         return selectedFiles;
+    }
+
+    static boolean useSwingMultiFileChooser(String osName) {
+        return osName != null && osName.toLowerCase(Locale.ROOT).contains("mac");
+    }
+
+    private JFileChooser createMultiFileChooser(String filetype) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle(filetype == null ? "Select files" : filetype);
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setMultiSelectionEnabled(true);
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                if (file.isDirectory()) return true;
+                String name = file.getName().toLowerCase(Locale.ROOT);
+                return Arrays.stream(fileExtensions)
+                        .anyMatch(extension -> extension.isBlank()
+                                || name.endsWith("." + extension.toLowerCase(Locale.ROOT)));
+            }
+
+            @Override
+            public String getDescription() {
+                return filetype == null ? "Supported files" : filetype;
+            }
+        });
+        return chooser;
     }
 
     public String saveFile() {
