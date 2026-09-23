@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -234,7 +235,7 @@ public class EngineDialogPanel {
 			verifytaPath = "Not setup";
 			verifytaversion = "N/A";
 		} else {
-			verifytaversion = verifyta.getVersion();
+			verifytaversion = getVersionSafely(verifyta::getVersion);
 		}
 		VerifyTAPN verifyTAPN = new VerifyTAPN(new FileFinder(), new MessengerImpl());
 		String verifytapnPath = verifyTAPN.getPath();
@@ -244,7 +245,7 @@ public class EngineDialogPanel {
 			verifytapnPath = "Not setup";
 			verifytapnversion = "N/A";
 		} else {
-			verifytapnversion = verifyTAPN.getVersion();
+			verifytapnversion = getVersionSafely(verifyTAPN::getVersion);
 		}
 
 		VerifyDTAPN verifydTAPN = new VerifyDTAPN(new FileFinder(), new MessengerImpl());
@@ -255,7 +256,7 @@ public class EngineDialogPanel {
 			verifydtapnPath = "Not setup";
 			verifydtapnversion = "N/A";
 		} else {
-			verifydtapnversion = verifydTAPN.getVersion();
+			verifydtapnversion = getVersionSafely(verifydTAPN::getVersion);
 		}
 		
 		VerifyPN verifypn = new VerifyPN(new FileFinder(), new MessengerImpl());
@@ -266,7 +267,7 @@ public class EngineDialogPanel {
 			verifypnpath = "Not setup";
 			verifypnversion = "N/A";
 		} else {
-			verifypnversion = verifypn.getVersion();
+			verifypnversion = getVersionSafely(verifypn::getVersion);
 		}
 		
 		tapaalLocationLabelVal.setText(verifytapnPath);
@@ -278,6 +279,15 @@ public class EngineDialogPanel {
 		uppaalLocationLabelVal.setText(verifytaPath);
 		uppaalVersionLabelVal.setText(verifytaversion);
 		fitDialog();
+	}
+
+	private static String getVersionSafely(Supplier<String> versionSupplier) {
+		try {
+			String version = versionSupplier.get();
+			return version == null || version.isBlank() ? "N/A" : version;
+		} catch (RuntimeException e) {
+			return "N/A";
+		}
 	}
 
 	private void makeTapaalPanel() {
