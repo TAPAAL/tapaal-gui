@@ -3401,9 +3401,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     @Override
     public void exportQueryXML() {
-        if (canNetBeSavedAndShowMessage()) {
-            Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens, this);
-        }
+        Export.exportGuiView(drawingSurface(), Export.QUERY, null, lens, this);
     }
 
 
