@@ -69,7 +69,7 @@ TOKEN :
 
 TOKEN :
 {
-	< NUM: ["1"-"9"] (["0"-"9"])* >
+	< NUM: "0" | ["1"-"9"] (["0"-"9"])* >
 	|
 	<IDENT: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","0"-"9"] )* >
 }
@@ -256,4 +256,3 @@ ColorExpression Element(ColorType expectedType) : {
         return cexpr;
     }
 }
-
