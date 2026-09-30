@@ -143,7 +143,17 @@ public class PNMLoader {
             return nameGenerator.getNewTemplateName();
         }
 
-        return NamePurifier.purify(result);
+        String purifiedName = NamePurifier.purify(result);
+        // Fallback to default name if invalid and cant be purified
+        if (!isNameAllowed(purifiedName)) {
+            return nameGenerator.getNewTemplateName();
+        }
+
+        return purifiedName;
+    }
+
+    private boolean isNameAllowed(String name) {
+        return name != null && name.matches("[a-zA-Z][_a-zA-Z0-9]*");
     }
 
     private void parseTimedArcPetriNet(Node netNode, TimedArcPetriNet tapn, Template template, TimedArcPetriNetNetwork network) throws FormatException {
