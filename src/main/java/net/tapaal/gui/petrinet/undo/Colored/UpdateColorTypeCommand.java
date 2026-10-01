@@ -94,6 +94,22 @@ public class UpdateColorTypeCommand implements Command {
                     arc.setExpression(arc.getExpression().getExprConverted(sourceType, targetType));
                 }
             }
+
+            for (var arc : tapn.inhibitorArcs()) {
+                if (arc.getArcExpression() != null) {
+                    arc.setExpression(arc.getArcExpression().getExprConverted(sourceType, targetType));
+                }
+            }
+
+            for (var arc : tapn.transportArcs()) {
+                if (arc.getInputExpression() != null) {
+                    arc.setInputExpression(arc.getInputExpression().getExprConverted(sourceType, targetType));
+                }
+                if (arc.getOutputExpression() != null) {
+                    arc.setOutputExpression(arc.getOutputExpression().getExprConverted(sourceType, targetType));
+                }
+            }
+
             for (TimedTransition transition : tapn.transitions()) {
                 if (transition.getGuard() != null) {
                     Expression newGuardExpr = updateExpressionRecursively(transition.getGuard(), sourceType, targetType);
