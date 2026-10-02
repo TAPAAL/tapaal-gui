@@ -104,20 +104,17 @@ public class writeTACPN { // both export and save share some of the same syntax 
             structureElement.appendChild(andElement);
 
         }
-        else if(expression instanceof NumberOfExpression) {
-            Element numberOfElement = document.createElement("numberof");
-            Element subtermElement = document.createElement("subterm");
+        else if (expression instanceof NumberOfExpression expr) {
+            var numberOfElement = document.createElement("numberof");
+            var subtermElement = document.createElement("subterm");
             numberOfElement.appendChild(subtermElement);
-            Element numberConstantElement = document.createElement("numberconstant");
-            numberConstantElement.setAttribute("value", ((NumberOfExpression)expression).getNumber().toString());
+            var numberConstantElement = document.createElement("numberconstant");
+            numberConstantElement.setAttribute("value", expr.getNumber().toString());
             subtermElement.appendChild(numberConstantElement);
-            Element positiveElement = document.createElement("positive");
+            var positiveElement = document.createElement("positive");
             numberConstantElement.appendChild(positiveElement);
-            Element subtermElement2 = document.createElement("subterm");
-
-
-            NumberOfExpression expr = (NumberOfExpression) expression;
-            for (Expression colorExpression : expr.getNumberOfExpression()) {
+            for (var colorExpression : expr.getNumberOfExpression()) {
+                var subtermElement2 = document.createElement("subterm");
                 numberOfElement.appendChild(parseArcExpression(colorExpression, document, subtermElement2));
             }
 

@@ -42,9 +42,11 @@ public class DecimalOnlyDocumentFilter extends DocumentFilter {
 
     private boolean stringIsValidDecimal(String text) {
         char localDecimalseparator = DecimalFormatSymbols.getInstance().getDecimalSeparator();
-        Pattern pattern = Pattern.compile("^(([1-9]([0-9])*)?|0)(" + Pattern.quote(Character.toString(localDecimalseparator)) + "([0-9]*))?$");
+        String decimalPart = numberOfDecimalPlaces == 0
+            ? ""
+            : "(" + Pattern.quote(Character.toString(localDecimalseparator)) + "([0-9]*))?";
+        Pattern pattern = Pattern.compile("^(([1-9]([0-9])*)?|0)" + decimalPart + "$");
         Matcher m = pattern.matcher(text);
-        return m.matches() && (numberOfDecimalPlaces < 0 || m.group(5) == null || m.group(5).length() <= numberOfDecimalPlaces);
+        return m.matches() && (numberOfDecimalPlaces <= 0 || m.group(5) == null || m.group(5).length() <= numberOfDecimalPlaces);
     }
 }
-
