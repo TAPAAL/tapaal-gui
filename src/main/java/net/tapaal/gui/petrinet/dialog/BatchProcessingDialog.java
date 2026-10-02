@@ -775,7 +775,7 @@ public class BatchProcessingDialog extends JDialog {
 			public javax.swing.JToolTip createToolTip() {
 				ToolTipManager.sharedInstance().setDismissDelay(Integer.MAX_VALUE); // disable tooltips disappearing
 				ToolTipManager.sharedInstance().setInitialDelay(200);
-				return new MultiLineAutoWrappingToolTip(this);
+				return new MultiLineAutoWrappingToolTip();
 			}
 		};
 		ResultTableCellRenderer renderer = new ResultTableCellRenderer(true);
@@ -1490,3 +1490,4 @@ public class BatchProcessingDialog extends JDialog {
         im.put(KeyStroke.getKeyStroke('Y', shortcutkey), "redo");
     }
 }
+
