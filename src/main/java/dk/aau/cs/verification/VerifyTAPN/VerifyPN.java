@@ -340,7 +340,8 @@ public class VerifyPN implements ModelChecker {
                     (query.getProperty() instanceof LTLENode && queryResult.value1().isQuerySatisfied()) ||
                     (query.getProperty() instanceof LTLANode && !queryResult.value1().isQuerySatisfied());
 
-                if (options.traceOption() != TraceOption.NONE && isColored && showTrace && options.unfoldedModelPath() != null) {
+                if (options.traceOption() != TraceOption.NONE && isColored && showTrace
+                    && options.unfoldedModelPath() != null && !options.traceInOriginalNet()) {
                     PNMLoader tapnLoader = new PNMLoader();
                     File fileOut = new File(options.unfoldedModelPath());
                     File queriesOut = new File(options.unfoldedQueriesPath());
@@ -467,7 +468,9 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(
+            model.value1(), options.useExplicitSearch() || options.traceInOriginalNet()
+        );
    
         return traceParser.parseTrace(new BufferedReader(new StringReader(output)));
     }
@@ -481,7 +484,9 @@ public class VerifyPN implements ModelChecker {
             return null;
         }
 
-        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(model.value1(), options.useExplicitSearch());
+        VerifyTAPNTraceParser traceParser = new VerifyTAPNTraceParser(
+            model.value1(), options.useExplicitSearch() || options.traceInOriginalNet()
+        );
         if (query.getCategory() == QueryCategory.HyperLTL) {
             return traceParser.parseTraces(new BufferedReader(new StringReader(output)));
         }

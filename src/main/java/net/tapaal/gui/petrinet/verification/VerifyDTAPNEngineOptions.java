@@ -9,6 +9,7 @@ public class VerifyDTAPNEngineOptions extends EngineSupportOptions {
             "TAPAAL: Discrete Engine (verifydtapn)",
             EnumSet.of(
                 EngineFeature.FASTEST_TRACE,
+                EngineFeature.UNFOLDED_TRACE_IN_ORIGINAL_NET,
                 EngineFeature.DEADLOCK_NET_DEGREE_2_EXP,
                 EngineFeature.DEADLOCK_EG_OR_AF,
                 EngineFeature.DEADLOCK_WITH_INHIB,
