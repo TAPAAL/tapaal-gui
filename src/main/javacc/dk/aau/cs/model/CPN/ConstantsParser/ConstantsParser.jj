@@ -46,6 +46,7 @@ public class ConstantsParser {
     private static final Map<String, ColorType> colorTypes = new LinkedHashMap<String, ColorType>();
     private static final Map<String, Variable> variables = new LinkedHashMap<String, Variable>();
     private static TimedArcPetriNetNetwork network;
+    private static boolean colored;
 
     private static class BoolRef {
         public boolean value;
@@ -55,8 +56,9 @@ public class ConstantsParser {
         }
     }
 
-    public static boolean parse(String constantsToParse, TimedArcPetriNetNetwork network) throws ParseException, TokenMgrError {
+    public static boolean parse(String constantsToParse, TimedArcPetriNetNetwork network, boolean isColored) throws ParseException, TokenMgrError {
         ConstantsParser.network = network;
+        ConstantsParser.colored = isColored;
         ConstantsParser parser = new ConstantsParser(new StringReader(constantsToParse));
         constants.clear();
         realConstants.clear();
@@ -244,7 +246,7 @@ public class ConstantsParser {
         network.getConstantStore().clear();
         network.setConstants(constantsList);
         network.setRealConstants(new ArrayList<RealConstant>(realConstants.values()));
-        if (network.isColored()) {
+        if (isColored) {
             network.setColorTypes(colorTypesList);
             network.setVariables(variablesList);
         }
@@ -549,7 +551,7 @@ void colorTypes() :
 {
     <TYPE> id = <ID> <IS> (<SBRACKET> (idList(values) | intList(values, isIntList)) <EBRACKET> | <LT> productList(values, isProductList) <GT>) { 
         ColorType ct = null;
-        if (!network.isColored()) {
+        if (!colored) {
             throw new ParseException("Color types are not allowed in uncolored networks");
         }
 
@@ -650,7 +652,7 @@ void variables() :
 }
 {
     <VAR> idList(ids) <IN> type = <ID> {
-        if (!network.isColored()) {
+        if (!colored) {
             throw new ParseException("Variables are not allowed in uncolored networks");
         }
 

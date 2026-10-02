@@ -1,8 +1,6 @@
 package pipe.gui.petrinet.animation;
 
-import java.awt.Container;
 import java.awt.MouseInfo;
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -48,7 +46,6 @@ import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.TupleExpression;
 import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.NetworkMarking;
-import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
 import dk.aau.cs.model.tapn.TimedOutputArc;
@@ -64,8 +61,10 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import dk.aau.cs.verification.VerifyTAPN.VerifyCPNExporter;
-import dk.aau.cs.verification.VerifyTAPN.VerifyPNInteractiveHandle;
+import dk.aau.cs.verification.VerifyTAPN.VerifyTACPNExporter;
+import dk.aau.cs.verification.VerifyTAPN.InteractiveHandle;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNExporter;
+import dk.aau.cs.model.tapn.TimeInterval;
 
 public class Animator {
     private final ArrayList<TAPNNetworkTraceStep> actionHistory = new ArrayList<TAPNNetworkTraceStep>();
@@ -83,9 +82,11 @@ public class Animator {
 
     private Map<String, TAPNNetworkTrace> traceMap;
 
-    private VerifyPNInteractiveHandle interactiveEngine;
+    private InteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
+    private boolean integerDelaysOnly;
     private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
+    private Map<TimedTransition, List<Map<Variable, Color>>> delayEnabledBindingsMap;
 
     public static boolean isUrgentTransitionEnabled(){
         return isUrgentTransitionEnabled;
@@ -98,18 +99,27 @@ public class Animator {
     public void initializeInteractiveEngine() {
         if (!tab.getLens().isColored()) return;
 
+        integerDelaysOnly = tab.getLens().isTimed();
+        tab.getAnimationController().setIntegerDelayInput(integerDelaysOnly);
+
         try {
             TAPNComposer composer = new TAPNComposer(new MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
             Tuple<TimedArcPetriNet, NameMapping> composedModel = composer.transformModel(tab.network());
 
-            VerifyTAPNExporter exporter = new VerifyCPNExporter();
+            VerifyTAPNExporter exporter;
+            if (tab.getLens().isTimed()) {
+                exporter = new VerifyTACPNExporter();
+            } else {
+                exporter = new VerifyCPNExporter();
+            }
+
             var exportedModel = exporter.exportModel(composedModel, composer.getGuiModel());
 
-            interactiveEngine = new VerifyPNInteractiveHandle(tab.network(), composer, composedModel.value2());
-            isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(exportedModel.modelFile());
+            interactiveEngine = new InteractiveHandle(tab.network(), composer, composedModel.value2());
+            isUsingInteractiveEngine = interactiveEngine.startInteractiveMode(exportedModel.modelFile(), tab.getLens().isTimed());
             if (!isUsingInteractiveEngine) {
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), 
-                    "Failed to start VerifyPN interactive mode", 
+                    "Failed to start interactive mode", 
                     "Engine Error", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
@@ -133,19 +143,26 @@ public class Animator {
         return this.traceMap;
     }
 
-    public void changeTrace(TAPNNetworkTrace trace) {
-        resetForTraceChange();
-        setTrace(trace);
+    public void switchTrace(TAPNNetworkTrace trace) {
+        setTrace(trace, currentMarkingIndex);
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
+        setTrace(trace, 0);
+    }
+
+    private void setTrace(TAPNNetworkTrace trace, int targetIndex) {
         tab.setAnimationMode(true, tab.getLens().isColored());
 
         try {
+            resetForTraceChange();
             if (trace.isConcreteTrace()) {
                 this.trace = trace;
                 if (trace.isColoredTrace()) {
                     setColoredTrace(trace);
+                    if (trace instanceof ColoredTAPNNetworkTrace coloredTrace && coloredTrace.getTraceType() != TraceType.NOT_EG) {
+                        tab.getAnimationHistorySidePanel().setLastShown(coloredTrace.getTraceType());
+                    }
                 } else {
                     setTimedTrace(trace);
                     TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
@@ -157,13 +174,25 @@ public class Animator {
                 setUntimedTrace(trace);
                 isDisplayingUntimedTrace = true;
             }
-            currentAction = -1;
-            currentMarkingIndex = 0;
+   
+            while (trace.isConcreteTrace() && currentMarkingIndex < targetIndex) {
+                int previousIndex = currentMarkingIndex;
+                extendTrace();
+                if (currentMarkingIndex == previousIndex) break;
+            }
+
+            currentMarkingIndex = Math.min(targetIndex, markings.size() - 1);
+            currentAction = currentMarkingIndex - 1;
+            updateBindings(currentAction + 1);
             tab.network().setMarking(markings.get(currentMarkingIndex));
-            tab.getAnimationHistorySidePanel().setSelectedIndex(0);
+            updateColoredMarking();
+            refreshAnimation();
+            activeGuiModel().redrawVisibleTokenLists();
+            tab.getAnimationHistorySidePanel().setSelectedIndex(currentMarkingIndex);
             updateAnimationButtonsEnabled();
             updateFireableTransitions();
-        } catch (RequireException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             disableTransitions();
             tab.setAnimationMode(false);
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "There was an error in the trace. Reason: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -213,12 +242,54 @@ public class Animator {
     }
 
     private void setColoredTrace(TAPNNetworkTrace trace) {
-        for (TAPNNetworkTraceStep step : trace) {
-            TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)step;
-            addMarking(step, coloredStep.getMarking());
+        addToColoredTrace(trace);
+        updateBindings(0);
+    }
+
+    private void addToColoredTrace(Iterable<TAPNNetworkTraceStep> steps) {
+        int firstAction = actionHistory.size();
+        List<String> historyItems = new ArrayList<>();
+        boolean engineMarkingCurrent = false;
+        for (var step : steps) {
+            NetworkMarking marking;
+            if (step instanceof TAPNNetworkColoredTransitionStep) {
+                var coloredStep = (TAPNNetworkColoredTransitionStep)step;
+                marking = coloredStep.getMarking();
+                if (marking == null && isUsingInteractiveEngine) {
+                    if (!engineMarkingCurrent) {
+                        tab.network().setMarking(currentMarking());
+                        updateColoredMarking();
+                        interactiveEngine.sendMarking(currentMarking());
+                    }
+                    
+                    marking = interactiveEngine.sendTransition(coloredStep.getTransition(), coloredStep.getBindings());
+                    engineMarkingCurrent = marking != null;
+                    coloredStep.setMarking(marking);
+                } else {
+                    engineMarkingCurrent = false;
+                }
+            } else if (step instanceof TAPNNetworkTimeDelayStep) {
+                var delayStep = (TAPNNetworkTimeDelayStep)step;
+                marking = currentMarking().delay(delayStep.getDelay());
+                engineMarkingCurrent = false;
+            } else {
+                continue;
+            }
+
+            historyItems.add(step.toString());
+            actionHistory.add(step);
+            markings.add(marking != null ? marking : currentMarking());
+            currentAction++;
+            currentMarkingIndex++;
         }
 
-        updateBindings(0);
+        var history = tab.getAnimationHistorySidePanel();
+        history.getListModel().addAll(firstAction + 1, historyItems);
+        for (int i = firstAction; i < actionHistory.size(); ++i) {
+            if (actionHistory.get(i) instanceof TAPNNetworkColoredTransitionStep step) {
+                history.setTooltipForIndex(i + 1, ColorBindingParser.createTooltip(step.getBindings()));
+            }
+        }
     }
 
     /**
@@ -260,20 +331,25 @@ public class Animator {
         return initialMarking;
     }
 
+    private Map<TimedTransition, Map<Map<Variable, Color>, BigDecimal>> bindingDelayMap = new HashMap<>();
+
     private void updateValidBindingsMap() {
         if (!isUsingInteractiveEngine) return;
-        validBindingsMap = interactiveEngine.sendMarking(currentMarking());
+        var result = interactiveEngine.sendMarking(currentMarking());
+        validBindingsMap = result.validBindings;
+        delayEnabledBindingsMap = result.delayEnabledBindings;
+        bindingDelayMap = result.bindingDelayMap;
     }
 
-    private boolean isColoredTransitionEnabled(TimedTransition transition) {
+    private boolean isColoredTransitionInMap(TimedTransition transition, Map<TimedTransition, ?> map) {
         if (tab.getLens().isColored() && isUsingInteractiveEngine) {
             if (transition.isShared()) {
-                for (TimedTransition t : transition.sharedTransition().transitions()) {
-                    if (validBindingsMap.keySet().contains(t)) {
+                for (var t : transition.sharedTransition().transitions()) {
+                    if (map.containsKey(t)) {
                         return true;
                     }
                 }
-            } else if (validBindingsMap.keySet().contains(transition)) {
+            } else if (map.containsKey(transition)) {
                 return true;
             }
         }
@@ -281,15 +357,45 @@ public class Animator {
         return false;
     }
 
+    private boolean isColoredTransitionEnabled(TimedTransition transition) {
+        return isColoredTransitionInMap(transition, validBindingsMap);
+    }
+
+    private boolean isColoredTransitionDelayEnabled(TimedTransition transition) {
+        return isColoredTransitionInMap(transition, delayEnabledBindingsMap);
+    }
+
+    public TimeInterval getColoredTransitionInterval(TimedTransition transition) {
+        if (!isUsingInteractiveEngine) return null;
+        List<Map<Variable, Color>> bindings = new ArrayList<>();
+        var members = transition.isShared() ? transition.sharedTransition().transitions() : List.of(transition);
+        for (var member : members) {
+            if (validBindingsMap != null) bindings.addAll(validBindingsMap.getOrDefault(member, List.of()));
+            if (delayEnabledBindingsMap != null) bindings.addAll(delayEnabledBindingsMap.getOrDefault(member, List.of()));
+        }
+
+        return ColoredTransitionIntervals.calculate(transition, bindings, isUrgentTransitionEnabled());
+    }
+
     private void updateFireableTransitionsColored(TransitionFiringComponent transFireComponent) {
         boolean anyTransitionsEnabled = false;
         updateValidBindingsMap();
-        for (Template template : tab.activeTemplates()) {
-            for (TimedTransition transition : template.model().transitions()) {
-                if (isColoredTransitionEnabled(transition)) {
-                    Transition guiTransition = template.guiModel().getTransitionByName(transition.name());
+        for (var template : tab.activeTemplates()) {
+            for (var transition : template.model().transitions()) {
+                boolean isEnabled = isColoredTransitionEnabled(transition);
+                if (transition.isUrgent() && isEnabled) {
+                    isUrgentTransitionEnabled = true;
+                }
+                boolean isDelayEnabled = !isEnabled && TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() && isColoredTransitionDelayEnabled(transition);
+                if (isEnabled || isDelayEnabled) {
+                    var guiTransition = template.guiModel().getTransitionByName(transition.name());
                     if (guiTransition != null) {
-                        guiTransition.markTransitionEnabled(true);
+                        if (isEnabled) {
+                            guiTransition.markTransitionEnabled(true);
+                        } else {
+                            guiTransition.markTransitionDelayEnabled(true);
+                        }
+                        
                         transFireComponent.addTransition(template, guiTransition);
                         anyTransitionsEnabled = true;
                     }
@@ -432,9 +538,58 @@ public class Animator {
      * @author jokke refactored and added backwards firing for TAPNTransitions
      */
 
+    public int getCurrentMarkingIndex() {
+        return currentMarkingIndex;
+    }
+
+    public void seekToMarking(int index) {
+        if (index < 0 || index >= tab.getAnimationHistorySidePanel().getListModel().size()) return;
+
+        int target = Math.min(index, markings.size() - 1);
+        if (target < 0) return;
+        if (target != currentMarkingIndex) {
+            if (isDisplayingUntimedTrace) {
+                seekSuggestedTrace(target);
+            }
+
+            currentMarkingIndex = target;
+            currentAction = target - 1;
+            tab.getAnimationHistorySidePanel().setSelectedIndex(target);
+            restoreCurrentMarking();
+        }
+
+        if (index > target) stepForward();
+    }
+
+    private void seekSuggestedTrace(int target) {
+        var history = tab.getUntimedAnimationHistory();
+        int position = history.getSelectedIndex();
+
+        for (int action = currentMarkingIndex; action < target; ++action) {
+            if (matchesSuggestedTransition(action, position + 1)) {
+                ++position;
+            }
+        }
+
+        for (int action = currentMarkingIndex - 1; action >= target; --action) {
+            if (matchesSuggestedTransition(action, position)) {
+                --position;
+            }
+        }
+
+        history.setSelectedIndex(position);
+    }
+
+    private boolean matchesSuggestedTransition(int action, int position) {
+        var history = tab.getUntimedAnimationHistory();
+        return position > 0 && position < history.getListModel().size()
+            && actionHistory.get(action) instanceof TAPNNetworkTimedTransitionStep
+            && history.getElement(position).equals(actionHistory.get(action).toString());
+    }
+
     public void stepBack() {
         tab.getAnimationHistorySidePanel().stepBackwards();
-        if (!actionHistory.isEmpty()){
+        if (!actionHistory.isEmpty() && currentAction >= 0 && currentMarkingIndex > 0) {
             TAPNNetworkTraceStep lastStep = actionHistory.get(currentAction);
             if(isDisplayingUntimedTrace && lastStep instanceof TAPNNetworkTimedTransitionStep){
                 AnimationHistoryList untimedAnimationHistory = tab.getUntimedAnimationHistory();
@@ -446,12 +601,7 @@ public class Animator {
 
             currentAction--;
             currentMarkingIndex--;
-            updateBindings(currentAction + 1);
-            tab.network().setMarking(markings.get(currentMarkingIndex));
-            updateColoredMarking();
-            refreshAnimation();
-            updateMouseOverInformation();
-            reportBlockingPlaces();
+            restoreCurrentMarking();
         }
     }
 
@@ -466,14 +616,7 @@ public class Animator {
             int action = currentAction;
             int markingIndex = currentMarkingIndex;
 
-            TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
-            if (timedTrace.getTraceType() == TraceType.EG_DELAY_FOREVER) {
-                addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
-            }
-
-            if (timedTrace.getLoopToIndex() != -1) {
-                addToTimedTrace(timedTrace.getLoopSteps());
-            }
+            extendTrace();
 
             tab.getAnimationHistorySidePanel().setSelectedIndex(selectedIndex);
             currentAction = action;
@@ -492,14 +635,45 @@ public class Animator {
 
             currentAction++;
             currentMarkingIndex++;
-            updateBindings(currentAction + 1);
+            restoreCurrentMarking();
+        }
+    }
+
+    private void extendTrace() {
+        if (trace instanceof TimedTAPNNetworkTrace) {
+            TimedTAPNNetworkTrace timedTrace = (TimedTAPNNetworkTrace)trace;
+            if (timedTrace.getTraceType() == TraceType.EG_DELAY_FOREVER) {
+                addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
+            }
+
+            if (timedTrace.getLoopToIndex() != -1) {
+                addToTimedTrace(timedTrace.getLoopSteps());
+            }
+        } else if (trace instanceof ColoredTAPNNetworkTrace coloredTrace) {
+            if (coloredTrace.getTraceType() == TraceType.EG_DELAY_FOREVER) {
+                addMarking(new TAPNNetworkTimeDelayStep(BigDecimal.ONE), currentMarking().delay(BigDecimal.ONE));
+            }
+
+            if (coloredTrace.getLoopToIndex() != -1) {
+                addToColoredTrace(coloredTrace.getLoopSteps());
+            }
+        }
+    }
+
+    private void restoreCurrentMarking() {
+        updateBindings(currentAction + 1);
+        if (currentMarkingIndex >= 0 && currentMarkingIndex < markings.size()) {
             tab.network().setMarking(markings.get(currentMarkingIndex));
-            updateColoredMarking();
-            refreshAnimation();
+        }
+
+        updateColoredMarking();
+        refreshAnimation();
+        if (activeGuiModel() != null) {
             activeGuiModel().redrawVisibleTokenLists();
-            updateMouseOverInformation();
-            reportBlockingPlaces();
-        }        
+        }
+
+        updateMouseOverInformation();
+        reportBlockingPlaces();
     }
 
     private void updateColoredMarking() {
@@ -511,8 +685,10 @@ public class Animator {
         for (var template : tab.activeTemplates()) {
             var localMarking = markingMap.get(template.model());
             Map<TimedPlace, List<TimedToken>> placesToTokensCopy = new HashMap<>();
-            for (var entry : localMarking.getPlacesToTokensMap().entrySet()) {
-                placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+            if (localMarking != null) {
+                for (var entry : localMarking.getPlacesToTokensMap().entrySet()) {
+                    placesToTokensCopy.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+                }
             }
     
             for (var entry : marking.getSharedPlacesTokens().entrySet()) {
@@ -602,9 +778,11 @@ public class Animator {
                     if (guiTransition != null) break;
                 }
 
-                Map<Variable, Color> bindings = coloredStep.getBindings();
-                guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
-                reloadTooltip(guiTransition);
+                if (guiTransition != null) {
+                    Map<Variable, Color> bindings = coloredStep.getBindings();
+                    guiTransition.setToolTipText(ColorBindingParser.createTooltip(bindings));
+                    reloadTooltip(guiTransition);
+                }
             }
         }
     }
@@ -619,16 +797,30 @@ public class Animator {
     }
 
     private void reloadTooltip(Transition transition) {
-        Point mousePos = MouseInfo.getPointerInfo().getLocation();
-        SwingUtilities.convertPointFromScreen(mousePos, transition);
-        
-        boolean mouseOver = transition.contains(mousePos) && 
-                            transition.isShowing() && 
-                            transition.isVisible();
-        if (mouseOver) {
-            ToolTipManager manager = ToolTipManager.sharedInstance();
-            long time = System.currentTimeMillis();
-            manager.mouseMoved(new MouseEvent(transition, -1, time, 0, mousePos.x, mousePos.y, 0, false));
+        if (transition == null || !transition.isShowing() || !transition.isVisible()) {
+            return;
+        }
+
+        try {
+            var pointerInfo = MouseInfo.getPointerInfo();
+            if (pointerInfo == null) {
+                return;
+            }
+
+            var mousePos = pointerInfo.getLocation();
+            if (mousePos == null) {
+                return;
+            }
+
+            SwingUtilities.convertPointFromScreen(mousePos, transition);
+            
+            var mouseOver = transition.contains(mousePos);
+            if (mouseOver) {
+                var manager = ToolTipManager.sharedInstance();
+                long time = System.currentTimeMillis();
+                manager.mouseMoved(new MouseEvent(transition, -1, time, 0, mousePos.x, mousePos.y, 0, false));
+            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -636,14 +828,24 @@ public class Animator {
      * Make the selected transition in the animation box blink, based on the
      * list element label
      */
-    public void blinkSelected(String label){
-        if(label.contains(".")){
+    public void blinkSelected(String label) {
+        if (label == null) {
+            return;
+        }
+
+        if (label.contains(" [")) {
+            label = label.substring(0, label.indexOf(" ["));
+        }
+
+        if (label.contains(".")) {
             label = label.split("\\.")[1];
         }
 
-        Transition t = activeGuiModel().getTransitionByName(label);
-        if(t != null){
-            t.blink();
+        if (activeGuiModel() != null) {
+            var t = activeGuiModel().getTransitionByName(label);
+            if (t != null) {
+                t.blink();
+            }
         }
     }
 
@@ -653,29 +855,29 @@ public class Animator {
             return;
         }
 
-        if (!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()){
+        if (!TAPAALGUI.getAppGui().isShowingDelayEnabledTransitions() || isUrgentTransitionEnabled()) {
             fireTransition(transition);
             return;
         }
 
-        TimeInterval dInterval = transition.getdInterval();
+        var dInterval = transition.getdInterval();
 
-        BigDecimal delayGranularity = tab.getDelayEnabledTransitionControl().getValue();
+        var delayGranularity = tab.getDelayEnabledTransitionControl().getValue();
         //Make sure the granularity is small enough
-        BigDecimal lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
-        if(!dInterval.isLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))){
-            do{
+        var lowerBound = IntervalOperations.getRatBound(dInterval.lowerBound()).getBound();
+        if (!dInterval.isLowerBoundNonStrict() && !dInterval.isIncluded(lowerBound.add(delayGranularity))) {
+            do {
                 delayGranularity = delayGranularity.divide(BigDecimal.TEN);
             } while (delayGranularity.compareTo(new BigDecimal("0.00001")) >= 0 && !dInterval.isIncluded(lowerBound.add(delayGranularity)));
         }
 
-        if(delayGranularity.compareTo(new BigDecimal("0.00001")) < 0){
+        if (delayGranularity.compareTo(new BigDecimal("0.00001")) < 0) {
             JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "<html>Due to the limit of only five decimal points in the simulator</br> its not possible to fire the transition</html>");
         } else {
-            BigDecimal delay = tab.getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
-            if(delay != null){
-                if(delay.compareTo(BigDecimal.ZERO) != 0){ //Don't delay if the chosen delay is 0
-                    if(!letTimePass(delay)){
+            var delay = tab.getDelayEnabledTransitionControl().getDelayMode().GetDelay(transition, dInterval, delayGranularity);
+            if (delay != null) {
+                if (delay.compareTo(BigDecimal.ZERO) != 0) { //Don't delay if the chosen delay is 0
+                    if (!letTimePass(delay)) {
                         return;
                     }
                 }
@@ -686,14 +888,16 @@ public class Animator {
     }
 
     private void fireColoredTransition(TimedTransition transition) {
-        if (!validBindingsMap.containsKey(transition)) return;
+        if (!validBindingsMap.containsKey(transition) && !delayEnabledBindingsMap.containsKey(transition)) {
+            return;
+        }
         
         if (trace != null && trace.isColoredTrace()) {
-            if (isColoredTransitionEnabled(transition)) {
+            if (isColoredTransitionEnabled(transition) || isColoredTransitionDelayEnabled(transition)) {
                 if (currentAction < actionHistory.size() - 1) {
-                    TAPNNetworkTraceStep nextStep = actionHistory.get(currentAction + 1);
+                    var nextStep = actionHistory.get(currentAction + 1);
                     if (nextStep.isColoredTransitionStep()) {
-                        TAPNNetworkColoredTransitionStep coloredStep = (TAPNNetworkColoredTransitionStep)nextStep;
+                        var coloredStep = (TAPNNetworkColoredTransitionStep)nextStep;
                         if (coloredStep.getTransition().equals(transition)) {
                             stepForward();
                             return;
@@ -717,29 +921,68 @@ public class Animator {
         }
 
         if (isUsingInteractiveEngine) {
+            var isDelayEnabledOnly = !isColoredTransitionEnabled(transition) && isColoredTransitionDelayEnabled(transition);
+
             Map<Variable, Color> bindings = new HashMap<>(); 
             var validBindings = validBindingsMap.get(transition);
-            if (SimulationControl.getInstance().randomSimulation() && !validBindings.isEmpty()) {
-                Random random = new Random();
-                int randomIndex = random.nextInt(validBindings.size());
-                bindings = validBindings.get(randomIndex);
-            } else if (validBindings.size() == 1) {
-                bindings = validBindingsMap.get(transition).get(0);
-            } else if (!validBindings.isEmpty()) {
-                bindings = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
-                if (bindings == null) return; // Cancelled
+            if (validBindings == null || validBindings.isEmpty()) {
+                validBindings = delayEnabledBindingsMap.get(transition);
             }
 
-            if (!clearStepsForward()) return;
+            if (validBindings != null && !validBindings.isEmpty()) {
+                if (SimulationControl.getInstance().randomSimulation()) {
+                    var random = new Random();
+                    int randomIndex = random.nextInt(validBindings.size());
+                    bindings = validBindings.get(randomIndex);
+                } else if (validBindings.size() == 1) {
+                    bindings = validBindings.get(0);
+                } else {
+                    bindings = ColoredBindingSelectionDialog.showDialog(transition, validBindings);
+                    if (bindings == null) {
+                        return; // Cancelled
+                    }
+                }
+            }
+
+            if (isDelayEnabledOnly && tab.getLens().isTimed()) {
+                var bindingDelays = bindingDelayMap.get(transition);
+                if (bindingDelays == null && transition.isShared()) {
+                    for (var t : transition.sharedTransition().transitions()) {
+                        if (bindingDelayMap.containsKey(t)) {
+                            bindingDelays = bindingDelayMap.get(t);
+                            break;
+                        }
+                    }
+                }
+
+                var minDelay = bindingDelays == null ? null : bindingDelays.get(bindings);
+                if (minDelay == null || minDelay.compareTo(BigDecimal.ZERO) <= 0) {
+                    minDelay = BigDecimal.ONE;
+                }
+
+                if (!letTimePass(minDelay)) {
+                    return;
+                }
+            }
+
+            if (!clearStepsForward()) {
+                return;
+            }
             
             NetworkMarking newMarking;
 
             newMarking = interactiveEngine.sendTransition(transition, bindings);
+            if (interactiveEngine.getLastBindingsResult() != null) {
+                validBindingsMap = interactiveEngine.getLastBindingsResult().validBindings;
+                delayEnabledBindingsMap = interactiveEngine.getLastBindingsResult().delayEnabledBindings;
+                bindingDelayMap = interactiveEngine.getLastBindingsResult().bindingDelayMap;
+            }
             
             addMarking(new TAPNNetworkColoredTransitionStep(transition, bindings, newMarking), newMarking);
 
             updateColoredMarking();
             refreshAnimation();
+            reportBlockingPlaces();
         }
     }
 
@@ -799,12 +1042,27 @@ public class Animator {
 
     public boolean letTimePass(BigDecimal delay) {
 
+        if (integerDelaysOnly && delay.stripTrailingZeros().scale() > 0) {
+            return false;
+        }
+
+        if (delay.compareTo(BigDecimal.ZERO) != 0
+            && (isUrgentTransitionEnabled || !currentMarking().isDelayPossible(delay))) {
+            return false;
+        }
+
         if(!clearStepsForward()){
             return false;
         }
 
         boolean result = false;
-        if (delay.compareTo(new BigDecimal(0))==0 || (currentMarking().isDelayPossible(delay) && !isUrgentTransitionEnabled)) {
+        if (isUsingInteractiveEngine && tab.getLens().isTimed()) {
+            interactiveEngine.sendDelay(delay);
+            NetworkMarking delayedMarking = currentMarking().delay(delay);
+            addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
+            updateColoredMarking();
+            result = true;
+        } else {
             NetworkMarking delayedMarking = currentMarking().delay(delay);
             addMarking(new TAPNNetworkTimeDelayStep(delay), delayedMarking);
             result = true;
@@ -1017,11 +1275,11 @@ public class Animator {
     }
 
     private List<TimedToken> showSelectSimulatorDialogue(TimedTransition transition) {
-        EscapableDialog guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Select Tokens", true);
+        var guiDialog = new EscapableDialog(TAPAALGUI.getApp(), "Select Tokens", true);
 
-        Container contentPane = guiDialog.getContentPane();
+        var contentPane = guiDialog.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.PAGE_AXIS));
-        AnimationTokenSelectDialog animationSelectmodeDialog = new AnimationTokenSelectDialog(transition);
+        var animationSelectmodeDialog = new AnimationTokenSelectDialog(transition);
         contentPane.add(animationSelectmodeDialog);
         guiDialog.setResizable(true);
 
@@ -1039,6 +1297,8 @@ public class Animator {
         resethistory();
         removeSetTrace(false);
         markings.add(initialMarking);
+        tab.network().setMarking(initialMarking);
+        tab.getAnimationHistorySidePanel().setLastShown(TraceType.NOT_EG);
     }
 
     public void reset(boolean keepInitial){

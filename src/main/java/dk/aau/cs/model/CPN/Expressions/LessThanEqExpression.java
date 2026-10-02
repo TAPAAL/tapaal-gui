@@ -52,7 +52,7 @@ public class LessThanEqExpression extends GuardExpression implements LeftRightGu
 
     @Override
     public GuardExpression copy() {
-        return new LessThanEqExpression(left, right);
+        return new LessThanEqExpression(left, right, colorType);
     }
 
     @Override

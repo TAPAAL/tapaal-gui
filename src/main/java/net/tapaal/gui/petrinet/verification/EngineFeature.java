@@ -2,6 +2,8 @@ package net.tapaal.gui.petrinet.verification;
 
 public enum EngineFeature {
     FASTEST_TRACE,
+    UNFOLDED_TRACE_IN_ORIGINAL_NET,
+    EXPLICIT_SEARCH,
     DEADLOCK_NET_DEGREE_2_EXP,
     DEADLOCK_EG_OR_AF,
     DEADLOCK_WITH_INHIB,
