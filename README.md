@@ -37,6 +37,8 @@ To run TAPAAL from IntelliJ select the Gradle tab (normally in the right pane), 
 From now on you can run and debug using the play/debug button in the tool menu.
 
 ## Gradle
+The bundled wrapper uses Gradle 9.8.0; no global Gradle installation is needed.
+
 To run gradle from commandline use the gradle bootstrap scripts. (gradlew for unix, gradlew.bat for Windows).
 You might need to set JAVA_HOME to point to the location of your JDK.
 
