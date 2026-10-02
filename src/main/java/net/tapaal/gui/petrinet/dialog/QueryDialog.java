@@ -106,6 +106,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.awt.event.FocusAdapter;
 
+import dk.aau.cs.DeduplicatingMessenger;
+import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.AritmeticOperator;
 import dk.aau.cs.TCTL.HyperLTLPathScopeNode;
 import dk.aau.cs.TCTL.TCTLTermListNode;
@@ -663,6 +665,7 @@ public class QueryDialog extends JPanel {
     private final static String TOOL_TIP_TRACE_TYPE = "Specifies the type of traces to be shown";
     private final static String TOOL_TIP_SMC_SEED = "64-bit unsigned value to seed the SMC random engine. Will use hardware (if available) or pseudo random engine if left empty.";
     private final static String TOOL_TIP_GRANULARITY = "Uses the given granularity for observations";
+    private final Messenger queryDialogMessenger = new DeduplicatingMessenger(new MessengerImpl());
 
     QueryDialog(EscapableDialog me, QueryDialogueOption option, TAPNQuery queryToCreateFrom, TimedArcPetriNetNetwork tapnNetwork, HashMap<TimedArcPetriNet, DataLayer> guiModels, TAPNLens lens, PetriNetTab tab) {
         guiDialog = me;
@@ -714,7 +717,7 @@ public class QueryDialog extends JPanel {
         int capacity = oldCapacity;
 
         if (rawVerificationOptionsEnabled.isSelected()) {
-            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+            ITAPNComposer composer = new TAPNComposer(queryDialogMessenger, false);
             Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
             int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
 
@@ -6538,7 +6541,7 @@ public class QueryDialog extends JPanel {
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
 
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+        ITAPNComposer composer = new TAPNComposer(queryDialogMessenger, false);
         Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
         verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
 
@@ -7097,7 +7100,7 @@ public class QueryDialog extends JPanel {
                 }
 
                 if (xmlFile != null && queryFile != null) {
-                    ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
+                    ITAPNComposer composer = new TAPNComposer(queryDialogMessenger, false);
                     Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
 
                     if (overApproximationEnable.isSelected()) {
@@ -7154,7 +7157,7 @@ public class QueryDialog extends JPanel {
             });
 
             mergeNetComponentsButton.addActionListener(e -> {
-                TAPNComposer composer = new TAPNComposer(new MessengerImpl(), guiModels, lens, true, true);
+                TAPNComposer composer = new TAPNComposer(queryDialogMessenger, guiModels, lens, true, true);
                 Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
 
                 ArrayList<Template> templates = new ArrayList<Template>(1);
