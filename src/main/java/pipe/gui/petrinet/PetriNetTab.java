@@ -2234,12 +2234,19 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				}
 
 				pno.update(true);
-			} else {
+			} else if (obj instanceof Note) {
                 int newX = (int)(obj.getLocation().x * factor);
                 int newY = (int)(obj.getLocation().y * factor);
 
-				obj.setLocation(newX, newY);
+				Note note = (Note) obj;
+				note.setPosition(new Point(newX, newY));
+				note.updateBounds();
 			}
+		}
+
+		for (Arc arc : currentTemplate().guiModel().getArcs()) {
+			arc.updateArcPosition();
+			arc.updateBounds();
 		}
 
 		this.currentTemplate().guiModel().repaintAll(true);
@@ -2248,13 +2255,14 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public PetriNetObjectPositionSnapshot captureGuiObjectLocations() {
-		return PetriNetObjectPositionSnapshot.capture(currentTemplate().guiModel().getPetriNetObjectsWithArcPathPoint());
+		return PetriNetObjectPositionSnapshot.capture(currentTemplate().guiModel());
 	}
 
 	public void restoreGuiObjectLocations(PetriNetObjectPositionSnapshot locations) {
 		locations.restore();
-		currentTemplate().guiModel().repaintAll(true);
-		drawingSurface().updatePreferredSize();
+		if (locations.belongsTo(drawingSurface().getGuiModel())) {
+			drawingSurface().updatePreferredSize();
+		}
 	}
 
 	public PetriNetTab duplicateTab(TAPNLens overwriteLens, String appendName) {
