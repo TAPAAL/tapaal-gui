@@ -6,6 +6,7 @@ import dk.aau.cs.io.TimedArcPetriNetNetworkWriter;
 import net.tapaal.gui.petrinet.Template;
 import org.junit.jupiter.api.Test;
 import pipe.gui.canvas.Grid;
+import pipe.gui.canvas.Zoomer;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 import pipe.gui.petrinet.graphicElements.Arc;
@@ -25,6 +26,28 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpacingIntegrationTest {
+    @Test
+    void spacingStartedAtDifferentZoomsRestoresExactSavedCoordinates() throws Exception {
+        onEdt(() -> {
+            for (int zoom : List.of(50, 200)) {
+                PetriNetTab tab = loadTab(modelXml());
+                tab.zoomTo(zoom);
+                Grid.enableGrid();
+                byte[] before = save(tab);
+                tab.increaseSpacing();
+                byte[] after = save(tab);
+                tab.getUndoManager().undo();
+                assertEquals(new String(before, StandardCharsets.UTF_8),
+                    new String(save(tab), StandardCharsets.UTF_8), "Undo at " + zoom);
+                tab.getUndoManager().redo();
+                assertEquals(new String(after, StandardCharsets.UTF_8),
+                    new String(save(tab), StandardCharsets.UTF_8), "Redo at " + zoom);
+                assertTrue(Grid.isEnabled());
+                Grid.disableGrid();
+            }
+        });
+    }
+
     @Test
     void spacingUndoPreservesPreviouslySavedBundledModels() throws Exception {
         onEdt(() -> {
@@ -63,6 +86,8 @@ class SpacingIntegrationTest {
             tab.getUndoManager().undo();
             assertTrue(Grid.isEnabled(), "Restoring positions must preserve the grid setting");
             assertEquals(before, positions(template));
+            assertEquals(new Point(Zoomer.getZoomedValue(noteBefore.x, 200),
+                Zoomer.getZoomedValue(noteBefore.y, 200)), annotation(template).getLocation());
             Grid.disableGrid();
             tab.zoomTo(100);
             assertEquals(noteBefore, annotation(template).getLocation());
@@ -72,6 +97,8 @@ class SpacingIntegrationTest {
             tab.zoomTo(50);
             tab.getUndoManager().redo();
             assertEquals(after, positions(template));
+            assertEquals(new Point(Zoomer.getZoomedValue(noteAfter.x, 50),
+                Zoomer.getZoomedValue(noteAfter.y, 50)), annotation(template).getLocation());
             tab.zoomTo(100);
             assertEquals(noteAfter, annotation(template).getLocation());
             assertEquals(pathAfter, path(template));
