@@ -157,6 +157,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private final Animator animator = new Animator(this);
     private boolean netChanged = false;
+    private boolean nonUndoableChange = false;
 
     @Override
     public boolean getNetChanged() {
@@ -164,7 +165,38 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     public void setNetChanged(boolean _netChanged) {
-        netChanged = _netChanged;
+		if (_netChanged) {
+			markNonUndoableChange();
+		} else {
+			nonUndoableChange = false;
+			updateNetChanged(false);
+		}
+    }
+
+	/**
+	 * Marks a model change that is not represented by the normal undo manager.
+	 * Undoing normal edits must not clear the dirty state while this flag is set.
+	 */
+	public void markNonUndoableChange() {
+		nonUndoableChange = true;
+		updateNetChangedFromUndoManager();
+	}
+
+    public void updateNetChangedFromUndoManager() {
+		updateNetChanged(nonUndoableChange || undoManager.hasAppliedNormalEdits());
+	}
+
+	private void updateNetChanged(boolean changed) {
+		if (netChanged == changed) {
+			return;
+		}
+		netChanged = changed;
+		Runnable updateTabState = () -> safeApp.ifPresent(tab -> tab.updatedTabState(this));
+		if (SwingUtilities.isEventDispatchThread()) {
+			updateTabState.run();
+		} else {
+			SwingUtilities.invokeLater(updateTabState);
+		}
     }
     private final NameGenerator nameGenerator = new NameGenerator();
 
@@ -2109,9 +2141,9 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
 	//Writes a tapaal net to a file, with the posibility to overwrite the quires
-	public void writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
+	public boolean writeNetToFile(File outFile, List<TAPNQuery> queriesOverwrite, TAPNLens lens) {
+		NetworkMarking currentMarking = null;
 		try {
-			NetworkMarking currentMarking = null;
 			if(isInAnimationMode()){
 				currentMarking = network().marking();
 				network().setMarking(getAnimator().getInitialMarking());
@@ -2127,34 +2159,30 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
 			tapnWriter.savePNML(outFile);
 
-			if(isInAnimationMode()){
-				network().setMarking(currentMarking);
-			}
+			return true;
 		} catch (Exception e) {
 			Logger.log(e);
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.toString(),
 					"File Output Error", JOptionPane.ERROR_MESSAGE);
+			return false;
+		} finally {
+			if(isInAnimationMode() && currentMarking != null){
+				network().setMarking(currentMarking);
+			}
 		}
 	}
 
-	public void writeNetToFile(File outFile) {
-		writeNetToFile(outFile, (List<TAPNQuery>) queries(), lens);
+	public boolean writeNetToFile(File outFile) {
+		return writeNetToFile(outFile, (List<TAPNQuery>) queries(), lens);
 	}
 
 	@Override
 	public void saveNet(File outFile) {
-		try {
-			writeNetToFile(outFile);
-
+		if (writeNetToFile(outFile)) {
 			setFile(outFile);
-
 			setNetChanged(false);
 			getUndoManager().clear();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.toString(), "File Output Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
