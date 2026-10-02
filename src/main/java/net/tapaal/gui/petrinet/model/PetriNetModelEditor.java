@@ -6,6 +6,7 @@ import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.tapn.IntWeight;
 import dk.aau.cs.model.tapn.TimeInterval;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInhibitorArc;
@@ -80,7 +81,19 @@ public final class PetriNetModelEditor {
     }
 
     public TransportArc createTransportArc(TimedPlace source, TimedTransition transition, TimedPlace destination) {
-        return new TransportArc(source, transition, destination);
+        Vector<ColorExpression> inputColors = new Vector<>();
+        inputColors.add(source.getColorType().createColorExpressionForFirstColor());
+        Vector<ColorExpression> outputColors = new Vector<>();
+        outputColors.add(destination.getColorType().createColorExpressionForFirstColor());
+        return new TransportArc(
+            source,
+            transition,
+            destination,
+            TimeInterval.ZERO_INF,
+            new IntWeight(1),
+            new NumberOfExpression(1, inputColors),
+            new NumberOfExpression(1, outputColors)
+        );
     }
 
     public void addInputArc(TimedArcPetriNet model, TimedInputArc arc) {

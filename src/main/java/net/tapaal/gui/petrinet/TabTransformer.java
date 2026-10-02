@@ -116,13 +116,9 @@ public class TabTransformer {
 
                     //Change the partner
 
-                    TimedOutputArcComponent arc2 = convertPartner(arc.getConnectedTo(), template, guiModel);
+                    convertPartner(arc.getConnectedTo(), template, guiModel);
 
                     removeTransportArc(arc, guiModel);
-
-                    // Add the partner to the model before attaching its view.
-                    template.model().add(arc2.underlyingArc());
-
                 }
             }
         }
@@ -142,7 +138,6 @@ public class TabTransformer {
         TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
 
         TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight(), arc.underlyingTransportArc().getOutputExpression());
-        //template.model().add(addedArc);
 
         // GUI
 
@@ -402,7 +397,7 @@ public class TabTransformer {
         }
         UnfoldNet thread = new UnfoldNet(engine, new MessengerImpl(), oldTab.getGuiModels(), partition, computeColorFixpoint, useSymmetricVars);
         RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread, "Unfolding");
-        SmartDrawDialog.setupWorkerListener(thread, oldTab);
+        SmartDrawDialog.setupWorkerListener(thread);
         thread.execute(oldTab.network(), oldTab);
         dialog.setVisible(true);
     }

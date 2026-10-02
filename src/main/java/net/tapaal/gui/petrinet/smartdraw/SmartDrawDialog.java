@@ -9,11 +9,13 @@ import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import net.tapaal.resourcemanager.ResourceManager;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
@@ -128,23 +130,29 @@ public class SmartDrawDialog extends JDialog {
 			objectDropdown.addItem(name);
 		}
 	}
-    public static void setupWorkerListener(final SwingWorker<?, ?> worker, final PetriNetTab tab) {
-	    if(worker != null){
-            worker.addPropertyChangeListener(event -> {
-                if (event.getPropertyName().equals("unfolding")) {
-                    SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
-                    if (stateValue.equals(SwingWorker.StateValue.DONE)) {
-                        //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000
-                        if (tab != null && tab.network().paintNet() && !tab.currentTemplate().getHasPositionalInfo() && (tab.currentTemplate().guiModel().getPlaces().length + tab.currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
-                            if (dialogResult == JOptionPane.YES_OPTION) {
-                                showSmartDrawDialog(tab);
-                            }
-                        }
-                    }
+    public static void setupWorkerListener(final SwingWorker<?, ?> worker) {
+        setupWorkerListener(worker, tab -> {
+            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                showSmartDrawDialog(tab);
+            }
+        });
+    }
+
+    static void setupWorkerListener(SwingWorker<?, ?> worker, Consumer<PetriNetTab> offerLayout) {
+        if (worker == null) return;
+        worker.addPropertyChangeListener(event -> {
+            // Completion carries the tab actually opened or given a trace,
+            // which may differ from both the source tab and the active tab.
+            if (event.getPropertyName().equals("unfolding") && event.getNewValue() instanceof PetriNetTab tab) {
+                Template template = tab.currentTemplate();
+                // Don't offer layout for empty nets or nets too big to draw.
+                if (tab.network().paintNet() && template != null && !template.getHasPositionalInfo()
+                    && template.guiModel().getPlaceTransitionObjects().size() > 0) {
+                    offerLayout.accept(tab);
                 }
-            });
-        }
+            }
+        });
     }
 	
 	private void initComponents() {

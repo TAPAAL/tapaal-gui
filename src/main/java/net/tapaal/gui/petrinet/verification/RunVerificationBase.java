@@ -255,9 +255,6 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
 				KBoundAnalyzer optimizer = new KBoundAnalyzer(model, lens, guiModels, options.extraTokens(), modelChecker, new MessengerImpl(), spinner, dataLayerQuery);
                 optimizer.analyze((VerifyTAPNOptions) options, true);
             }
-            if (result.getQueryResult() != null && result.getQueryResult().isQuerySatisfied() && result.getTrace() != null) {
-                firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
-            }
 		} else {
 			modelChecker.kill();
 			messenger.displayInfoMessage("Verification was interrupted by the user. No result found!", "Verification Cancelled");

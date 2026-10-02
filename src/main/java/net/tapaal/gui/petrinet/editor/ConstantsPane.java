@@ -117,7 +117,7 @@ public class ConstantsPane extends JPanel implements SidePane {
 
 	public ConstantsPane(PetriNetTab currentTab) {
 		tab = currentTab;
-		networkEditService = new NetworkEditService(currentTab.network(), currentTab::updateConstantsList);
+		networkEditService = new NetworkEditService(currentTab.network(), this::showConstants);
         list = new NonsearchableJList<>();
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		constantsPanel = new JPanel(new GridBagLayout());
@@ -941,7 +941,8 @@ public class ConstantsPane extends JPanel implements SidePane {
             UndoManager undoManager = tab.getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
-            networkEditService.removeVariable(variable, undoManager, messages);
+            NetworkEditService editService = new NetworkEditService(network, this::updateName);
+            editService.removeVariable(variable, undoManager, messages);
             if(messages.isEmpty()){
                 //Since we just removed our selection everything is false
                 enableButtons(true);
@@ -1020,7 +1021,8 @@ public class ConstantsPane extends JPanel implements SidePane {
             UndoManager undoManager = tab.getUndoManager();
             undoManager.newEdit();
             ArrayList<String> messages = new ArrayList<>();
-            networkEditService.removeColorType(colorType, undoManager, messages);
+            NetworkEditService editService = new NetworkEditService(network, this::updateName);
+            editService.removeColorType(colorType, undoManager, messages);
             if(messages.isEmpty()){
                 //Since we just removed our selection everything is false
                 enableButtons(true);

@@ -57,6 +57,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = Constants.MAX_NET_SIZE;
     private boolean netTooBig = false;
+    private PetriNetTab unfoldedTab;
 
     public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         super();
@@ -204,6 +205,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 }
             }
 
+            unfoldedTab = newTab;
+
             ColorBindingParser parser = new ColorBindingParser();
             parser.addBindings(loadedModel, String.join(System.lineSeparator(), outputLines));
         } catch (FormatException e) {
@@ -323,7 +326,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 showErrorMessage(result);
             } else {
                 firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-                firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
+                firePropertyChange("unfolding", null, unfoldedTab);
             }
 
         } else {

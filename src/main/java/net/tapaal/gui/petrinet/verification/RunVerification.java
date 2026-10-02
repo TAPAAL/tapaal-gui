@@ -115,6 +115,7 @@ public class RunVerification extends RunVerificationBase {
                             }
                             animator.setTrace(result.getTrace(), traceMap);
                         }
+                        firePropertyChange("unfolding", null, tab);
                     } else {
                         if ((
                             //XXX: this is not complete, we need a better way to signal the engine could not create a trace
