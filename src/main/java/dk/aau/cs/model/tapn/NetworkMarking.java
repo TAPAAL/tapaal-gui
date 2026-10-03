@@ -393,7 +393,7 @@ public class NetworkMarking implements TimedMarking {
              }
         }
 
-        if (network != null && !network.isTimed()) {
+        if (network != null && !composer.getLens().isTimed()) {
             for (var entry : allPlaces.entrySet()) {
                 var place = entry.getKey();
                 var placeElement = document.createElement("place");
@@ -424,7 +424,7 @@ public class NetworkMarking implements TimedMarking {
                     var token = tokenEntry.getKey();
                     var count = tokenEntry.getValue();
                     var tokenElement = document.createElement("token");
-                    tokenElement.setAttribute("age", String.valueOf(token.age().intValue()));
+                    tokenElement.setAttribute("age", token.age().toPlainString());
                     tokenElement.setAttribute("count", String.valueOf(count));
                     if (token.color() != null) {
                         tokenElement.setAttribute("color", token.color().toString());
