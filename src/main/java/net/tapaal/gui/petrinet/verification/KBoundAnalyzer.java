@@ -18,7 +18,6 @@ import dk.aau.cs.TCTL.TCTLTrueNode;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
-import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.util.Tuple;
 import dk.aau.cs.verification.ModelChecker;
 import dk.aau.cs.verification.NameMapping;
@@ -124,31 +123,23 @@ public class KBoundAnalyzer {
     }
 
     private ArrayList<TCTLAbstractStateProperty> getFactors() {
-        TimedArcPetriNet net = mergeNetComponents();
-        ArrayList<TCTLAbstractStateProperty> factors = new ArrayList<>();
+        var composedModel = mergeNetComponents();
+        var factors = new ArrayList<TCTLAbstractStateProperty>();
 
-        tapnNetwork.sharedPlaces().forEach(o -> {
-            if (net.getPlaceByName(o.name()) != null && !net.getPlaceByName(o.name()).name().contains("Shared__")) {
-                net.getPlaceByName(o.name()).setName("Shared__" + o.name());
+        for (var place : composedModel.value1().places()) {
+            if (!factors.isEmpty()) {
+                factors.add(new AritmeticOperator("+"));
             }
-        });
-        tapnNetwork.allTemplates().forEach(o -> o.places().forEach(x -> {
-            if (net.getPlaceByName(x.name()) != null) net.getPlaceByName(x.name()).setName(o.name() + "__" + x.name());
-        }));
 
-        for (TimedPlace place : net.places()) {
-            factors.add(new TCTLPlaceNode(place.name()));
-            factors.add(new AritmeticOperator("+"));
+            var originalName = composedModel.value2().map(place.name());
+            factors.add(new TCTLPlaceNode(originalName.value1(), originalName.value2()));
         }
-        if (factors.get(factors.size()-1) instanceof AritmeticOperator) factors.remove(factors.size()-1);
 
         return factors;
     }
 
-    private TimedArcPetriNet mergeNetComponents() {
-
-        HashMap<TimedArcPetriNet, DataLayer> guiModels = this.guiModels;
-        HashMap<TimedArcPetriNet, DataLayer> updatedModels = new HashMap<>();
+    private Tuple<TimedArcPetriNet, NameMapping> mergeNetComponents() {
+        var updatedModels = new HashMap<TimedArcPetriNet, DataLayer>();
 
         // FIXME: Fixed issue #1987383, error due to changes to collection while iterating iteration over it.
         //  however, this code seem way out of place and wrong, the way the the update is done is wired.
@@ -156,19 +147,13 @@ public class KBoundAnalyzer {
         //  crazy. Better would be to make sure the correct gui model is passed.
         //  The loop looks even weirder now, but for the bugfix I just rewrote the loop to keep the same behaviour as before
         //  -- kyrke 2023-02-09
-        for (TimedArcPetriNet net : guiModels.keySet()) {
-            if (tapnNetwork.getTAPNByName(net.name()) != null) {
-                DataLayer dl = guiModels.get(net);
-
-                updatedModels.put(tapnNetwork.getTAPNByName(net.name()), dl);
-            } else {
-                updatedModels.put(net, guiModels.get(net));
-            }
+        for (var net : guiModels.keySet()) {
+            var template = tapnNetwork.getTAPNByName(net.name());
+            updatedModels.put(template != null ? template : net, guiModels.get(net));
         }
-        TAPNComposer composer = new TAPNComposer(new MessengerImpl(), updatedModels, lens, true, true);
 
-        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(tapnNetwork);
+        var composer = new TAPNComposer(new MessengerImpl(), updatedModels, lens, true, true);
 
-        return transformedModel.value1();
+        return composer.transformModel(tapnNetwork);
     }
 }
