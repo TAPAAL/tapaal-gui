@@ -90,14 +90,19 @@ public class GuiModelManager {
     }
 
     public void addAnnotationNote(DataLayer c, Point p) {
-        AnnotationNote pnObject = new AnnotationNote(p.x, p.y);
+        var pnObject = new AnnotationNote(p.x, p.y);
 
         //enableEditMode open editor, retuns true of text added, else false
         //If no text is added,dont add it to model
         if (pnObject.enableEditMode(true)) {
-            c.addPetriNetObject(pnObject);
-            addCommand(new AddAnnotationNoteCommand(pnObject, c));
+            addAnnotationNote(c, pnObject);
         }
+
+    }
+
+    public void addAnnotationNote(DataLayer c, AnnotationNote note) {
+        c.addPetriNetObject(note);
+        addCommand(new AddAnnotationNoteCommand(note, c));
     }
 
     public Result<TimedInputArcComponent, ModelViolation> addTimedInputArc(@NotNull DataLayer c, @NotNull TimedPlaceComponent p, @NotNull TimedTransitionComponent t, ArcPath path) {

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull
 import pipe.gui.Constants
 import pipe.gui.petrinet.PetriNetTab
 import pipe.gui.petrinet.graphicElements.Arc
+import pipe.gui.petrinet.graphicElements.AnnotationNote
 import pipe.gui.petrinet.graphicElements.PetriNetObject
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject
 import pipe.gui.petrinet.graphicElements.tapn.*
@@ -28,7 +29,11 @@ class CopyPastImportExport {
         val outputArc: List<OutputArcModel>,
         val inhibitorArc: List<InhibitorArcModel>,
         val transportArcs: List<TransportArcModel>,
+        val annotations: List<AnnotationModel> = listOf(),
     )
+
+    @Serializable
+    data class AnnotationModel(val text: String, val x: Int, val y: Int, val width: Int, val height: Int, val border: Boolean, val filled: Boolean)
 
     @Serializable
     data class PathPointModel(val x: Int, val y: Int, val curve: Boolean = false)
@@ -66,9 +71,13 @@ class CopyPastImportExport {
             val outputArcs = mutableListOf<OutputArcModel>()
             val transportArcs = mutableListOf<TransportArcModel>()
             val inhibitorArcs = mutableListOf<InhibitorArcModel>()
+            val annotations = mutableListOf<AnnotationModel>()
 
             for (o in selection) {
                 when (o) {
+                    is AnnotationNote -> {
+                        annotations.add(AnnotationModel(o.noteText, o.originalX, o.originalY, o.noteWidth, o.noteHeight, o.isShowingBorder, o.isFilled))
+                    }
                     is TimedPlaceComponent -> {
                         val tokens = o.numberOfTokens
                         val invariant = o.invariant.toString(false)
@@ -146,6 +155,7 @@ class CopyPastImportExport {
                     outputArcs,
                     inhibitorArcs,
                     transportArcs,
+                    annotations,
                 )
             )
         }
@@ -163,6 +173,16 @@ class CopyPastImportExport {
             tab.drawingSurface().selectionObject.clearSelection()
             tab.guiModelManager.startTransaction()
             val nameToElementMap = HashMap<String, PlaceTransitionObject>()
+
+            for (a in model.annotations) {
+                val note = AnnotationNote(a.text, a.x + Constants.PLACE_TRANSITION_HEIGHT, a.y + Constants.PLACE_TRANSITION_HEIGHT, a.width, a.height, a.border)
+                if (!a.filled) {
+                    note.changeBackground()
+                }
+
+                tab.guiModelManager.addAnnotationNote(tab.model, note)
+                note.select()
+            }
 
             for ( p in model.places) {
                 val tokens = p.tokens
@@ -308,5 +328,3 @@ class CopyPastImportExport {
     }
 
 }
-
-
