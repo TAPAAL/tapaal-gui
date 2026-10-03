@@ -3538,6 +3538,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcConfidence = new JTextField(7);
+        smcConfidence.setMinimumSize(smcConfidence.getPreferredSize());
         smcConfidence.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcConfidence.getText().length();
@@ -3566,6 +3567,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
+        smcEstimationIntervalWidth.setMinimumSize(smcEstimationIntervalWidth.getPreferredSize());
         smcEstimationIntervalWidth.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcEstimationIntervalWidth.getText().length();
@@ -3600,6 +3602,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
+        smcTimeExpected.setMinimumSize(smcTimeExpected.getPreferredSize());
         smcTimeExpected.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcTimeExpected.getText().length();
@@ -3638,7 +3641,6 @@ public class QueryDialog extends JPanel {
         subPanelGbc.gridwidth = 2;
         subPanelGbc.fill = GridBagConstraints.HORIZONTAL;
         smcTimeEstimationButton = new JButton(UPDATE_VERIFICATION_TIME_BTN_TEXT);
-        smcTimeEstimationButton.setPreferredSize(new Dimension(378, 25));
         smcTimeEstimationButton.addActionListener(evt -> {
             runBenchmark();
         });
