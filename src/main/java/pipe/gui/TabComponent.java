@@ -48,9 +48,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JToolTip;
 
 import dk.aau.cs.util.Require;
 import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.swingcomponents.MultiLineAutoWrappingToolTip;
 
 /**
  * This class represents the component inside the "head" of a tab. That is, it
@@ -59,6 +61,7 @@ import pipe.gui.petrinet.PetriNetTab;
  * 
  */
 public abstract class TabComponent extends JPanel {
+	private static final int MAX_TAB_TITLE_WIDTH = 400;
 
 	private final JTabbedPane pane;
 
@@ -81,9 +84,40 @@ public abstract class TabComponent extends JPanel {
 				}
 				return null;
 			}
+
+			@Override
+			public Dimension getPreferredSize() {
+				Dimension preferredSize = super.getPreferredSize();
+				preferredSize.width = Math.min(preferredSize.width, MAX_TAB_TITLE_WIDTH);
+				return preferredSize;
+			}
+
+			@Override
+			public String getToolTipText(MouseEvent event) {
+				String title = getText();
+				return title != null && super.getPreferredSize().width > getWidth() ? title : null;
+			}
+
+			@Override
+			public JToolTip createToolTip() {
+				return new MultiLineAutoWrappingToolTip();
+			}
 		};
 
 		add(label);
+		// Register the label with Swing's ToolTipManager. The text itself is
+		// supplied dynamically by getToolTipText when the title is clipped.
+		label.setToolTipText("");
+		label.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent event) {
+				int index = pane.indexOfTabComponent(TabComponent.this);
+				if (index >= 0) {
+					pane.setSelectedIndex(index);
+					pane.requestFocusInWindow();
+				}
+			}
+		});
 		label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
 
 		JButton button = new TabButton();
