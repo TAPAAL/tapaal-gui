@@ -129,6 +129,11 @@ public class SelectionManager extends JComponent {
 		for (PetriNetObject pnObject : drawingSurface.getGuiModel().getPlaceTransitionObjects()) {
 			pnObject.select(intersectionRectangle);
 		}
+
+		for (var note : drawingSurface.getGuiModel().getLabels()) {
+			note.select(intersectionRectangle);
+		}
+
 	}
 
 	@Override
