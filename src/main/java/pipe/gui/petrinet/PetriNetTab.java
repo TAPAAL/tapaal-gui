@@ -39,6 +39,7 @@ import net.tapaal.gui.petrinet.editor.ConstantsPane;
 import net.tapaal.gui.petrinet.editor.SharedPlacesAndTransitionsPanel;
 
 import net.tapaal.gui.petrinet.undo.ChangeSpacingEditCommand;
+import net.tapaal.gui.petrinet.undo.PetriNetObjectPositionSnapshot;
 import net.tapaal.gui.petrinet.undo.Command;
 import net.tapaal.gui.petrinet.undo.MovePetriNetObjectCommand;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
@@ -2161,18 +2162,22 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     @Override
     public void increaseSpacing() {
 		double factor = 1.25;
-		changeSpacing(factor);
-		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
+		PetriNetObjectPositionSnapshot before = captureGuiObjectLocations();
+		if (changeSpacing(factor)) {
+			getUndoManager().addNewEdit(new ChangeSpacingEditCommand(before, captureGuiObjectLocations(), this));
+		}
     }
 
 	@Override
 	public void decreaseSpacing() {
 		double factor = 0.8;
-		changeSpacing(factor);
-		getUndoManager().addNewEdit(new ChangeSpacingEditCommand(factor, this));
+		PetriNetObjectPositionSnapshot before = captureGuiObjectLocations();
+		if (changeSpacing(factor)) {
+			getUndoManager().addNewEdit(new ChangeSpacingEditCommand(before, captureGuiObjectLocations(), this));
+		}
 	}
 
-	public void changeSpacing(double factor) {
+	public boolean changeSpacing(double factor) {
         if (factor < 1) {
             Quadtree quadtree = new Quadtree();
             final int minimumDistance = 45;
@@ -2183,7 +2188,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
                     int newX = (int)(((PlaceTransitionObject)obj).getCenter().getX() * factor);
                     int newY = (int)(((PlaceTransitionObject)obj).getCenter().getY() * factor);
                     Point newLocation = new Point(newX, newY);
-                    if (quadtree.containsWithin(newLocation, minimumDistance)) return;
+					if (quadtree.containsWithin(newLocation, minimumDistance)) return false;
                     quadtree.insert(newLocation);
                 }
             }
@@ -2229,16 +2234,35 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				}
 
 				pno.update(true);
-			} else {
+			} else if (obj instanceof Note) {
                 int newX = (int)(obj.getLocation().x * factor);
                 int newY = (int)(obj.getLocation().y * factor);
 
-				obj.setLocation(newX, newY);
+				Note note = (Note) obj;
+				note.setPosition(new Point(newX, newY));
+				note.updateBounds();
 			}
+		}
+
+		for (Arc arc : currentTemplate().guiModel().getArcs()) {
+			arc.updateArcPosition();
+			arc.updateBounds();
 		}
 
 		this.currentTemplate().guiModel().repaintAll(true);
 		drawingSurface().updatePreferredSize();
+		return true;
+	}
+
+	public PetriNetObjectPositionSnapshot captureGuiObjectLocations() {
+		return PetriNetObjectPositionSnapshot.capture(currentTemplate().guiModel());
+	}
+
+	public void restoreGuiObjectLocations(PetriNetObjectPositionSnapshot locations) {
+		locations.restore();
+		if (locations.belongsTo(drawingSurface().getGuiModel())) {
+			drawingSurface().updatePreferredSize();
+		}
 	}
 
 	public PetriNetTab duplicateTab(TAPNLens overwriteLens, String appendName) {
