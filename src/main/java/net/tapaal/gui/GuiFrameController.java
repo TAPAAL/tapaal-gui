@@ -238,35 +238,57 @@ public final class GuiFrameController implements GuiFrameControllerActions{
     public void showAbout() {
         StringBuilder buffer = new StringBuilder("About " + TAPAAL.getProgramName());
         buffer.append("\n\n");
-        buffer.append("TAPAAL is a tool for editing, simulation and verification of P/T and timed-arc Petri nets.\n");
-        buffer.append("The GUI is based on PIPE2: http://pipe2.sourceforge.net/\n\n");
-        buffer.append("License information and more is available at: www.tapaal.net\n\n");
+        buffer.append("TAPAAL is a tool for modelling, simulation and verification of Timed-Arc Petri nets developed at Department of Computer Science at Aalborg University.\n");
+        buffer.append("The GUI is based on PIPE2: https://pipe2.sourceforge.net/\n");
+        buffer.append("License information and more is available at: https://www.tapaal.net/about/\n\n");
 
         buffer.append("Credits\n\n");
-        buffer.append("TAPAAL GUI and Translations:\n");
-            buffer.append("Mathias Andersen, Sine V. Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nTanguy Dubois, Jakob Dyhr, Louise Foshammer, Malte Neve-Gr\u00E6sb\u00F8ll, ");
-            buffer.append("Lasse Jacobsen, \nMorten Jacobsen,Thomas S. Jacobsen, Jacob J. Jensen, Peter G. Jensen, ");
-            buffer.append("Mads Johannsen,\nKenneth Y. J\u00F8rgensen, Mikael H. M\u00F8ller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena S. Ernstsen, Niels N. Samuelsen, Jiri Srba, Mathias G. S\u00F8rensen,\nJakob H. Taankvist, Peter H. Taankvist and Mikkel Tygesen\n");
+        buffer.append("Current Core Team:\n");
+        buffer.append("Tanguy Dubois, Peter G. Jensen, Kenneth Yrke Joergensen, Jiri Srba and Mikkel Tygesen\n\n");
 
-            buffer.append("Aalborg University 2008-2026\n\n");
+        buffer.append("GUI and Translations:\n");
+            buffer.append("Mathias Andersen, Sine Viesmose Birch, Jacob Hjort Bundgaard, Joakim Byg, Malo Dautry, \nTanguy Dubois, Jakob Dyhr, Louise Foshammer, Malte Neve-Graesboell, ");
+            buffer.append("Lasse Jacobsen, \nMorten Jacobsen, Thomas Stig Jacobsen, Jacob Jon Jensen, Peter G. Jensen, ");
+            buffer.append("Mads Johannsen,\nKenneth Yrke J\u00F8rgensen, Mikael H. Moeller, Christoffer Moesgaard, Kristian Morsing Pedersen,\nThomas Pedersen, Lena Said, Niels N. Samuelsen, Mathias G. Soerensen,\nJakob H. Taankvist, Peter H. Taankvist and Mikkel Tygesen\n");
+
+            buffer.append("\n");
 
         buffer.append("TAPAAL Continuous Engine (verifytapn):\n");
             buffer.append("Alexandre David, Lasse Jacobsen, Morten Jacobsen and Jiri Srba\n");
-            buffer.append("Aalborg University 2011-2026\n\n");
+            buffer.append("\n");
 
         buffer.append("TAPAAL Discrete Engine (verifydtapn):\n");
             buffer.append("Mathias Andersen, Tanguy Dubois, Peter G. Jensen, Heine G. Larsen, Jiri Srba,\n");
-            buffer.append("Mathias G. S\u00F8rensen, Jakob H. Taankvist and Mikkel Tygesen\n");
-            buffer.append("Aalborg University 2012-2026\n\n");
+            buffer.append("Mathias G. Soerensen, Jakob H. Taankvist and Mikkel Tygesen\n");
+            buffer.append("\n");
 
         buffer.append("TAPAAL Untimed Engine (verifypn):\n");
-            buffer.append("Alexander Bilgram, Emil Normann Brandt, Frederik M. B\u00F8nneland, Jakob Dyhr, Malo Dautry, Peter Fogh, \n");
-            buffer.append("Jens Emil Fink Højriis, Jonas F. Jensen, Emil Gybel Henriksen, Lasse S. Jensen, Peter G. Jensen,\nNicolaj \u00D8. Jensen, ");
-            buffer.append("Tobias S. Jepsen, Mads Johannsen, Kenneth Y. J\u00F8rgensen, Isabella Kaufmann, \n");
-            buffer.append("Alan Mozafar Khorsid, Andreas H. Klostergaard, Esben Nielsen, S\u00F8ren M. Nielsen, \nThomas S. Nielsen, ");
-            buffer.append("Samuel Pastva, Thomas Pedersen, Kira S. Pedersen, Theodor Risager, Jiri Srba, \nAdam M. St\u00FCck, Andreas S. S\u00F8rensen, Mathias M. S\u00F8rensen, Peter H. Taankvist, Rasmus G. Tollund, \nMikkel Tygesen, Nikolaj J. Ulrik, Simon M. Virenfeldt and Lars K. Oestergaard \n");
-            buffer.append("Aalborg University 2014-2026\n\n");
+            buffer.append("Alexander Bilgram, Frederik Meyer Boenneland, Emil Normann Brandt, Malo Dautry, \n");
+            buffer.append("Jesper Adriaan van Diepen, Jakob Dyhr, Peter Fogh, Emil Gybel Henriksen, \n");
+            buffer.append("Jens Emil Fink Højriis, Jonas Finnemann Jensen, Lasse Steen Jensen, Peter Gjøl Jensen, \n");
+            buffer.append("Nicolaj Østerby Jensen, Tobias Skovgaard Jepsen, Mads Johannsen, Kenneth Yrke Jørgensen, \n");
+            buffer.append("Isabella Kaufmann, Alan Mozafar Khorsid, Andreas Hairing Klostergaard, Esben Nielsen, \n");
+            buffer.append("Søren Moss Nielsen, Thomas Søndersø Nielsen, Samuel Pastva, Thomas Pedersen, \n");
+            buffer.append("Theodor Risager, Jiri Srba, Adam Moloney Stück, Andreas Sebastian Sørensen, \n");
+            buffer.append("Mathias Mehl Sørensen, Peter Haar Taankvist, Rasmus Grønkjær Tollund, Mikkel Tygesen, \n");
+            buffer.append("Nikolaj Jensen Ulrik, Simon Mejlby Virenfeldt and Lars Kærlund Østergaard \n");
+            buffer.append("\n");
 
+        buffer.append("Other Contributors:\n");
+        buffer.append("Gideon Blegmand, Thomas Frandsen, Michael Garde, Henrik N. Ginnerup, Mark Glavind,\n");
+        buffer.append("Rasmus H. Hansen, Jacob Buchreitz Harbo, Arild Martin Moeller Haugstad, Daniel Heidemann,\n");
+        buffer.append("Martin Chmelik, Martin Christensen, Niels Christensen, Sebastian Lassen, Martin Leginus,\n");
+        buffer.append("Jose Antonio Mateo, Thomas Birch Mogensen, Nichlas Korgaard Moeller, Heidi Selmer Nielsen,\n");
+        buffer.append("Daniel O. Nykjær, Marius Pallisgaard Olsen, Christian Hoegh Pedersen, Morten Turn Pedersen,\n");
+        buffer.append("Long Huy Phan, Kenneth Sejersgaard-Jacobsen, Christian Stephansen, Mikkel Holm Soegaard\n");
+        buffer.append("and Valdas Zemaitis\n\n");
+
+        buffer.append("Acknowledgments:\n");
+        buffer.append("The UPPAAL development team, especially Alexandre David and Arild Martin Moeller Haugstad,\n");
+        buffer.append("for their help with UPPAAL; Krishna Prasad Gundam and Ye Tian for their comments and\n");
+        buffer.append("suggestions for the first version of the translation algorithms; Michael J. A. Smith for\n");
+        buffer.append("the idea and example code for the improved query designer; and the PIPE2 development teams\n");
+        buffer.append("for creating and releasing PIPE2 under an open source license.\n");
 
         buffer.append("\n");
         JOptionPane.showMessageDialog(TAPAALGUI.getApp(), buffer.toString(), "About " + TAPAAL.getProgramName(),
@@ -499,7 +521,7 @@ public final class GuiFrameController implements GuiFrameControllerActions{
                 Preferences.getInstance().setLatestVersion(null);
                 dialog.setVisible(false);
                 dialog.dispose();
-                GuiFrameController.showInBrowserDeprecatedDirectCall("http://www.tapaal.net/download");
+                GuiFrameController.showInBrowserDeprecatedDirectCall("https://www.tapaal.net/download/");
             });
             ignoreButton.addActionListener(e -> {
                 Preferences.getInstance().setLatestVersion(versionChecker.getNewVersionNumber());
