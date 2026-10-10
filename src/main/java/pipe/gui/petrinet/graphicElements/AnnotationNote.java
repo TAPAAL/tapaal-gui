@@ -362,7 +362,6 @@ public class AnnotationNote extends Note {
 			if ((typeMask & RIGHT) == RIGHT) {
 				myNote.adjustRight(Zoomer.getUnzoomedValue(x, getZoom()));
 			}
-			TAPAALGUI.getCurrentTab().setNetChanged(true);
 		}
 
 		public void myPaintComponent(Graphics g) {

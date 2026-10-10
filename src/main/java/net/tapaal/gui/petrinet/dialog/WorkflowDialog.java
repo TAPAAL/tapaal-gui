@@ -61,6 +61,7 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import pipe.gui.*;
 import net.tapaal.gui.petrinet.verification.Verifier;
 import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.undo.ChangeDefaultBoundCommand;
 
 public class WorkflowDialog extends JDialog {
 
@@ -653,9 +654,14 @@ public class WorkflowDialog extends JDialog {
 		panel.add(numberOfExtraTokensInNet, gbc);
 
 		numberOfExtraTokensInNet.addChangeListener(e -> {
-			model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-			tab.network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-			tab.setNetChanged(true);
+			int newBound = (Integer) numberOfExtraTokensInNet.getValue();
+			int oldBound = tab.network().getDefaultBound();
+			model.setDefaultBound(newBound);
+			if (oldBound != newBound) {
+				ChangeDefaultBoundCommand command = new ChangeDefaultBoundCommand(tab.network(), oldBound, newBound);
+				command.redo();
+				tab.getUndoManager().addNewEdit(command);
+			}
 		});
 
 		gbc.gridwidth = 1;
