@@ -3,6 +3,7 @@ package net.tapaal.gui.petrinet;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.canvas.Zoomer;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
+import dk.aau.cs.model.tapn.LocalTimedMarking;
 
 public class Template {
 	private final TimedArcPetriNet net;
@@ -40,6 +41,11 @@ public class Template {
 	public Template copy() {
 		TimedArcPetriNet tapn = net.copy();
 		tapn.setName(tapn.name() + "Copy");
+		if (net.parentNetwork() != null) {
+			tapn.setParentNetwork(net.parentNetwork());
+			((LocalTimedMarking)tapn.marking()).setNetworkMarking(net.parentNetwork().marking());
+		}
+        
 		return new Template(tapn, guiModel.copy(tapn), new Zoomer(zoomer.getPercent()));
 	}
 
