@@ -41,10 +41,8 @@ public class Template {
 	public Template copy() {
 		TimedArcPetriNet tapn = net.copy();
 		tapn.setName(tapn.name() + "Copy");
-		if (net.parentNetwork() != null) {
-			tapn.setParentNetwork(net.parentNetwork());
-			((LocalTimedMarking)tapn.marking()).setNetworkMarking(net.parentNetwork().marking());
-		}
+		tapn.setParentNetwork(net.parentNetwork());
+		((LocalTimedMarking)tapn.marking()).setNetworkMarking(net.parentNetwork().marking());
         
 		return new Template(tapn, guiModel.copy(tapn), new Zoomer(zoomer.getPercent()));
 	}
