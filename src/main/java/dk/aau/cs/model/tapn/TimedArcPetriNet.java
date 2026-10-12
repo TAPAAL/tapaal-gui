@@ -55,7 +55,7 @@ public class TimedArcPetriNet {
 			Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name, "+place.name()+", already exists in the petri net.");
 		if (!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
-		place.setCurrentMarking(currentMarking);
+		if (!place.isShared()) place.setCurrentMarking(currentMarking);
 	}
 
 	public boolean isColored(){
