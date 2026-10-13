@@ -356,7 +356,7 @@ public class TimedArcPetriNet {
 				TimedPlace copy = p.copy();
 				tapn.add(copy);
 				for(TimedToken token : p.tokens()){
-					tapn.addToken(new TimedToken(copy, token.getColor()));
+					tapn.addToken(new TimedToken(copy, token.age(), token.getColor()));
 				}
 			} else {
 				tapn.add(p);
