@@ -22,7 +22,7 @@ public class AddTimedPlaceCommand extends TAPNElementCommand {
 
 	@Override
 	public void redo() {
-		guiModel.addPetriNetObject(timedPlace);
 		tapn.add(timedPlace.underlyingPlace());
+		guiModel.addPetriNetObject(timedPlace);
 	}
 }
