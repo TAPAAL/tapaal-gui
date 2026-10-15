@@ -427,7 +427,7 @@ public class NetworkMarking implements TimedMarking {
                     tokenElement.setAttribute("age", token.age().toPlainString());
                     tokenElement.setAttribute("count", String.valueOf(count));
                     if (token.color() != null) {
-                        tokenElement.setAttribute("color", token.color().toString());
+                        tokenElement.setAttribute("color", token.color().toString().replaceAll(",\\s+", ","));
                     }
                     placeElement.appendChild(tokenElement);
                 }
