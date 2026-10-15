@@ -758,8 +758,8 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private boolean doOK() {
-		// Check urgent constrain
-		if(!invariantInf.isSelected() && !isUrgencyOK()){
+		// Check urgent constrain. An invariant that uses a constant leaves the infinity checkbox selected.
+		if((constantInvRadioButton.isSelected() || !invariantInf.isSelected()) && !isUrgencyOK()){
 			return false;
 		}
 
