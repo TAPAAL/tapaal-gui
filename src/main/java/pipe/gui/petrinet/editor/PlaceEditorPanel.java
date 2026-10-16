@@ -591,6 +591,10 @@ public class PlaceEditorPanel extends JPanel {
 
 		constantInvRadioButton = new JRadioButton("Constant");
 		constantInvRadioButton.addActionListener(e -> {
+			if (!isUrgencyOK()) {
+				normalInvRadioButton.setSelected(true);
+				return;
+			}
 			disableInvariantComponents();
 			enableConstantInvariantComponents();
 		});
