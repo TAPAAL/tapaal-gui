@@ -10,16 +10,26 @@ group 'net.tapaal'
 version '4.0-SNAPSHOT'
 
 var targetJavaVersion = "17"
+var toolchainJavaVersion = 25
 var targetKotlinVersion = "2.0"
 
 java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(toolchainJavaVersion)
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
     sourceCompatibility = targetJavaVersion
     targetCompatibility = targetJavaVersion
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = Integer.parseInt(targetJavaVersion)
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = targetJavaVersion
+        freeCompilerArgs += ["-Xjdk-release=${targetJavaVersion}"]
         apiVersion = targetKotlinVersion
         languageVersion = targetKotlinVersion
     }
