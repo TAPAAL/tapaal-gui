@@ -493,7 +493,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	private BugHandledJXMultisplitPane animatorSplitPane;
 
 	private Integer selectedTemplate = 0;
-	private Boolean selectedTemplateWasActive = false;
 
 	private WorkflowDialog workflowDialog = null;
 
@@ -674,28 +673,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		return scroller;
 	}
 
-	public void selectFirstActiveTemplate() {
-		templateExplorer.selectFirst();
-	}
-
-	public Boolean templateWasActiveBeforeSimulationMode() {
-		return selectedTemplateWasActive;
-	}
-
-	public void resetSelectedTemplateWasActive() {
-		selectedTemplateWasActive = false;
-	}
-
-	public void setSelectedTemplateWasActive() {
-		selectedTemplateWasActive = true;
-	}
-
 	public void rememberSelectedTemplate() {
 		selectedTemplate = templateExplorer.indexOfSelectedTemplate();
 	}
 
 	public void restoreSelectedTemplate() {
 		templateExplorer.restoreSelectedTemplate(selectedTemplate);
+		templateExplorer.openSelectedTemplate();
 	}
 
 	public void updateConstantsList() {
@@ -835,6 +819,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public void switchToAnimationComponents() {
+		var selected = templateExplorer.selectedModel();
 
 		//Remove dummy
 		Component dummy = animatorSplitPane.getMultiSplitLayout().getComponentForNode(animatorSplitPane.getMultiSplitLayout().getNodeForName(templateExplorerName));
@@ -845,6 +830,13 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 		//Add the templateExplorer
 		simulatorTemplateExplorer = new TemplateExplorer(this);
 		simulatorTemplateExplorer.switchToAnimationMode();
+		if (selected.isActive()) {
+			simulatorTemplateExplorer.selectTemplate(selected);
+		} else {
+			simulatorTemplateExplorer.selectFirst();
+		}
+        
+		simulatorTemplateExplorer.openSelectedTemplate();
 		animatorSplitPane.add(simulatorTemplateExplorer, templateExplorerName);
 
 		this.setLeftComponent(animatorSplitPaneScroller);
@@ -1012,7 +1004,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 	}
 
 	public Template currentTemplate() {
-		return templateExplorer.selectedModel();
+		return getActiveTemplateExplorer().selectedModel();
 	}
 
 	public Iterable<TAPNQuery> queries() {
@@ -1450,9 +1442,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				drawingSurface().repaintAll();
 
 				rememberSelectedTemplate();
-				if (currentTemplate().isActive()){
-					setSelectedTemplateWasActive();
-				}
 
 				getAnimator().resetTraceBox();
 
@@ -1474,13 +1463,6 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 				drawingSurface().setBackground(Constants.ANIMATION_BACKGROUND_COLOR);
 				SwingUtilities.invokeLater(() -> getAnimationHistorySidePanel().requestFocusInWindow());
 
-				if (templateWasActiveBeforeSimulationMode()) {
-					restoreSelectedTemplate();
-					resetSelectedTemplateWasActive();
-				}
-				else {
-					selectFirstActiveTemplate();
-				}
 				drawingSurface().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 				animationmode = true; //XXX: Must be called after setGuiMode as guiMode uses last state,
