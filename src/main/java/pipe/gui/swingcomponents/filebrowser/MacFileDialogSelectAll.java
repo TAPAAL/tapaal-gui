@@ -110,10 +110,6 @@ final class MacFileDialogSelectAll {
         }
     }
 
-    static boolean hasCommandA() {
-        return findCommandA() != null;
-    }
-
     /**
      * A modal dialog disables the owner window. AWT copies that into the menu bar,
      * and a disabled menu ignores key equivalents, so Select All never reaches the panel.
@@ -241,30 +237,6 @@ final class MacFileDialogSelectAll {
         return null;
     }
 
-    static boolean selectAllAncestorsEnabled() {
-        CommandA commandA = findCommandA();
-        if (commandA == null) {
-            return false;
-        }
-        Pointer current = commandA.menu;
-        boolean sawParent = false;
-        for (int depth = 0; current != null && depth < 8; depth++) {
-            Pointer parent = parentItem(current);
-            if (parent != null) {
-                sawParent = true;
-                if (!enabled(parent)) {
-                    return false;
-                }
-            }
-            Pointer next = msg(current, "supermenu");
-            if (next == null || next.equals(current)) {
-                break;
-            }
-            current = next;
-        }
-        return sawParent;
-    }
-
     private static boolean enabled(Pointer object) {
         return enabled(object, "isEnabled");
     }
@@ -278,92 +250,6 @@ final class MacFileDialogSelectAll {
             return false;
         }
         return (ObjC.I.msgLong(receiver, selector("respondsToSelector:"), selector(name)) & 0xffL) != 0;
-    }
-
-    static String shortcutDump() {
-        try {
-            Pointer app = msg(cls("NSApplication"), "sharedApplication");
-            Pointer mainMenu = app == null ? null : msg(app, "mainMenu");
-            if (mainMenu == null) {
-                return "no main menu";
-            }
-            StringBuilder dump = new StringBuilder();
-            dumpMenu(mainMenu, dump, 0);
-            return dump.toString();
-        } catch (Throwable failure) {
-            return String.valueOf(failure);
-        }
-    }
-
-    static String describeCommandA() {
-        AtomicReference<String> description = new AtomicReference<>();
-        try {
-            onMainThread(() -> description.set(describeCommandANow()));
-        } catch (Throwable failure) {
-            return String.valueOf(failure);
-        }
-        return description.get();
-    }
-
-    private static String describeCommandANow() {
-        try {
-            CommandA commandA = findCommandA();
-            if (commandA == null) {
-                return "missing " + ancestorDump(null);
-            }
-            Pointer action = msg(commandA.item, "action");
-            Pointer target = msg(commandA.item, "target");
-            String actionName = action == null ? "null" : selectorName(action);
-            return "action=" + actionName
-                    + " targetNull=" + (target == null)
-                    + " itemEnabled=" + enabled(commandA.item)
-                    + " " + ancestorDump(commandA.menu);
-        } catch (Throwable failure) {
-            return String.valueOf(failure);
-        }
-    }
-
-    private static String ancestorDump(Pointer menu) {
-        if (menu == null) {
-            return "no-menu";
-        }
-        StringBuilder dump = new StringBuilder();
-        Pointer current = menu;
-        for (int depth = 0; current != null && depth < 8; depth++) {
-            Pointer parent = parentItem(current);
-            dump.append("menu").append(depth)
-                    .append("(auto=").append(enabled(current, "autoenablesItems"))
-                    .append(", parent=").append(parent == null ? "none" : enabled(parent) + " " + title(parent))
-                    .append(") ");
-            Pointer next = msg(current, "supermenu");
-            if (next == null || next.equals(current)) {
-                break;
-            }
-            current = next;
-        }
-        Pointer window = menuBarWindow();
-        dump.append("windowEnabled=").append(window == null ? "none" : enabled(window));
-        return dump.toString();
-    }
-
-    static boolean commandATargetsFirstResponder() {
-        CommandA commandA = findCommandA();
-        if (commandA == null) {
-            return false;
-        }
-        Pointer action = msg(commandA.item, "action");
-        Pointer target = msg(commandA.item, "target");
-        return selector("selectAll:").equals(action) && target == null;
-    }
-
-    static boolean controlATargetsFirstResponder() {
-        CommandA controlA = findKeyEquivalent("a", CONTROL);
-        if (controlA == null) {
-            return false;
-        }
-        Pointer action = msg(controlA.item, "action");
-        Pointer target = msg(controlA.item, "target");
-        return selector("selectAll:").equals(action) && target == null;
     }
 
     private static void restore(Pointer item, Pointer action, Pointer target, boolean enabled, Pointer extraMenu, Pointer extraItem) {
@@ -391,33 +277,6 @@ final class MacFileDialogSelectAll {
         // The menu retains the item. Balance the alloc.
         msgVoid(item, "release");
         return item;
-    }
-
-    private static void dumpMenu(Pointer menu, StringBuilder dump, int depth) {
-        if (menu == null || depth > 4) {
-            return;
-        }
-        long count = msgLong(menu, "numberOfItems");
-        if (count < 0 || count > 500) {
-            return;
-        }
-        for (long i = 0; i < count; i++) {
-            Pointer item = msg(menu, "itemAtIndex:", i);
-            if (item == null) {
-                continue;
-            }
-            String key = keyEquivalent(item);
-            if (!key.isEmpty()) {
-                dump.append(" ".repeat(depth))
-                        .append(title(item))
-                        .append(" key=")
-                        .append(key)
-                        .append(" mods=")
-                        .append(deviceModifiers(item))
-                        .append('\n');
-            }
-            dumpMenu(msg(item, "submenu"), dump, depth + 1);
-        }
     }
 
     private static CommandA findCommandA() {
@@ -544,11 +403,6 @@ final class MacFileDialogSelectAll {
         return ObjC.I.sel_registerName(name);
     }
 
-    private static String selectorName(Pointer selector) {
-        Pointer name = ObjC.I.sel_getName(selector);
-        return name == null ? "null" : name.getString(0, StandardCharsets.UTF_8.name());
-    }
-
     private static Pointer msg(Pointer receiver, String selector, Object... args) {
         Pointer sel = selector(selector);
         if (args.length == 0) {
@@ -631,7 +485,6 @@ final class MacFileDialogSelectAll {
 
         Pointer objc_getClass(String className);
         Pointer sel_registerName(String selectorName);
-        Pointer sel_getName(Pointer selector);
 
         Pointer msg(Pointer receiver, Pointer selector);
         long msgLong(Pointer receiver, Pointer selector);
