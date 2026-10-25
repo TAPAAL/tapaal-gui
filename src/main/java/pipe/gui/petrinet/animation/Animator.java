@@ -1085,9 +1085,10 @@ public class Animator {
                 StringBuilder sb = new StringBuilder();
                 sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
                 for (Template template : tab.activeTemplates()) {
-                    for (Transition t : template.guiModel().transitions()) {
-                        if (t.isTransitionEnabled() && template.model().getTransitionByName(t.getName()).isUrgent()) {
-                            sb.append(template + "." + t.getName() + "<br />");
+                    for (var transition : template.model().transitions()) {
+                        if (transition.isUrgent() && (tab.getLens().isColored()
+                            ? isColoredTransitionEnabled(transition) : transition.isEnabled())) {
+                            sb.append(template + "." + transition.name() + "<br />");
                         }
                     }
                 }
