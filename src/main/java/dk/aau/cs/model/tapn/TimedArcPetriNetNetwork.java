@@ -234,6 +234,12 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void setMarking(NetworkMarking marking) {
+		for (TimedArcPetriNet tapn : tapns) {
+			if (!tapn.isActive() && marking.getMarkingFor(tapn) == null) {
+				marking.addMarking(tapn, currentMarking.getMarkingFor(tapn).clone());
+			}
+		}
+        
 		currentMarking = marking;
 		for (TimedArcPetriNet tapn : tapns) {
 			tapn.setMarking(currentMarking);
