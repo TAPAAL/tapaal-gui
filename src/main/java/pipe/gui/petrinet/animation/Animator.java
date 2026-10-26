@@ -84,7 +84,6 @@ public class Animator {
 
     private InteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
-    private boolean integerDelaysOnly;
     private Map<TimedTransition, List<Map<Variable, Color>>> validBindingsMap;
     private Map<TimedTransition, List<Map<Variable, Color>>> delayEnabledBindingsMap;
 
@@ -98,9 +97,6 @@ public class Animator {
 
     public void initializeInteractiveEngine() {
         if (!tab.getLens().isColored()) return;
-
-        integerDelaysOnly = tab.getLens().isTimed();
-        tab.getAnimationController().setIntegerDelayInput(integerDelaysOnly);
 
         try {
             TAPNComposer composer = new TAPNComposer(new MessengerImpl(), tab.getGuiModels(), tab.getLens(), false, true);
@@ -1041,10 +1037,6 @@ public class Animator {
     }
 
     public boolean letTimePass(BigDecimal delay) {
-
-        if (integerDelaysOnly && delay.stripTrailingZeros().scale() > 0) {
-            return false;
-        }
 
         if (delay.compareTo(BigDecimal.ZERO) != 0
             && (isUrgentTransitionEnabled || !currentMarking().isDelayPossible(delay))) {
