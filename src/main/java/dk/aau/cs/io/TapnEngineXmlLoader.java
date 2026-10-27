@@ -489,11 +489,7 @@ public class TapnEngineXmlLoader {
 
         Node conditionNode = getFirstDirectChild(transition, "condition");
         if (conditionNode != null) {
-            try {
-                guardExpr = loadTACPN.parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
-            } catch (FormatException e) {
-                e.printStackTrace();
-            }
+            guardExpr = loadTACPN.parseGuardExpression(getFirstDirectChild(conditionNode, "structure"));
         }
 		
 		TimedTransition t = new TimedTransition(nameInput, guardExpr);
@@ -631,7 +627,7 @@ public class TapnEngineXmlLoader {
 
         if (hlInitialMarkingNode instanceof Element) {
             try {
-                colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0));
+                colorMarking = loadTACPN.parseArcExpression(((Element)hlInitialMarkingNode).getElementsByTagName("structure").item(0), p.getColorType());
             } catch (FormatException e) {
                 e.printStackTrace();
             }
@@ -791,10 +787,16 @@ public class TapnEngineXmlLoader {
         ArcExpression arcExpr = null;
         List<ColoredTimeInterval> ctiList = new ArrayList<ColoredTimeInterval>();
         Node hlInscription = getFirstDirectChild(arc, "hlinscription");
-        if (hlInscription != null)
+        if (hlInscription != null) {
             hlInscription = getFirstDirectChild(hlInscription, "structure");
-        if (hlInscription != null)
-            arcExpr = loadTACPN.parseArcExpression(hlInscription);
+        }
+        
+        if (hlInscription != null) {
+            var place = sourceIn instanceof TimedPlaceComponent
+                ? ((TimedPlaceComponent)sourceIn).underlyingPlace()
+                : ((TimedPlaceComponent)targetIn).underlyingPlace();
+            arcExpr = loadTACPN.parseArcExpression(hlInscription, place.getColorType());
+        }
 
         NodeList intervalNodes = arc.getElementsByTagName("colorinterval");
         if (intervalNodes != null) {

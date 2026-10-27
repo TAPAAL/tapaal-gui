@@ -62,11 +62,14 @@ public class UpdateColorTypeCommand implements Command {
                     }
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(targetType);
+                    List<TimedToken> newTokens = new ArrayList<>();
                     for (TimedToken token : oldTokens) {
                         if (targetType.contains(token.getColor())) {
-                            place.addToken(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
+                            newTokens.add(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
                         }
                     }
+                    
+                    place.updateTokens(newTokens, place.getTokensAsExpression());
                 } else if (isModifiedProductType) {
                     if (place.getTokensAsExpression() != null) {
                         place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));
@@ -91,6 +94,22 @@ public class UpdateColorTypeCommand implements Command {
                     arc.setExpression(arc.getExpression().getExprConverted(sourceType, targetType));
                 }
             }
+
+            for (var arc : tapn.inhibitorArcs()) {
+                if (arc.getArcExpression() != null) {
+                    arc.setExpression(arc.getArcExpression().getExprConverted(sourceType, targetType));
+                }
+            }
+
+            for (var arc : tapn.transportArcs()) {
+                if (arc.getInputExpression() != null) {
+                    arc.setInputExpression(arc.getInputExpression().getExprConverted(sourceType, targetType));
+                }
+                if (arc.getOutputExpression() != null) {
+                    arc.setOutputExpression(arc.getOutputExpression().getExprConverted(sourceType, targetType));
+                }
+            }
+
             for (TimedTransition transition : tapn.transitions()) {
                 if (transition.getGuard() != null) {
                     Expression newGuardExpr = updateExpressionRecursively(transition.getGuard(), sourceType, targetType);
