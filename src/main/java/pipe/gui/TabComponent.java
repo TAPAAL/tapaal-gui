@@ -116,7 +116,8 @@ public abstract class TabComponent extends JPanel {
 			@Override
 			public void mousePressed(MouseEvent event) {
 				int index = pane.indexOfTabComponent(TabComponent.this);
-				if (index >= 0) {
+				if (index >= 0 && event.getButton() == MouseEvent.BUTTON1
+					&& !event.isPopupTrigger() && !event.isControlDown()) {
 					pane.setSelectedIndex(index);
 					pane.requestFocusInWindow();
 				}
@@ -195,7 +196,13 @@ public abstract class TabComponent extends JPanel {
 	}
 
 	private void closeTabs(List<PetriNetTab> tabs) {
-		tabs.forEach(this::closeTab);
+		for (PetriNetTab tab : tabs) {
+			closeTab(tab);
+			// A cancelled save prompt leaves the tab open; cancel the whole operation.
+			if (pane.indexOfComponent(tab) != -1) {
+				break;
+			}
+		}
 	}
 
 	private JPopupMenu createContextMenu() {
@@ -253,7 +260,8 @@ public abstract class TabComponent extends JPanel {
 		public void mouseClicked(MouseEvent e) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
 				closeTab();
-			} else if (e.getButton() == MouseEvent.BUTTON1) {
+			} else if (e.getButton() == MouseEvent.BUTTON1
+					&& !e.isPopupTrigger() && !e.isControlDown()) {
 				selectTab();
 			}
 		}
@@ -267,6 +275,16 @@ public abstract class TabComponent extends JPanel {
 	}
 
 	private static final MouseListener buttonMouseListener = new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.isPopupTrigger() && e.getComponent() instanceof AbstractButton) {
+				AbstractButton button = (AbstractButton) e.getComponent();
+				// Disarm before releasing so a Control-click cannot fire the close action.
+				button.getModel().setArmed(false);
+				button.getModel().setPressed(false);
+			}
+		}
+
 		@Override
 		public void mouseEntered(MouseEvent e) {
 			Component component = e.getComponent();
