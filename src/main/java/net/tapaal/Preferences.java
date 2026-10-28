@@ -102,6 +102,19 @@ public class Preferences {
 		}
 	}
 
+	public String getVerificationEngineDownloadLocation() {
+		return pref.get("verification.engines.download.location", "");
+	}
+
+	public void setVerificationEngineDownloadLocation(String location) {
+		final String key = "verification.engines.download.location";
+		if (location == null || location.isEmpty()) {
+			pref.remove(key);
+		} else {
+			pref.put(key, location);
+		}
+	}
+
 	public String getLatestVersion() {
 		return pref.get("tapaal.latestVersion", "");
 	}
