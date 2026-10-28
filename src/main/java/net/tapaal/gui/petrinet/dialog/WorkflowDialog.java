@@ -655,7 +655,7 @@ public class WorkflowDialog extends JDialog {
 		numberOfExtraTokensInNet.addChangeListener(e -> {
 			model.setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
 			tab.network().setDefaultBound((Integer) numberOfExtraTokensInNet.getValue());
-			tab.setNetChanged(true);
+			tab.markNonUndoableChange();
 		});
 
 		gbc.gridwidth = 1;
