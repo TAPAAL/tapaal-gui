@@ -143,7 +143,7 @@ public class InteractiveHandle {
 
     public NetworkMarking sendDelay(BigDecimal delay) {
         try {
-            var amount = delay.intValue();
+            var amount = delay.toPlainString();
             var msg = "<delay value=\"" + amount + "\"/>";
             var xmlResponse = sendMessage(msg, "valid-bindings");
             lastBindingsResult = parseBindingsResult(xmlResponse);

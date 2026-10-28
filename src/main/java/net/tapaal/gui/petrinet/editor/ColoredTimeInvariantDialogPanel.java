@@ -219,6 +219,10 @@ public class ColoredTimeInvariantDialogPanel extends JPanel {
 
         constantInvRadioButton = new JRadioButton("Constant");
         constantInvRadioButton.addActionListener(e -> {
+            if (!isUrgencyOK(true)) {
+                normalInvRadioButton.setSelected(true);
+                return;
+            }
             disableInvariantComponents();
             enableConstantInvariantComponents();
         });

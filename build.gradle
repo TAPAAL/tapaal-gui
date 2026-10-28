@@ -24,6 +24,7 @@ java {
 
 tasks.withType(JavaCompile).configureEach {
     options.release = Integer.parseInt(targetJavaVersion)
+    options.encoding = "UTF-8"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {

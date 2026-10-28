@@ -55,7 +55,7 @@ public class TimedArcPetriNet {
 			Require.that(!isNameUsed(place.name()) || (place.isShared() && !places.contains(place)), "A place or transition with the specified name, "+place.name()+", already exists in the petri net.");
 		if (!place.isShared()) ((LocalTimedPlace)place).setModel(this);
 		places.add(place);
-		place.setCurrentMarking(currentMarking);
+		if (!place.isShared()) place.setCurrentMarking(currentMarking);
 	}
 
 	public boolean isColored(){
@@ -356,7 +356,7 @@ public class TimedArcPetriNet {
 				TimedPlace copy = p.copy();
 				tapn.add(copy);
 				for(TimedToken token : p.tokens()){
-					tapn.addToken(new TimedToken(copy, token.getColor()));
+					tapn.addToken(new TimedToken(copy, token.age(), token.getColor()));
 				}
 			} else {
 				tapn.add(p);
