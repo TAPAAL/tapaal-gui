@@ -234,6 +234,12 @@ public class TimedArcPetriNetNetwork {
 	}
 
 	public void setMarking(NetworkMarking marking) {
+		for (TimedArcPetriNet tapn : tapns) {
+			if (!tapn.isActive() && marking.getMarkingFor(tapn) == null) {
+				marking.addMarking(tapn, currentMarking.getMarkingFor(tapn).clone());
+			}
+		}
+        
 		currentMarking = marking;
 		for (TimedArcPetriNet tapn : tapns) {
 			tapn.setMarking(currentMarking);
@@ -881,16 +887,6 @@ public class TimedArcPetriNetNetwork {
         }
         return null;
     }
-	
-	public boolean isIndeticalToExisting(ColorType newColorType) {
-		for (ColorType ct : colorTypes) {
-			if (ct.isIdentical(newColorType)) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 
     public boolean isNameUsedForColorType(String name) {
         for (ColorType element : colorTypes) {

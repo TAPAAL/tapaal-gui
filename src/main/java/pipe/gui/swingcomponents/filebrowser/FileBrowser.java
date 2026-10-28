@@ -86,7 +86,13 @@ public class FileBrowser {
 
         fileDialog.setMultipleMode(true);
         fileDialog.setMode(FileDialog.LOAD);
-        fileDialog.setVisible(true);
+        // Command-A is TAPAAL's Select All. Hand it, and Control-A, to the panel.
+        Runnable restoreSelectAll = MacFileDialogSelectAll.redirectWhileOpen();
+        try {
+            fileDialog.setVisible(true);
+        } finally {
+            restoreSelectAll.run();
+        }
         File[] selectedFiles = fileDialog.getFiles();
         Preferences.getInstance().setFileBrowserLocation(fileDialog.getDirectory());
         return selectedFiles;

@@ -12,8 +12,8 @@ Run the focused characterization suite after changing eligibility policy:
 
 The suite currently checks:
 
-- all `2^17` combinations of semantic input facts against an independent legacy feature-derivation oracle;
-- all `2^20 * 8` feature/catalog compatibility comparisons;
+- all `2^18` combinations of semantic input facts against an independent legacy feature-derivation oracle;
+- all `2^22 * 8` feature/catalog compatibility comparisons;
 - timed, stochastic, and untimed engine filtering and catalog order;
 - trace, search, Tarjan, trace-refinement, explicit-search, symmetry, approximation, colored-reduction, inclusion, stubborn-reduction, and discrete forced-disable policies;
 - state restoration for explicit search and the selected-option fallback rules.
@@ -26,7 +26,7 @@ The browser prototype at `src/main/java/net/tapaal/gui/petrinet/verification/PRO
 - [x] Trace choices: none, some, fastest
 - [x] Search strategies and heuristic label
 - [x] Trace refinement
-- [x] Tarjan visibility and HyperLTL forced-off state
+- [x] Tarjan visibility and HyperLTL/SMC forced-off state
 - [x] Explicit-search disable/restore memory
 - [x] Colored reduction
 - [x] Discrete inclusion visibility

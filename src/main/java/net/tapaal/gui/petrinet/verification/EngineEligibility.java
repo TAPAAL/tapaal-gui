@@ -30,7 +30,8 @@ public final class EngineEligibility {
         boolean hasEfOrAg,
         boolean hasEgOrAf,
         boolean nestedQuantifications,
-        boolean coloredPlaceQueries
+        boolean coloredPlaceQueries,
+        boolean explicitSearch
     ) { }
 
     public enum SearchStrategy { BFS, DFS, RANDOM, HEURISTIC }
@@ -115,7 +116,7 @@ public final class EngineEligibility {
     public static TarjanDecision tarjanDecision(int queryTypeIndex) {
         return switch (queryTypeIndex) {
             case 1 -> new TarjanDecision(true, true, false);
-            case 2 -> new TarjanDecision(true, false, true);
+            case 2, 3 -> new TarjanDecision(true, false, true);
             default -> new TarjanDecision(false, false, false);
         };
     }
@@ -214,8 +215,8 @@ public final class EngineEligibility {
         );
     }
 
-    public static boolean stubbornReductionEnabled(boolean hyperLtl, boolean timeDarts) {
-        return !hyperLtl && !timeDarts;
+    public static boolean stubbornReductionEnabled(boolean timeDarts) {
+        return !timeDarts;
     }
 
     public record DiscreteDecision(
@@ -313,6 +314,7 @@ public final class EngineEligibility {
         EnumSet<EngineFeature> required = EnumSet.noneOf(EngineFeature.class);
 
         if (context.fastestTrace()) required.add(EngineFeature.FASTEST_TRACE);
+        if (context.explicitSearch()) required.add(EngineFeature.EXPLICIT_SEARCH);
         if (context.deadlock() && context.hasEfOrAg() && !context.degreeGreaterThanTwo()) {
             required.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
         }

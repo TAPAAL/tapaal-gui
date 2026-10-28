@@ -121,5 +121,5 @@ public class EqualityExpression extends GuardExpression implements LeftRightGuar
     }
 
     @Override
-    public GuardExpression copy() {return new EqualityExpression(left, right);}
+    public GuardExpression copy() {return new EqualityExpression(left, right, colorType);}
 }

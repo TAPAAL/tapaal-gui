@@ -312,9 +312,12 @@ public class TimedTransitionComponent extends Transition {
 		}
 		
 		// Build interface
-		if (show && (transition.getdInterval() != null) && isTimed()) {
+		TimeInterval interval = show && isTimed()
+            ? (isColored() ? TAPAALGUI.getCurrentTab().getAnimator().getColoredTransitionInterval(transition)
+                : transition.getdInterval()) : null;
+        if (interval != null) {
 			dIntervalWindow = new Window(new Frame());
-			dIntervalWindow.add(new JTextArea(transition.getdInterval().toString()));
+			dIntervalWindow.add(new JTextArea(interval.toString()));
 			
 			dIntervalWindow.getComponent(0).setBackground(Color.lightGray);
 

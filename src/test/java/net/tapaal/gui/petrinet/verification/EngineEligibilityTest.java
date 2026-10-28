@@ -26,12 +26,13 @@ class EngineEligibilityTest {
     void derivesAllRequiredFeaturesFromEligibilityContext() {
         var context = new EngineEligibility.Context(
             true, true, true, true, true, true, true, true, true, true,
-            true, true, true, true, true, true, true
+            true, true, true, true, true, true, true, true
         );
 
         var expected = EnumSet.allOf(EngineFeature.class);
         expected.remove(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
         expected.remove(EngineFeature.ONLY_UNTIMED);
+        expected.remove(EngineFeature.UNFOLDED_TRACE_IN_ORIGINAL_NET);
         assertEquals(expected, EngineEligibility.requiredFeatures(context));
     }
 
@@ -81,12 +82,12 @@ class EngineEligibilityTest {
             }
         }
 
-        assertEquals(8 * (1 << 20), comparisons);
+        assertEquals(CATALOG.size() * (1 << features.length), comparisons);
     }
 
     @Test
     void requiredFeatureDerivationMatchesLegacyRulesForEveryBooleanCombination() {
-        int combinations = 1 << 17;
+        int combinations = 1 << 18;
         for (int mask = 0; mask < combinations; mask++) {
             int currentMask = mask;
             var context = new EngineEligibility.Context(
@@ -94,7 +95,7 @@ class EngineEligibilityTest {
                 bit(mask, 4), bit(mask, 5), bit(mask, 6), bit(mask, 7),
                 bit(mask, 8), bit(mask, 9), bit(mask, 10), bit(mask, 11),
                 bit(mask, 12), bit(mask, 13), bit(mask, 14), bit(mask, 15),
-                bit(mask, 16)
+                bit(mask, 16), bit(mask, 17)
             );
             assertEquals(legacyRequiredFeatures(context), EngineEligibility.requiredFeatures(context),
                 () -> "feature derivation mismatch for mask " + currentMask);
@@ -214,6 +215,8 @@ class EngineEligibilityTest {
             EngineEligibility.tarjanDecision(1));
         assertEquals(new EngineEligibility.TarjanDecision(true, false, true),
             EngineEligibility.tarjanDecision(2));
+        assertEquals(new EngineEligibility.TarjanDecision(true, false, true),
+            EngineEligibility.tarjanDecision(3));
         assertEquals(new EngineEligibility.TarjanDecision(false, false, false),
             EngineEligibility.tarjanDecision(0));
     }
@@ -271,10 +274,9 @@ class EngineEligibilityTest {
     }
 
     @Test
-    void stubbornReductionRequiresNeitherHyperLtlNorTimeDarts() {
-        assertTrue(EngineEligibility.stubbornReductionEnabled(false, false));
-        assertFalse(EngineEligibility.stubbornReductionEnabled(true, false));
-        assertFalse(EngineEligibility.stubbornReductionEnabled(false, true));
+    void stubbornReductionIsAvailableUnlessTimeDartsIsSelected() {
+        assertTrue(EngineEligibility.stubbornReductionEnabled(false));
+        assertFalse(EngineEligibility.stubbornReductionEnabled(true));
     }
 
     @Test
@@ -305,6 +307,7 @@ class EngineEligibilityTest {
     private static EnumSet<EngineFeature> legacyRequiredFeatures(EngineEligibility.Context context) {
         EnumSet<EngineFeature> required = EnumSet.noneOf(EngineFeature.class);
         if (context.fastestTrace()) required.add(EngineFeature.FASTEST_TRACE);
+        if (context.explicitSearch()) required.add(EngineFeature.EXPLICIT_SEARCH);
         if (context.deadlock() && context.hasEfOrAg() && !context.degreeGreaterThanTwo()) {
             required.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
         }

@@ -96,6 +96,45 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
             long numericPrecision,
             Optional<Long> smcSeed
 	) {
+		this(extraTokens, traceOption, search, symmetry, gcd, timeDarts, pTrie, useStateequationCheck, discreteInclusion, inclusionPlaces, workflow, workflowbound, enableOverApproximation, enableUnderApproximation, approximationDenominator, stubbornReduction, reducedModelPath, partition, colorFixpoint, unfoldNet, useRawVerification, rawVerificationOptions, benchmark, benchmarkRuns, parallel, queryCategory, numberOfTraces, smcTraceType, isSimulate, granularity, maxGranularity, numericPrecision, smcSeed, false);
+	}
+
+	public VerifyDTAPNOptions(
+			int extraTokens,
+			TraceOption traceOption,
+			SearchOption search,
+			boolean symmetry,
+			boolean gcd,
+			boolean timeDarts,
+			boolean pTrie,
+			boolean useStateequationCheck,
+			boolean discreteInclusion,
+			InclusionPlaces inclusionPlaces,
+			WorkflowMode workflow,
+			long workflowbound,
+			boolean enableOverApproximation,
+			boolean enableUnderApproximation,
+			int approximationDenominator,
+			boolean stubbornReduction,
+            String reducedModelPath,
+            boolean partition,
+            boolean colorFixpoint,
+            boolean unfoldNet,
+			boolean useRawVerification,
+			String rawVerificationOptions,
+            boolean benchmark,
+            int benchmarkRuns,
+            boolean parallel,
+			QueryCategory queryCategory,
+            int numberOfTraces,
+            SMCTraceType smcTraceType,
+            boolean isSimulate,
+            int granularity,
+            boolean maxGranularity,
+            long numericPrecision,
+            Optional<Long> smcSeed,
+            boolean traceInOriginalNet
+	) {
 		super(extraTokens, traceOption, search, symmetry, useStateequationCheck, discreteInclusion, inclusionPlaces, enableOverApproximation, enableUnderApproximation, approximationDenominator);
 		this.timeDarts = timeDarts;
 		this.pTrie = pTrie;
@@ -120,13 +159,22 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         this.maxGranularity = maxGranularity;
         this.numericPrecision = numericPrecision;
         this.smcSeed = smcSeed;
+        this.traceInOriginalNet = traceInOriginalNet;
 
 		// we only force unfolding when traces are involved
-        if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
+        if (traceInOriginalNet) {
+            unfoldedModelPath = null;
+            unfoldedQueriesPath = null;
+        } else if((unfold && trace() != TraceOption.NONE || enableOverApproximation || enableUnderApproximation || isSmc && isSimulate && unfold) && !useRawVerification)
         {
             try {
-				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
-                unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                if (Platform.isWindows()) {
+                    unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
+                    unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
+                } else {
+                    unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                    unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                }
             } catch (IOException e) {
                 new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
             }
@@ -147,7 +195,9 @@ public class VerifyDTAPNOptions extends VerifyTAPNOptions {
         result.append(kBoundArg());
         result.append(deadTokenArg());
         result.append(traceArg(traceOption));
-        if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation || isSmc && isSimulate && unfold)
+        if (traceInOriginalNet) {
+            result.append(" --trace-original-net ");
+        } else if(unfold && trace() != TraceOption.NONE || enabledOverApproximation || enabledUnderApproximation || isSmc && isSimulate && unfold)
         {
             result.append(writeUnfolded());
             result.append(" --bindings ");

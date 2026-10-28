@@ -591,6 +591,10 @@ public class PlaceEditorPanel extends JPanel {
 
 		constantInvRadioButton = new JRadioButton("Constant");
 		constantInvRadioButton.addActionListener(e -> {
+			if (!isUrgencyOK()) {
+				normalInvRadioButton.setSelected(true);
+				return;
+			}
 			disableInvariantComponents();
 			enableConstantInvariantComponents();
 		});
@@ -758,8 +762,8 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private boolean doOK() {
-		// Check urgent constrain
-		if(!invariantInf.isSelected() && !isUrgencyOK()){
+		// Check urgent constrain. An invariant that uses a constant leaves the infinity checkbox selected.
+		if((constantInvRadioButton.isSelected() || !invariantInf.isSelected()) && !isUrgencyOK()){
 			return false;
 		}
 
@@ -1586,6 +1590,20 @@ public class PlaceEditorPanel extends JPanel {
     }
 
     private void updateArcsAccordingToColorType() {
+        if (place.underlyingPlace().isShared()) {
+            for (var template : currentTab.allTemplates()) {
+                var matchingPlace = template.guiModel().getPlaceByName(place.underlyingPlace().name());
+                if (matchingPlace instanceof TimedPlaceComponent sharedPlace
+                    && sharedPlace.underlyingPlace() == place.underlyingPlace()) {
+                    updateArcsAccordingToColorType(sharedPlace);
+                }
+            }
+        } else {
+            updateArcsAccordingToColorType(place);
+        }
+    }
+
+    private void updateArcsAccordingToColorType(TimedPlaceComponent place) {
         for (var arc : place.getPostset()) {
             //We know it goes from place to transition so it can be either InputArcComponent or TransportArc or InhibitorArc
             if (arc instanceof TimedTransportArcComponent) {
