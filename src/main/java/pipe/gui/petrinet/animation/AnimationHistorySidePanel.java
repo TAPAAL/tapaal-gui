@@ -34,20 +34,20 @@ public class AnimationHistorySidePanel extends JPanel {
         //BorderLayout.Center fill the parent components size
         setLayout(new BorderLayout());
 
-        animBox = new AnimationHistoryList();
+        animBox = new AnimationHistoryList(animator.getTab());
         var inputMap = animBox.getInputMap(JComponent.WHEN_FOCUSED);
         inputMap.put(KeyStroke.getKeyStroke("UP"), "simulator.previousComponent");
         inputMap.put(KeyStroke.getKeyStroke("DOWN"), "simulator.nextComponent");
         animBox.getActionMap().put("simulator.previousComponent", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                TAPAALGUI.getCurrentTab().previousComponent();
+                animator.getTab().previousComponent();
             }
         });
         animBox.getActionMap().put("simulator.nextComponent", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                TAPAALGUI.getCurrentTab().nextComponent();
+                animator.getTab().nextComponent();
             }
         });
         animBox.addMouseListener(new MouseAdapter() {

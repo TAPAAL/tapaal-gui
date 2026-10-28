@@ -2,11 +2,11 @@ package dk.aau.cs.verification.VerifyTAPN;
 
 import com.sun.jna.Platform;
 
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.verification.SMCTraceType;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.SearchOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
+import dk.aau.cs.verification.VerificationOptions.SearchOption;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 

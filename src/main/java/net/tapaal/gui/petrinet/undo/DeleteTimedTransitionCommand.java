@@ -26,11 +26,11 @@ public class DeleteTimedTransitionCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
         transition.deselect();
-		guiModel.addPetriNetObject(transition);
 		if(sharedTransition != null) {
 			sharedTransition.makeShared(transition.underlyingTransition());
 		}
 		tapn.add(transition.underlyingTransition());
+		guiModel.addPetriNetObject(transition);
 	}
 
 }

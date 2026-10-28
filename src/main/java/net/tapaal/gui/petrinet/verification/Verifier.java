@@ -6,8 +6,13 @@ import javax.swing.JSpinner;
 import com.sun.jna.Platform;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import pipe.gui.petrinet.PetriNetTab;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
+import net.tapaal.gui.petrinet.smartdraw.SmartDrawDialog;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.verification.VerifyTAPN.*;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
 import pipe.gui.petrinet.dataLayer.DataLayer;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
@@ -88,7 +93,7 @@ public class Verifier {
                 lens.isColored() && query.useSymmetricVars(),
                 lens.isColored(),
                 query.useColoredReduction());
-            newQuery.setCategory(TAPNQuery.QueryCategory.CTL);
+            newQuery.setCategory(QueryCategory.CTL);
             newQuery.setUseSiphontrap(query.isSiphontrapEnabled());
             newQuery.setUseQueryReduction(query.isQueryReductionEnabled());
             newQuery.setUseStubbornReduction(query.isStubbornReductionEnabled());
@@ -190,6 +195,10 @@ public class Verifier {
 
 
     public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input) {
+        runUppaalVerification(timedArcPetriNetNetwork, input, null);
+    }
+
+    public static void runUppaalVerification(TimedArcPetriNetNetwork timedArcPetriNetNetwork, TAPNQuery input, PetriNetTab tab) {
         Verifyta verifyta = getVerifyta();
         if (!verifyta.isCorrectVersion()) {
             System.err.println("Verifyta not found, or you are running an old version of Verifyta.\n"
@@ -200,8 +209,8 @@ public class Verifier {
         TCTLAbstractProperty inputQuery = input.getProperty();
 
         VerifytaOptions verifytaOptions = new VerifytaOptions(
-            input.getTraceOption(),
-            input.getSearchOption(),
+            QueryMetadataAdapter.toVerificationTraceOption(input.getTraceOption()),
+            QueryMetadataAdapter.toVerificationSearchOption(input.getSearchOption()),
             false,
             input.getReductionOption(),
             input.useSymmetry(),
@@ -216,7 +225,7 @@ public class Verifier {
         }
 
         if (timedArcPetriNetNetwork != null) {
-            RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl());
+            RunVerificationBase thread = new RunVerification(verifyta, new UppaalIconSelector(), new MessengerImpl(), tab);
             RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
             thread.execute(
                 verifytaOptions,
@@ -234,7 +243,11 @@ public class Verifier {
     }
 
     public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback) {
-        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false, null);
+        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false, null, null);
+    }
+
+    public static void runVerifyTAPNVerification(TimedArcPetriNetNetwork tapnNetwork, TAPNQuery query, VerificationCallback callback, PetriNetTab tab) {
+        runVerifyTAPNVerification(tapnNetwork, query, callback, null, false, null, tab);
     }
 
     public static void runVerifyTAPNVerification(
@@ -244,6 +257,17 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet,
         TAPNLens lens) {
+        runVerifyTAPNVerification(tapnNetwork, query, callback, guiModels, onlyCreateReducedNet, lens, null);
+    }
+
+    public static void runVerifyTAPNVerification(
+        TimedArcPetriNetNetwork tapnNetwork,
+        TAPNQuery query,
+        VerificationCallback callback,
+        HashMap<TimedArcPetriNet, DataLayer> guiModels,
+        boolean onlyCreateReducedNet,
+        TAPNLens lens,
+        PetriNetTab tab) {
         query = convertQuery(query, lens, tapnNetwork);
         ModelChecker verifytapn = getModelChecker(query);
 
@@ -268,9 +292,9 @@ public class Verifier {
         if (tapnNetwork != null) {
             RunVerificationBase thread;
             if (reducedNetTempFile != null) {
-                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet);
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet, tab != null ? tab : RunVerificationBase.findOwnerTab(guiModels).orElse(null));
             } else {
-                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, null, false, tab != null ? tab : RunVerificationBase.findOwnerTab(guiModels).orElse(null));
             }
 
             RunningVerificationDialog dialog = new RunningVerificationDialog(TAPAALGUI.getApp(), thread);
@@ -287,12 +311,12 @@ public class Verifier {
 
     public static VerifyTAPNOptions getVerificationOptions(TAPNQuery query, boolean isColored) {
         if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            boolean isSmcSimulation = query.isSimulate() && query.getCategory() == TAPNQuery.QueryCategory.SMC;
+            boolean isSmcSimulation = query.isSimulate() && query.getCategory() == QueryCategory.SMC;
             boolean unfold = isColored && (query.getTraceOption() != TAPNQuery.TraceOption.NONE || isSmcSimulation) && !query.traceInOriginalNet();
             return new VerifyDTAPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useSymmetry(),
                 query.useGCD(),
                 query.useTimeDarts(),
@@ -330,8 +354,8 @@ public class Verifier {
                 && !query.useExplicitSearch() && !query.traceInOriginalNet();
             VerifyPNOptions options = new VerifyPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useOverApproximation(),
                 query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION,
                 query.isOverApproximationEnabled(),
@@ -340,7 +364,7 @@ public class Verifier {
                 query.getCategory(),
                 query.getAlgorithmOption(),
                 query.isSiphontrapEnabled(),
-                query.isQueryReductionEnabled() ? TAPNQuery.QueryReductionTime.UnlimitedTime : TAPNQuery.QueryReductionTime.NoTime,
+                query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime,
                 query.isStubbornReductionEnabled(),
                 getReducedNetFilePath(),
                 query.isTarOptionEnabled(),
@@ -360,8 +384,8 @@ public class Verifier {
         } else {
             return new VerifyTAPNOptions(
                 query.getCapacity(),
-                query.getTraceOption(),
-                query.getSearchOption(),
+                QueryMetadataAdapter.toVerificationTraceOption(query.getTraceOption()),
+                QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()),
                 query.useSymmetry(),
                 query.useOverApproximation(),
                 query.discreteInclusion(),
@@ -397,6 +421,17 @@ public class Verifier {
         HashMap<TimedArcPetriNet, DataLayer> guiModels,
         boolean onlyCreateReducedNet,
         TAPNLens lens) {
+        return runVerifyTAPNSilent(tapnNetwork, query, callback, guiModels, onlyCreateReducedNet, lens, null);
+    }
+
+    public static RunVerificationBase runVerifyTAPNSilent(
+        TimedArcPetriNetNetwork tapnNetwork,
+        TAPNQuery query,
+        VerificationCallback callback,
+        HashMap<TimedArcPetriNet, DataLayer> guiModels,
+        boolean onlyCreateReducedNet,
+        TAPNLens lens,
+        PetriNetTab tab) {
         query = convertQuery(query, lens);
         ModelChecker verifytapn = getModelChecker(query);
 
@@ -421,9 +456,9 @@ public class Verifier {
         if (tapnNetwork != null) {
             RunVerificationBase thread;
             if (reducedNetTempFile != null) {
-                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet);
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, getReducedNetFilePath(), onlyCreateReducedNet, tab != null ? tab : RunVerificationBase.findOwnerTab(guiModels).orElse(null));
             } else {
-                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels);
+                thread = new RunVerification(verifytapn, new VerifyTAPNIconSelector(), new MessengerImpl(), callback, guiModels, null, false, tab != null ? tab : RunVerificationBase.findOwnerTab(guiModels).orElse(null));
             }
 
             thread.execute(verifytapnOptions, tapnNetwork, new dk.aau.cs.model.tapn.TAPNQuery(query.getProperty(), query.getCapacity(), query.getSmcSettings()), query, lens);

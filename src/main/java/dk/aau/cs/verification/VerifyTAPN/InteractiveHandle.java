@@ -132,7 +132,7 @@ public class InteractiveHandle {
 
     public BindingsResult sendMarking(NetworkMarking marking) {
         try {
-            var xmlResponse = sendMessage(marking.toXmlStr(composer), "valid-bindings");
+            var xmlResponse = sendMessage(marking.toXmlStr(composer, composer.getLens().isTimed()), "valid-bindings");
             lastBindingsResult = parseBindingsResult(xmlResponse);
             return lastBindingsResult;
         } catch (Exception e) {

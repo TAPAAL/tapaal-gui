@@ -1,15 +1,17 @@
 package net.tapaal.gui.debug
 
 import net.tapaal.gui.petrinet.undo.Command
+import net.tapaal.gui.TabInteraction
 import pipe.gui.TAPAALGUI
 import pipe.gui.petrinet.undo.UndoManager
 import java.awt.event.ActionEvent
 import java.util.ArrayList
+import java.util.function.Supplier
 import javax.swing.*
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 
-class UndoRedoSpy : JFrame() {
+class UndoRedoSpy(private val tabInteraction: Supplier<TabInteraction>) : JFrame() {
     private val reloadBtn = JButton(object : AbstractAction("Reload") {
         override fun actionPerformed(e: ActionEvent?) {
             reloadUndoRedoStack()
@@ -23,7 +25,7 @@ class UndoRedoSpy : JFrame() {
         val m = tree.model as DefaultTreeModel
         treeRoot.removeAllChildren()
 
-        val undoManager = TAPAALGUI.getCurrentTab().undoManager
+        val undoManager = tabInteraction.get().getCurrentTab().orElseThrow().undoManager
         
         // Normal edits
         val normalEditsField = UndoManager::class.java.getDeclaredField("normalEdits")

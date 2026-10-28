@@ -7,7 +7,6 @@ package pipe.gui.petrinet.action;
 
 import java.awt.event.ActionEvent;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.ArcPathPoint;
 
 public class ToggleArcPointAction extends javax.swing.AbstractAction {
@@ -25,7 +24,7 @@ public class ToggleArcPointAction extends javax.swing.AbstractAction {
 	 * java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent e) {
-		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
+		arcPathPoint.getOwnerTab().getUndoManager().addNewEdit(
 				arcPathPoint.togglePointType());
 	}
 

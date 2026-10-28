@@ -7,7 +7,6 @@ import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.GuiFrameController;
 import net.tapaal.resourcemanager.ResourceManager;
-import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.petrinet.PetriNetTab;
 
 import javax.swing.*;
@@ -17,7 +16,7 @@ public class TAPAALGUI {
 	private final static GuiFrame appGui = new GuiFrame(TAPAAL.getProgramName());
     private final static GuiFrameController appGuiController = new GuiFrameController(appGui);
 
-	public static void init() {
+    public static void init() {
 
 	    try {
             Desktop.getDesktop().setAboutHandler(e -> appGuiController.showAbout());
@@ -49,26 +48,6 @@ public class TAPAALGUI {
 		appGuiController.checkForUpdate(false);
 	}
 
-    //XXX Please avoid using the function below. It is only used for legacy code, or quick prototyping
-    // instead pass down arguments using the constructor.
-
-	@Deprecated
-	public static PetriNetTab getCurrentTab() {
-		return appGuiController.getTabs().get(appGui.getSelectedTabIndex());
-	}
-
-	/**
-	 * @deprecated Use method getAnimator in GuiFrame
-	 */
-	@Deprecated
-	public static Animator getAnimator() {
-        var tab = getCurrentTab();
-		if (tab == null) {
-			return null;
-		}
-		return tab.getAnimator();
-	}
-	
 	//XXX Two Methodes to access same data (created after auto encapsulate)
 	//Used for setting parent in popups
     @Deprecated

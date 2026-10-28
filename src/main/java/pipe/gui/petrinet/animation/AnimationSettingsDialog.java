@@ -10,6 +10,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.petrinet.animation.DelayEnabledTransitionControl;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.swingcomponents.EscapableDialog;
@@ -20,7 +21,7 @@ public class AnimationSettingsDialog {
 	private static DelayEnabledTransitionControl delayEnabled;
 	private static SimulationControl simControl;
 
-	private static JPanel getContent(TAPNLens lens){
+	private static JPanel getContent(TAPNLens lens, PetriNetTab tab){
 		JPanel content = new JPanel(new BorderLayout());
 		 
 		delayEnabled = DelayEnabledTransitionControl.getInstance();
@@ -31,7 +32,7 @@ public class AnimationSettingsDialog {
 			if(simControl.randomSimulation()){
 				simControl.randomMode.setSelected(true);
 			}
-			TAPAALGUI.getCurrentTab().getTransitionFiringComponent().updateFireButton();
+			tab.getTransitionFiringComponent().updateFireButton();
 		});
 		
 		content.add(delayEnabled, BorderLayout.NORTH);
@@ -44,7 +45,7 @@ public class AnimationSettingsDialog {
 	    delayEnabled.setVisible(lens.isTimed());
     }
 	
-	public static void showAnimationSettings(TAPNLens lens){
+	public static void showAnimationSettings(TAPNLens lens, PetriNetTab tab){
 		JPanel contentPane = new JPanel(new GridBagLayout());
 		
 		JButton closeDialogButton = new JButton("Close");
@@ -54,7 +55,7 @@ public class AnimationSettingsDialog {
 		gbc.anchor = GridBagConstraints.NORTHWEST;
 		gbc.insets = new Insets(0, 3, 0, 3);
 		gbc.fill = GridBagConstraints.BOTH;
-		contentPane.add(getContent(lens), gbc);
+		contentPane.add(getContent(lens, tab), gbc);
 		
 		gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.NORTHWEST;

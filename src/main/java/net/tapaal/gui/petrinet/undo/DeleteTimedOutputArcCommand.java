@@ -23,8 +23,8 @@ public class DeleteTimedOutputArcCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
 	    arc.deselect();
-		guiModel.addPetriNetObject(arc);
 		tapn.add(arc.underlyingArc());
+		guiModel.addPetriNetObject(arc);
 	}
 
 }

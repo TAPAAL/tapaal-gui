@@ -4,6 +4,7 @@ import java.util.*;
 
 import dk.aau.cs.util.RequireException;
 import pipe.gui.canvas.Canvas;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
@@ -17,6 +18,16 @@ import dk.aau.cs.util.Require;
 
 
 public class DataLayer {
+
+	private PetriNetTab ownerTab;
+
+	public void setOwnerTab(PetriNetTab ownerTab) {
+		this.ownerTab = ownerTab;
+	}
+
+	public PetriNetTab getOwnerTab() {
+		return ownerTab;
+	}
 
 
 	//XXX: Temp solution while refactoring, should be changed to interface to now allow to many actions
@@ -360,7 +371,6 @@ public class DataLayer {
 	public void addPetriNetObject(PetriNetObject pnObject) {
 
 		pnObject.setGuiModel(this);
-		addToViewIfConnected(pnObject); // Must be called after model is set
 
         //XXX: temp solution to have access to all elements types at once
         petriNetObjects.add(pnObject);
@@ -393,6 +403,10 @@ public class DataLayer {
 		} else {
 			throw new RuntimeException("Unknow element type added");
 		}
+
+		// Register the object completely before attaching it to Swing. Adding to
+		// the view can repaint immediately and inspect the DataLayer/model state.
+		addToViewIfConnected(pnObject);
 		// we reset to null so that the wrong ArrayList can't get added to
 		changeArrayList = null;
 	}

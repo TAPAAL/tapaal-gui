@@ -33,7 +33,7 @@ import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedOutputArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import net.tapaal.gui.petrinet.verification.RunningVerificationDialog;
 import pipe.gui.petrinet.PetriNetTab;
 
@@ -111,18 +111,14 @@ public class TabTransformer {
                     newArc.setUnderlyingArc(addedArc);
                     newArc.setArcPath(newArcPath);
                     newArc.updateArcPosition();
+                    template.model().add(addedArc);
                     guiModel.addPetriNetObject(newArc);
 
                     //Change the partner
 
-                    TimedOutputArcComponent arc2 = convertPartner(arc.getConnectedTo(), template, guiModel);
+                    convertPartner(arc.getConnectedTo(), template, guiModel);
 
                     removeTransportArc(arc, guiModel);
-
-                    //Add arc to model and GUI
-                    template.model().add(addedArc);
-                    template.model().add(arc2.underlyingArc());
-
                 }
             }
         }
@@ -142,7 +138,6 @@ public class TabTransformer {
         TimedTransition source = template.model().getTransitionByName(arc.getSource().getName());
 
         TimedOutputArc addedArc = new TimedOutputArc(source, destination, arc.getWeight(), arc.underlyingTransportArc().getOutputExpression());
-        //template.model().add(addedArc);
 
         // GUI
 
@@ -164,6 +159,7 @@ public class TabTransformer {
         newArc.setUnderlyingArc(addedArc);
         newArc.setArcPath(newArcPath);
         newArc.updateArcPosition();
+        template.model().add(addedArc);
         guiModel.addPetriNetObject(newArc);
 
         return newArc;

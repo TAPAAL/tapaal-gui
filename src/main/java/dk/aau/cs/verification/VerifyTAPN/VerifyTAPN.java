@@ -18,7 +18,6 @@ import net.tapaal.gui.petrinet.verification.UnfoldNet;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import pipe.gui.Constants;
@@ -39,6 +38,7 @@ import dk.aau.cs.util.UnsupportedModelException;
 import dk.aau.cs.util.UnsupportedQueryException;
 
 import com.sun.jna.Platform;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 
 public class VerifyTAPN implements ModelChecker {
 	private static final String NEED_TO_LOCATE_VERIFYTAPN_MSG = "TAPAAL needs to know the location of the file verifytapn.\n\n"
@@ -338,7 +338,7 @@ public class VerifyTAPN implements ModelChecker {
 
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
-                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        TAPNModelComposer newComposer = new TAPNModelComposer(true);
                         model = newComposer.transformModel(loadedModel.network());
 
                         if (queryResult != null && queryResult.value1() != null) {

@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.AnnotationNote;
 
 public class EditAnnotationBorderAction extends AbstractAction {
@@ -21,7 +20,7 @@ public class EditAnnotationBorderAction extends AbstractAction {
 
 	/** Action for editing the text in an AnnotationNote */
 	public void actionPerformed(ActionEvent e) {
-		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(
+		selected.getOwnerTab().getUndoManager().addNewEdit(
 				selected.showBorder(!selected.isShowingBorder()));
 	}
 

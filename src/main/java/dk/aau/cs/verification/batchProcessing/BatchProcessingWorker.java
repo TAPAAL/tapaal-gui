@@ -15,14 +15,10 @@ import javax.swing.SwingWorker;
 import dk.aau.cs.debug.Logger;
 import dk.aau.cs.verification.*;
 import dk.aau.cs.verification.VerifyTAPN.*;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryReductionTime;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
 import net.tapaal.gui.petrinet.widgets.QueryPane;
-import dk.aau.cs.Messenger;
 import dk.aau.cs.TCTL.visitors.RenameAllPlacesVisitor;
 import dk.aau.cs.TCTL.visitors.RenameAllTransitionsVisitor;
 import dk.aau.cs.approximation.ApproximationWorker;
@@ -42,6 +38,10 @@ import dk.aau.cs.verification.UPPAAL.Verifyta;
 import dk.aau.cs.verification.UPPAAL.VerifytaOptions;
 import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.RealConstant;
+import net.tapaal.gui.petrinet.model.QueryMetadataAdapter;
+import dk.aau.cs.verification.VerificationOptions.QueryReductionTime;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
 
 public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVerificationResult> {
 	private final List<File> files;
@@ -244,14 +244,7 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 	}
 
 	private Tuple<TimedArcPetriNet, NameMapping> composeModel(LoadedBatchProcessingModel model) {
-		ITAPNComposer composer = new TAPNComposer(new Messenger(){
-			public void displayInfoMessage(String message) { }
-			public void displayInfoMessage(String message, String title) {}
-			public void displayErrorMessage(String message) {}
-			public void displayErrorMessage(String message, String title) {}
-			public void displayWrappedErrorMessage(String message, String title) {}
-			
-		}, false);
+		TAPNModelComposer composer = new TAPNModelComposer(false);
         return composer.transformModel(model.network());
 	}
 
@@ -359,12 +352,12 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
     private VerificationResult<TimedArcPetriNetTrace> verify(Tuple<TimedArcPetriNet, NameMapping> composedModel, net.tapaal.gui.petrinet.verification.TAPNQuery query, BatchProcessingVerificationOptions option) throws Exception {
         TAPNQuery queryToVerify = getTAPNQuery(query);
         queryToVerify.setCategory(query.getCategory());
-        queryToVerify.setVerificationType(query.getVerificationType());
+        queryToVerify.setVerificationType(QueryMetadataAdapter.toModelVerificationType(query.getVerificationType()));
         MapQueryToNewNames(queryToVerify, composedModel.value2());
 
         TAPNQuery clonedQuery = new TAPNQuery(query.getProperty().copy(), queryToVerify.getExtraTokens(), query.getSmcSettings());
         clonedQuery.setCategory(query.getCategory());
-        clonedQuery.setVerificationType(query.getVerificationType());
+        clonedQuery.setVerificationType(QueryMetadataAdapter.toModelVerificationType(query.getVerificationType()));
         MapQueryToNewNames(clonedQuery, composedModel.value2());
 
         fireVerificationTaskStarted();
@@ -419,13 +412,13 @@ public class BatchProcessingWorker extends SwingWorker<Void, BatchProcessingVeri
 
 	public VerificationOptions getVerificationOptionsFromQuery(net.tapaal.gui.petrinet.verification.TAPNQuery query) {
         if (query.getReductionOption() == ReductionOption.VerifyTAPN) {
-            return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isColored(), false, query.getRawVerification(), query.getRawVerificationPrompt());    // XXX DISABLES OverApprox
+            return new VerifyTAPNOptions(query.getCapacity(), TraceOption.NONE, QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()), query.useSymmetry(), false, query.discreteInclusion(), query.inclusionPlaces(), query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isColored(), false, query.getRawVerification(), query.getRawVerificationPrompt());    // XXX DISABLES OverApprox
         } else if (query.getReductionOption() == ReductionOption.VerifyDTAPN) {
-            return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored(), query.getRawVerification(), query.getRawVerificationPrompt(), query.isBenchmarkMode(), query.getBenchmarkRuns(), query.isParallel(), query.getCategory(), query.getNumberOfTraces(), query.getSmcTraceType(), query.isSimulate(), query.getGranularity(), query.isMaxGranularity(), query.getSmcSettings().getNumericPrecision(), query.getSmcSettings().getSmcSeed());
+            return new VerifyDTAPNOptions(query.getCapacity(), TraceOption.NONE, QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()), query.useSymmetry(), query.useGCD(), query.useTimeDarts(), query.usePTrie(), false, query.discreteInclusion(), query.inclusionPlaces(), query.getWorkflowMode(), 0, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.isStubbornReductionEnabled(), null, query.usePartitioning(), query.useColorFixpoint(), query.isColored(), query.getRawVerification(), query.getRawVerificationPrompt(), query.isBenchmarkMode(), query.getBenchmarkRuns(), query.isParallel(), query.getCategory(), query.getNumberOfTraces(), query.getSmcTraceType(), query.isSimulate(), query.getGranularity(), query.isMaxGranularity(), query.getSmcSettings().getNumericPrecision(), query.getSmcSettings().getSmcSeed());
         } else if (query.getReductionOption() == ReductionOption.VerifyPN || query.getReductionOption() == ReductionOption.VerifyPNApprox || query.getReductionOption() == ReductionOption.VerifyPNReduce) {
-            return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, query.getSearchOption(), query.useOverApproximation(), query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime, query.isStubbornReductionEnabled(), null, query.isTarOptionEnabled(), query.isTarjan(), query.isColored(), false, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), query.useColoredReduction(), query.useExplicitSearch(), query.getRawVerification(), query.getRawVerificationPrompt());
+            return new VerifyPNOptions(query.getCapacity(), TraceOption.NONE, QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()), query.useOverApproximation(), query.useReduction() ? ModelReduction.AGGRESSIVE : ModelReduction.NO_REDUCTION, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator(), query.getCategory(), query.getAlgorithmOption(), query.isSiphontrapEnabled(), query.isQueryReductionEnabled() ? QueryReductionTime.UnlimitedTime : QueryReductionTime.NoTime, query.isStubbornReductionEnabled(), null, query.isTarOptionEnabled(), query.isTarjan(), query.isColored(), false, query.usePartitioning(), query.useColorFixpoint(), query.useSymmetricVars(), query.useColoredReduction(), query.useExplicitSearch(), query.getRawVerification(), query.getRawVerificationPrompt());
         } else {
-            return new VerifytaOptions(TraceOption.NONE, query.getSearchOption(), false, query.getReductionOption(), query.useSymmetry(), false, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
+            return new VerifytaOptions(TraceOption.NONE, QueryMetadataAdapter.toVerificationSearchOption(query.getSearchOption()), false, query.getReductionOption(), query.useSymmetry(), false, query.isOverApproximationEnabled(), query.isUnderApproximationEnabled(), query.approximationDenominator());
         }
     }
 	

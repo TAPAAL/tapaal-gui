@@ -9,11 +9,13 @@ import java.awt.Insets;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import net.tapaal.resourcemanager.ResourceManager;
+import net.tapaal.gui.petrinet.Template;
 import net.tapaal.swinghelpers.CustomJSpinner;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.PetriNetTab;
@@ -102,9 +104,9 @@ public class SmartDrawDialog extends JDialog {
 		}
 	});
 
-	public static void showSmartDrawDialog() {
+	public static void showSmartDrawDialog(PetriNetTab tab) {
         SmartDrawDialog smartDrawDialog;
-        smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true, TAPAALGUI.getCurrentTab());
+        smartDrawDialog = new SmartDrawDialog(TAPAALGUI.getApp(), "Smart Draw", true, tab);
         smartDrawDialog.pack();
         smartDrawDialog.setPreferredSize(smartDrawDialog.getSize());
         smartDrawDialog.setMinimumSize(new Dimension(smartDrawDialog.getWidth(), smartDrawDialog.getHeight()));
@@ -129,23 +131,28 @@ public class SmartDrawDialog extends JDialog {
 		}
 	}
     public static void setupWorkerListener(final SwingWorker<?, ?> worker) {
-	    if(worker != null){
-            worker.addPropertyChangeListener(event -> {
-                if (event.getPropertyName().equals("unfolding")) {
-                    SwingWorker.StateValue stateValue = (SwingWorker.StateValue) event.getNewValue();
-                    if (stateValue.equals(SwingWorker.StateValue.DONE)) {
-                        //Don't auto-layout on empty net or net too big to draw, hotfix for issue #1960000
-                        PetriNetTab currentTab = TAPAALGUI.getCurrentTab();
-                        if (currentTab != null && currentTab.network().paintNet() && !currentTab.currentTemplate().getHasPositionalInfo() && (currentTab.currentTemplate().guiModel().getPlaces().length + currentTab.currentTemplate().guiModel().getTransitions().length) > 0) {
-                            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
-                            if (dialogResult == JOptionPane.YES_OPTION) {
-                                showSmartDrawDialog();
-                            }
-                        }
-                    }
+        setupWorkerListener(worker, tab -> {
+            int dialogResult = JOptionPane.showConfirmDialog(TAPAALGUI.getApp(), "The net does not have any layout information. Would you like to do automatic layout?", "Automatic Layout?", JOptionPane.YES_NO_OPTION);
+            if (dialogResult == JOptionPane.YES_OPTION) {
+                showSmartDrawDialog(tab);
+            }
+        });
+    }
+
+    static void setupWorkerListener(SwingWorker<?, ?> worker, Consumer<PetriNetTab> offerLayout) {
+        if (worker == null) return;
+        worker.addPropertyChangeListener(event -> {
+            // Completion carries the tab actually opened or given a trace,
+            // which may differ from both the source tab and the active tab.
+            if (event.getPropertyName().equals("unfolding") && event.getNewValue() instanceof PetriNetTab tab) {
+                Template template = tab.currentTemplate();
+                // Don't offer layout for empty nets or nets too big to draw.
+                if (tab.network().paintNet() && template != null && !template.getHasPositionalInfo()
+                    && template.guiModel().getPlaceTransitionObjects().size() > 0) {
+                    offerLayout.accept(tab);
                 }
-            });
-        }
+            }
+        });
     }
 	
 	private void initComponents() {

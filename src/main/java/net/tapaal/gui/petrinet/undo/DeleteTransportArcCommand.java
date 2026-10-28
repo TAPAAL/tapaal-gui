@@ -34,10 +34,9 @@ public class DeleteTransportArcCommand extends TAPNElementCommand {
 
         transportArcComponent.deselect();
 
-        guiModel.addPetriNetObject(transportArcComponent);
-		guiModel.addPetriNetObject(partner);
-
 		tapn.add(transportArc);
+		guiModel.addPetriNetObject(transportArcComponent);
+		guiModel.addPetriNetObject(partner);
 		transportArcComponent.refreshTransportLabelsOnTransition();
 	}
 

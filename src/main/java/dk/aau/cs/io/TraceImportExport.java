@@ -138,7 +138,7 @@ public class TraceImportExport {
                     .anyMatch(step -> step instanceof TAPNNetworkColoredTransitionStep);
             if (isColoredTrace) {
                 NetworkMarking initialMarking = tab.network().marking();
-                Element initialMarkingElement = initialMarking.toXmlElement(document, composer);
+                Element initialMarkingElement = initialMarking.toXmlElement(document, composer, tab.getLens().isTimed());
                 traceRootNode.appendChild(initialMarkingElement);
             }
             
@@ -195,7 +195,7 @@ public class TraceImportExport {
                     traceRootNode.appendChild(transitionElement);
 
                     NetworkMarking marking = coloredStep.getMarking();
-                    Element markingElement = marking.toXmlElement(document, composer);
+                    Element markingElement = marking.toXmlElement(document, composer, tab.getLens().isTimed());
                     traceRootNode.appendChild(markingElement);
                 }
             }

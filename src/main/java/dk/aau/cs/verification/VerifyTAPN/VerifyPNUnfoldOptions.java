@@ -1,7 +1,8 @@
 package dk.aau.cs.verification.VerifyTAPN;
 
 import dk.aau.cs.verification.VerificationOptions;
-import net.tapaal.gui.petrinet.verification.TAPNQuery;
+import dk.aau.cs.verification.VerificationOptions.SearchOption;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,7 @@ import com.sun.jna.Platform;
 
 public class VerifyPNUnfoldOptions extends VerificationOptions {
 
-    private static final Map<TAPNQuery.SearchOption, String> searchMap = createSearchOptionsMap();
+    private static final Map<SearchOption, String> searchMap = createSearchOptionsMap();
     private final String modelOut;
     private final String queryOut;
     private final int numQueries;
@@ -48,15 +49,15 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
     }
 
     @Override
-    public TAPNQuery.TraceOption traceOption() {
+    public TraceOption traceOption() {
         return null;
     }
 
     @Override
-    public void setTraceOption(TAPNQuery.TraceOption option) { }
+    public void setTraceOption(TraceOption option) { }
 
     @Override
-    public TAPNQuery.SearchOption searchOption() {
+    public SearchOption searchOption() {
         return null;
     }
 
@@ -93,13 +94,13 @@ public class VerifyPNUnfoldOptions extends VerificationOptions {
         return "--write-unfolded-queries " + queryOut + " --write-unfolded-net " + modelOut;
     }
 
-    private static Map<TAPNQuery.SearchOption, String> createSearchOptionsMap() {
-        HashMap<TAPNQuery.SearchOption, String> map = new HashMap<TAPNQuery.SearchOption, String>();
-        map.put(TAPNQuery.SearchOption.BFS, " --search-strategy BFS");
-        map.put(TAPNQuery.SearchOption.DFS, " --search-strategy DFS");
-        map.put(TAPNQuery.SearchOption.RANDOM, " --search-strategy RDFS");
-        map.put(TAPNQuery.SearchOption.HEURISTIC, " --search-strategy BestFS");
-        map.put(TAPNQuery.SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox");
+    private static Map<SearchOption, String> createSearchOptionsMap() {
+        HashMap<SearchOption, String> map = new HashMap<SearchOption, String>();
+        map.put(SearchOption.BFS, " --search-strategy BFS");
+        map.put(SearchOption.DFS, " --search-strategy DFS");
+        map.put(SearchOption.RANDOM, " --search-strategy RDFS");
+        map.put(SearchOption.HEURISTIC, " --search-strategy BestFS");
+        map.put(SearchOption.OVERAPPROXIMATE, " --search-strategy OverApprox");
 
         return map;
     }

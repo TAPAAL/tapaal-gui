@@ -9,6 +9,7 @@ import dk.aau.cs.io.*;
 import dk.aau.cs.io.queries.XMLQueryLoader;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.util.FormatException;
@@ -56,6 +57,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = Constants.MAX_NET_SIZE;
     private boolean netTooBig = false;
+    private PetriNetTab unfoldedTab;
 
     public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         super();
@@ -203,6 +205,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 }
             }
 
+            unfoldedTab = newTab;
+
             ColorBindingParser parser = new ColorBindingParser();
             parser.addBindings(loadedModel, String.join(System.lineSeparator(), outputLines));
         } catch (FormatException e) {
@@ -221,10 +225,10 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         return null;
     }
 
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, TAPNQuery.QueryCategory queryCategory) {
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, QueryCategory queryCategory) {
         return getQueries(queryFile, network, List.of(queryCategory));
     }
-    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<TAPNQuery.QueryCategory> queryCategories) {
+    public static List<TAPNQuery> getQueries(File queryFile, TimedArcPetriNetNetwork network, List<QueryCategory> queryCategories) {
         XMLQueryLoader queryLoader = new XMLQueryLoader(queryFile, network, queryCategories);
         try {
             return new ArrayList<>(queryLoader.parseQueries().getQueries());
@@ -322,7 +326,7 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 showErrorMessage(result);
             } else {
                 firePropertyChange("state", StateValue.PENDING, StateValue.DONE);
-                firePropertyChange("unfolding", StateValue.PENDING, StateValue.DONE);
+                firePropertyChange("unfolding", null, unfoldedTab);
             }
 
         } else {

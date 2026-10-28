@@ -22,9 +22,9 @@ import net.tapaal.TAPAAL;
 import net.tapaal.gui.petrinet.TAPNLens;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces.InclusionPlacesOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.WorkflowMode;
 import net.tapaal.gui.petrinet.verification.UnfoldNet;
+import dk.aau.cs.verification.VerificationOptions.TraceOption;
+import dk.aau.cs.verification.VerificationOptions.WorkflowMode;
 import pipe.gui.Constants;
 import pipe.gui.FileFinder;
 import pipe.gui.MessengerImpl;
@@ -349,7 +349,7 @@ public class VerifyDTAPN implements ModelChecker{
                     File queriesOut = new File(options.unfoldedQueriesPath());
                     try {
                         LoadedModel loadedModel = tapnLoader.load(fileOut);
-                        TAPNComposer newComposer = new TAPNComposer(new MessengerImpl(), true);
+                        TAPNModelComposer newComposer = new TAPNModelComposer(true);
                         model = newComposer.transformModel(loadedModel.network());
                         
                         if (queryResult.value1() != null) {

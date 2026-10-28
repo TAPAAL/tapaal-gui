@@ -2,13 +2,6 @@ package dk.aau.cs.model.tapn;
 
 import java.util.*;
 
-import net.tapaal.gui.petrinet.undo.AddConstantEditCommand;
-import net.tapaal.gui.petrinet.undo.AddRealConstantEditCommand;
-import net.tapaal.gui.petrinet.undo.RemoveConstantEditCommand;
-import net.tapaal.gui.petrinet.undo.RemoveRealConstantEditCommand;
-import net.tapaal.gui.petrinet.undo.UpdateConstantEditCommand;
-import net.tapaal.gui.petrinet.undo.UpdateRealConstantEditCommand;
-import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
 import dk.aau.cs.util.StringComparator;
@@ -242,29 +235,29 @@ public class ConstantStore {
 		}
 	}
 
-	public Command addConstant(String name, LinkedHashSet<Integer> vals) {
+	public Constant addConstantValue(String name, LinkedHashSet<Integer> vals) {
 		if (isNameInf(name) || containsRealConstantByName(name))
 			return null;
 
 		if (!containsConstantByName(name)) {
 			Constant c = new Constant(name, vals);
-			constants.add(c);
+			add(c);
 			Collections.sort(constants, new StringComparator());
 
-			return new AddConstantEditCommand(c, this);
+			return c;
 		}
 
 		return null;
 	}
 
-	public Command addConstant(String name, int val) {
+	public Constant addConstantValue(String name, int val) {
 		if (isNameInf(name) || containsRealConstantByName(name))
 			return null;
 
 		if (!containsConstantByName(name)) {
 			Constant c = new Constant(name, val);
 			add(c);
-			return new AddConstantEditCommand(c, this);
+			return c;
 		}
 		
 
@@ -283,13 +276,13 @@ public class ConstantStore {
 		}
 	}
 
-	public Command removeConstant(String name) {
+	public Constant removeConstantValue(String name) {
 		if (!isConstantInUse(name)) {
 			if (containsConstantByName(name)) {
 				Constant c = getConstantByName(name);
 				remove(c);
 				findLargestConstantValue();
-				return new RemoveConstantEditCommand(c, this);
+				return c;
 			}
 		}
 
@@ -341,7 +334,7 @@ public class ConstantStore {
 		return name.equals("inf");
 	}
 
-	public Command updateConstant(String oldName, Constant updatedConstant,	TimedArcPetriNetNetwork model) {
+	public Constant updateConstantValue(String oldName, Constant updatedConstant) {
 		if (containsRealConstantByName(updatedConstant.name())) {
 			return null;
         }
@@ -353,7 +346,7 @@ public class ConstantStore {
 				updatedConstant.setUpperBound(old.upperBound());
 				updatedConstant.setIsUsed(old.isUsed());
 				replace(old, updatedConstant);
-				return new UpdateConstantEditCommand(old, updatedConstant, this, model);
+				return updatedConstant;
 			}
 		}
 		return null;
@@ -399,7 +392,7 @@ public class ConstantStore {
 		return constants.indexOf(constant);
 	}
 
-	public Command addRealConstant(String name, LinkedHashSet<Double> vals) {
+	public RealConstant addRealConstantValue(String name, LinkedHashSet<Double> vals) {
 		if (isNameInf(name) || containsRealConstantByName(name) || containsConstantByName(name)) {
 			return null;
 		}
@@ -407,7 +400,7 @@ public class ConstantStore {
 		var c = new RealConstant(name, vals);
 		realConstants.add(c);
 		realConstants.sort(new StringComparator());
-		return new AddRealConstantEditCommand(c, this);
+		return c;
 	}
 
 	public void add(RealConstant constant) {
@@ -430,7 +423,7 @@ public class ConstantStore {
 		realConstants.set(index, newConstant);
 	}
 
-	public Command removeRealConstant(String name) {
+	public RealConstant removeRealConstantValue(String name) {
 		if (isRealConstantInUse(name)) {
 			return null;
 		}
@@ -441,7 +434,7 @@ public class ConstantStore {
 		}
 
 		realConstants.remove(c);
-		return new RemoveRealConstantEditCommand(c, this);
+		return c;
 	}
 
 	public boolean isRealConstantInUse(String name) {
@@ -449,7 +442,7 @@ public class ConstantStore {
 		return c != null && c.isUsed();
 	}
 
-	public Command updateRealConstant(String oldName, RealConstant updatedConstant, TimedArcPetriNetNetwork model) {
+	public RealConstant updateRealConstantValue(String oldName, RealConstant updatedConstant) {
 		if (!oldName.equals(updatedConstant.name())
 				&& (containsRealConstantByName(updatedConstant.name()) || containsConstantByName(updatedConstant.name()))) {
 			return null;
@@ -462,7 +455,7 @@ public class ConstantStore {
 
 		updatedConstant.setIsUsed(old.isUsed());
 		replace(old, updatedConstant);
-		return new UpdateRealConstantEditCommand(old, updatedConstant, this, model);
+		return updatedConstant;
 	}
 
 	public void swapRealConstants(int currentIndex, int newIndex) {

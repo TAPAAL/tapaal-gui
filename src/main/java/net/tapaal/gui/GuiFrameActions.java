@@ -1,6 +1,5 @@
 package net.tapaal.gui;
 
-import net.tapaal.helpers.Reference.Reference;
 import pipe.gui.GuiFrame;
 import pipe.gui.petrinet.action.GuiAction;
 import pipe.gui.petrinet.PetriNetTab;
@@ -44,7 +43,9 @@ public interface GuiFrameActions {
 
     void setStatusBarText(String s);
 
-    void registerController(GuiFrameControllerActions guiFrameController, Reference<TabActions> currentTab);
+    void registerController(GuiFrameControllerActions guiFrameController);
+
+    void registerTabInteraction(TabInteraction tabInteraction);
 
     void changeToTab(PetriNetTab tab);
 

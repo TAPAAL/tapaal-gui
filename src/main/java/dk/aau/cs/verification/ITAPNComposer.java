@@ -2,12 +2,11 @@ package dk.aau.cs.verification;
 
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
+import dk.aau.cs.model.tapn.ComposedNameProvider;
 import dk.aau.cs.util.Tuple;
-import pipe.gui.petrinet.dataLayer.DataLayer;
 
-public interface ITAPNComposer {
+public interface ITAPNComposer extends ComposedNameProvider {
 
 	Tuple<TimedArcPetriNet, NameMapping> transformModel(TimedArcPetriNetNetwork model);
-	DataLayer getGuiModel();
 
 }

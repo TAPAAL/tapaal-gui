@@ -23,8 +23,8 @@ public class DeleteTimedInputArcCommand extends TAPNElementCommand {
 	@Override
 	public void undo() {
         timedInputArc.deselect();
-		guiModel.addPetriNetObject(timedInputArc);
 		tapn.add(timedInputArc.underlyingTimedInputArc());
+		guiModel.addPetriNetObject(timedInputArc);
 	}
 
 }

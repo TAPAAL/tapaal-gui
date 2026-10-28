@@ -14,7 +14,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.ToolTipManager;
 
 import net.tapaal.gui.petrinet.Template;
-import pipe.gui.TAPAALGUI;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.graphicElements.Transition;
 
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
@@ -22,10 +22,12 @@ import dk.aau.cs.verification.VerifyTAPN.TraceType;
 public class AnimationHistoryList extends JList<String> {
 
 	private TraceType lastShown = TraceType.NOT_EG;
+    private final PetriNetTab tab;
     private final Map<Integer, String> itemTooltips = new HashMap<>();
 
-	public AnimationHistoryList() {
+	public AnimationHistoryList(PetriNetTab tab) {
 		super();
+		this.tab = tab;
 		setModel(new DefaultListModel<>());
 		setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		
@@ -178,7 +180,7 @@ public class AnimationHistoryList extends JList<String> {
 			return;
 		}
         
-		for (Template t : TAPAALGUI.getCurrentTab().activeTemplates()){
+		for (Template t : tab.activeTemplates()){
 			for(Transition trans : t.guiModel().getTransitions()){
 				if(trans.isTransitionEnabled() || trans.isDelayEnabled()){
 					return;

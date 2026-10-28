@@ -20,17 +20,24 @@ import org.w3c.dom.Element;
 
 import dk.aau.cs.model.NTA.trace.TraceToken;
 import dk.aau.cs.io.writeTACPN;
-import pipe.gui.TAPAALGUI;
 import dk.aau.cs.model.tapn.simulation.FiringMode;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.util.Tuple;
-import dk.aau.cs.verification.TAPNComposer;
 
 public class NetworkMarking implements TimedMarking {
 	private final Map<TimedArcPetriNet, LocalTimedMarking> markings = new HashMap<TimedArcPetriNet, LocalTimedMarking>();
 	private final Map<TimedPlace, List<TimedToken>> sharedPlacesTokens = new HashMap<TimedPlace, List<TimedToken>>();
+	private TimedArcPetriNetNetwork network;
 
 	public NetworkMarking() {
+	}
+
+	NetworkMarking(TimedArcPetriNetNetwork network) {
+		this.network = network;
+	}
+
+	void setNetwork(TimedArcPetriNetNetwork network) {
+		this.network = network;
 	}
 
 	public void addMarking(TimedArcPetriNet tapn, LocalTimedMarking marking) {
@@ -72,7 +79,7 @@ public class NetworkMarking implements TimedMarking {
 
 	public boolean isDelayPossible(BigDecimal delay) {
 		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
-			if(TAPAALGUI.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
+			if(isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
 				for(TimedToken token : entry.getValue()){
 					TimeInvariant invariant = token.place().invariantFor(token.color());
 					if (!invariant.isSatisfied(token.age().add(delay))) {
@@ -95,7 +102,7 @@ public class NetworkMarking implements TimedMarking {
 	public List<TimedPlace> getBlockingPlaces(BigDecimal delay){
 		List<TimedPlace> result = new ArrayList<TimedPlace>();
 		for(Entry<TimedPlace, List<TimedToken>> entry: sharedPlacesTokens.entrySet()){
-			if(TAPAALGUI.getCurrentTab().network().isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
+			if(isSharedPlaceUsedInTemplates((SharedPlace)entry.getKey())){
 				for(TimedToken token : entry.getValue()){
 					TimeInvariant invariant = token.place().invariantFor(token.color());
 					if (!invariant.isSatisfied(token.age().add(delay))) {
@@ -120,7 +127,7 @@ public class NetworkMarking implements TimedMarking {
 		Require.that(amount != null, "Delay must not be null");
 		Require.that(isDelayPossible(amount), "Delay breaks invariant.");
 
-		NetworkMarking newMarking = new NetworkMarking();
+		NetworkMarking newMarking = new NetworkMarking(network);
 		for(Entry<TimedPlace, List<TimedToken>> entry : sharedPlacesTokens.entrySet()){
 			List<TimedToken> newTokens = new ArrayList<TimedToken>(entry.getValue().size());
 			for(TimedToken token : entry.getValue()){
@@ -135,6 +142,11 @@ public class NetworkMarking implements TimedMarking {
 			}
 		}
 		return newMarking;
+	}
+
+	private boolean isSharedPlaceUsedInTemplates(SharedPlace place) {
+		TimedArcPetriNetNetwork owningNetwork = network != null ? network : place.network();
+		return owningNetwork != null && owningNetwork.isSharedPlaceUsedInTemplates(place);
 	}
 
 	public Tuple<NetworkMarking, List<TimedToken>> fireTransition(TimedTransition transition, FiringMode firingMode) {
@@ -344,13 +356,13 @@ public class NetworkMarking implements TimedMarking {
         return sb.toString();
     }
 
-    public String toXmlStr(TAPNComposer composer) {
+    public String toXmlStr(ComposedNameProvider composer, boolean timed) {
         try {
             var dbf = DocumentBuilderFactory.newInstance();
             var builder = dbf.newDocumentBuilder();
             var document = builder.newDocument();
             
-            var markingElement = toXmlElement(document, composer);
+            var markingElement = toXmlElement(document, composer, timed);
             document.appendChild(markingElement);
 
             var transformerFactory = TransformerFactory.newInstance();
@@ -367,7 +379,7 @@ public class NetworkMarking implements TimedMarking {
         }   
     }
 
-    public Element toXmlElement(Document document, TAPNComposer composer) {
+    public Element toXmlElement(Document document, ComposedNameProvider composer, boolean timed) {
         Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
         for (var entry : markings.entrySet()) {
             if (entry.getKey().isActive()) {
@@ -393,7 +405,7 @@ public class NetworkMarking implements TimedMarking {
              }
         }
 
-        if (network != null && !composer.getLens().isTimed()) {
+        if (network != null && !timed) {
             for (var entry : allPlaces.entrySet()) {
                 var place = entry.getKey();
                 var placeElement = document.createElement("place");

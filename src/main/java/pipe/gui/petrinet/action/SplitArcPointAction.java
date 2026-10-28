@@ -7,7 +7,6 @@ package pipe.gui.petrinet.action;
 
 import java.awt.event.ActionEvent;
 
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.ArcPathPoint;
 
 /**
@@ -25,7 +24,7 @@ public class SplitArcPointAction extends javax.swing.AbstractAction {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		TAPAALGUI.getCurrentTab().getUndoManager().addNewEdit(arcPathPoint.splitPoint());
+		arcPathPoint.getOwnerTab().getUndoManager().addNewEdit(arcPathPoint.splitPoint());
 	}
 
 }

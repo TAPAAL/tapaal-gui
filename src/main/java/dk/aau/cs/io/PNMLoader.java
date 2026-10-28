@@ -514,10 +514,12 @@ public class PNMLoader {
             arc = new TimedInputArcComponent(new TimedOutputArcComponent(source, target, weight, arcId), lens);
             arc.setUnderlyingArc(inputArc);
 
-            template.guiModel().addPetriNetObject(arc);
         }
 
         template.model().add(inputArc);
+        if(isNetDrawable()){
+            template.guiModel().addPetriNetObject(arc);
+        }
 
         return arc;
 
@@ -542,11 +544,12 @@ public class PNMLoader {
                 source, target, weight,	arcId);
             arc.setUnderlyingArc(outputArc);
 
-            template.guiModel().addPetriNetObject(arc);
-
         }
 
         template.model().add(outputArc);
+        if(isNetDrawable()){
+            template.guiModel().addPetriNetObject(arc);
+        }
         return arc;
     }
 
@@ -561,8 +564,8 @@ public class PNMLoader {
         TimedInhibitorArc inhibArc = new TimedInhibitorArc(place, transition, TimeInterval.ZERO_INF, new IntWeight(weight), arcExpression);
 
         tempArc.setUnderlyingArc(inhibArc);
-        template.guiModel().addPetriNetObject(tempArc);
         template.model().add(inhibArc);
+        template.guiModel().addPetriNetObject(tempArc);
 
         return tempArc;
     }

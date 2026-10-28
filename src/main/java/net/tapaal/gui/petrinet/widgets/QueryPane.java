@@ -27,7 +27,7 @@ import net.tapaal.gui.petrinet.undo.MoveElementDownCommand;
 import net.tapaal.gui.petrinet.undo.MoveElementUpCommand;
 import net.tapaal.resourcemanager.ResourceManager;
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
+import dk.aau.cs.model.tapn.TAPNQuery.QueryCategory;
 import pipe.gui.MessengerImpl;
 import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
@@ -489,9 +489,9 @@ public class QueryPane extends JPanel implements SidePane {
 
 		if (NumberOfSelectedElements == 1 && !hasMultipleConstants) {
 			if (query.getReductionOption() == ReductionOption.VerifyTAPN || query.getReductionOption() == ReductionOption.VerifyDTAPN || query.getReductionOption() == ReductionOption.VerifyPN || Verifier.hasNonzeroInitialTokenAges(tabContent.network()))
-				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens);
+				Verifier.runVerifyTAPNVerification(tabContent.network(), query, null, tabContent.getGuiModels(), false, tabContent.lens, tabContent);
 			else
-				Verifier.runUppaalVerification(tabContent.network(), query);
+				Verifier.runUppaalVerification(tabContent.network(), query, tabContent);
 		} else if (NumberOfSelectedElements > 1 || hasMultipleConstants) {
 			saveNetAndRunBatchProcessing(queries);
 		}

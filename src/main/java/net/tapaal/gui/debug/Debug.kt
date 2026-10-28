@@ -1,11 +1,13 @@
 package net.tapaal.gui.debug
 
+import net.tapaal.gui.TabInteraction
 import pipe.gui.TAPAALGUI
 import pipe.gui.petrinet.PetriNetTab
 import pipe.gui.petrinet.action.GuiAction
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.InputEvent
+import java.util.function.Supplier
 import javax.swing.AbstractAction
 import javax.swing.JMenu
 import javax.swing.JOptionPane
@@ -14,7 +16,7 @@ import javax.swing.KeyStroke
 fun noOp() {}
 object DEBUG {
 
-    @JvmStatic fun buildMenuDEBUG(): JMenu {
+    @JvmStatic fun buildMenuDEBUG(tabInteraction: Supplier<TabInteraction>): JMenu {
 
         val debugMenu = JMenu("DEBUG")
 
@@ -29,7 +31,7 @@ object DEBUG {
             })
 
             add(object : AbstractAction("Show undo/redo stack") {
-                override fun actionPerformed(e: ActionEvent) = UndoRedoSpy().show()
+                override fun actionPerformed(e: ActionEvent) = UndoRedoSpy(tabInteraction).show()
             })
 
             add(object : GuiAction(
@@ -38,7 +40,7 @@ object DEBUG {
                 KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)
             ) {
                 override fun actionPerformed(e: ActionEvent?) {
-                    val tab = TAPAALGUI.getCurrentTab();
+                    val tab = tabInteraction.get().getCurrentTab().orElseThrow();
                     val tmpFile = kotlin.io.path.createTempFile("tapaalSaveTest", ".tapn").toFile()
                     tab.writeNetToFile(tmpFile)
 

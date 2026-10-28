@@ -11,6 +11,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 import net.tapaal.gui.petrinet.TAPNLens;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.animation.Animator;
 import pipe.gui.petrinet.animation.EnabledTransitionsList;
 import net.tapaal.gui.petrinet.Template;
@@ -25,10 +26,12 @@ public class TransitionFiringComponent extends JPanel {
 	private final JButton fireButton;
 	private final JButton settingsButton;
 	private final TAPNLens lens;
+	private final PetriNetTab tab;
 
 	public TransitionFiringComponent(boolean showDelayEnabledTransitions, TAPNLens lens, Animator animator) {
 		super(new GridBagLayout());
 		enabledTransitionsList = new EnabledTransitionsList(animator);
+        this.tab = animator.getTab();
         this.lens = lens;
 		this.setBorder(
 		    BorderFactory.createCompoundBorder(
@@ -46,7 +49,7 @@ public class TransitionFiringComponent extends JPanel {
 
 		settingsButton = new JButton("Settings");
 		settingsButton.setPreferredSize(new Dimension(0, settingsButton.getPreferredSize().height)); //Make the two buttons equal in size
-		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings(lens));
+		settingsButton.addActionListener(e -> AnimationSettingsDialog.showAnimationSettings(lens, tab));
 
 		fireButton = new JButton("Delay & Fire");
 		fireButton.setPreferredSize(new Dimension(0, fireButton.getPreferredSize().height)); //Make the two buttons equal in size

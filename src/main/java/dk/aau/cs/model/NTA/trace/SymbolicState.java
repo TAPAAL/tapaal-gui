@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import pipe.gui.Constants;
+import dk.aau.cs.model.tapn.simulation.SimulationConstants;
 
 public class SymbolicState {
 	private static final String AUTOMATA_LOCATION_PATTERN = "([\\w\\(\\)]+)\\.(\\w+)";
@@ -118,14 +118,14 @@ public class SymbolicState {
 						.get(clockOrVariable) : new ValueRange();
 				if (isLower) {
 					range.setLower(new BigDecimal(value, new MathContext(
-							Constants.AGE_DECIMAL_PRECISION)));
+							SimulationConstants.AGE_DECIMAL_PRECISION)));
 					range.setLowerIncluded(operator.equals("<=")
 							|| operator.equals("="));
 				}
 
 				if (isUpper) {
 					range.setUpper(new BigDecimal(value, new MathContext(
-							Constants.AGE_DECIMAL_PRECISION)));
+							SimulationConstants.AGE_DECIMAL_PRECISION)));
 					range.setUpperIncluded(operator.equals(">=")
 							|| operator.equals("="));
 				}
@@ -163,14 +163,14 @@ public class SymbolicState {
 						: new ValueRange();
 				if (isLower) {
 					range.setLower(new BigDecimal(valueAsDouble,
-							new MathContext(Constants.AGE_DECIMAL_PRECISION)));
+							new MathContext(SimulationConstants.AGE_DECIMAL_PRECISION)));
 					range.setLowerIncluded(operator.equals("<=")
 							|| operator.equals("="));
 				}
 
 				if (isUpper) {
 					range.setUpper(new BigDecimal(valueAsDouble,
-							new MathContext(Constants.AGE_DECIMAL_PRECISION)));
+							new MathContext(SimulationConstants.AGE_DECIMAL_PRECISION)));
 					range.setUpperIncluded(operator.equals(">=")
 							|| operator.equals("="));
 				}

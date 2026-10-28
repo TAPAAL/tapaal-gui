@@ -5,13 +5,19 @@ import dk.aau.cs.TCTL.visitors.HasDeadlockVisitor;
 import dk.aau.cs.verification.QueryType;
 import dk.aau.cs.verification.SMCSettings;
 import dk.aau.cs.verification.observations.Observation;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.QueryCategory;
-import net.tapaal.gui.petrinet.verification.TAPNQuery.VerificationType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TAPNQuery {
+	public enum QueryCategory {
+		Default, CTL, LTL, HyperLTL, SMC
+	}
+
+	public enum VerificationType {
+		QUANTITATIVE, QUALITATIVE, SIMULATE
+	}
+
 	private TCTLAbstractProperty property;
 	private int extraTokens = 0;
 	private QueryCategory queryCategory = QueryCategory.Default;
@@ -103,4 +109,3 @@ public class TAPNQuery {
         return smcSettings.getObservations();
     }
 }
-

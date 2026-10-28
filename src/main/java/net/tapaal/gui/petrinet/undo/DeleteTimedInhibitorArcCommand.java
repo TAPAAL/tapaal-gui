@@ -22,8 +22,8 @@ public class DeleteTimedInhibitorArcCommand extends TAPNElementCommand {
 
 	@Override
 	public void undo() {
-	    inhibitorArc.deselect();
-		guiModel.addPetriNetObject(inhibitorArc);
+        inhibitorArc.deselect();
 		tapn.add(inhibitorArc.underlyingTimedInhibitorArc());
+		guiModel.addPetriNetObject(inhibitorArc);
 	}
 }

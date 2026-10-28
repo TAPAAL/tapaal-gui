@@ -1,17 +1,23 @@
 package dk.aau.cs.io
 
+import dk.aau.cs.model.CPN.Expressions.ColorExpression
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression
+import dk.aau.cs.model.tapn.IntWeight
 import dk.aau.cs.model.CPN.Expressions.AndExpression
 import dk.aau.cs.model.CPN.Expressions.GuardExpression
 import dk.aau.cs.model.CPN.Expressions.LeftRightGuardExpression
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent
 import java.math.BigDecimal
+import java.util.Vector
 
 
+@Tag("gui")
 internal class TapnXmlLoaderTest {
 
     internal class MalformedXML {
@@ -24,6 +30,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class Place {
 
         @Test
@@ -195,8 +202,73 @@ internal class TapnXmlLoaderTest {
             )
             Assertions.assertTrue(saved.contains("color=\"1\""))
         }
+
+        @Test
+        fun `Native tapn round trip preserves model diagram and query data`() {
+            val loaded = TapnXmlLoader().load(xmlNet(
+                """
+                    <place displayName="true" id="Start" initialMarking="2" invariant="&lt; inf" name="Start" nameOffsetX="-5" nameOffsetY="35" positionX="60" positionY="60">
+                        <initialMarkingAge><token age="1.5"/></initialMarkingAge>
+                    </place>
+                    <transition angle="90" displayName="true" id="Finish" infiniteServer="false" name="Finish" nameOffsetX="10" nameOffsetY="20" positionX="240" positionY="60" priority="2" urgent="true"/>
+                    <arc id="Start to Finish" inscription="[2,5]" nameOffsetX="3" nameOffsetY="4" source="Start" target="Finish" type="timed" weight="1">
+                        <arcpath arcPointType="false" id="0" xCoord="87" yCoord="72"/>
+                        <arcpath arcPointType="true" id="1" xCoord="180" yCoord="120"/>
+                    </arc>
+                    <query active="false" approximationDenominator="3" capacity="7" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Reach start" overApproximation="false" pTrie="true" query="EF IntroExample.Start = 1" reduction="true" reductionOption="VerifyDTAPN" searchOption="DFS" symmetry="false" timeDarts="true" traceOption="SOME" useStubbornReduction="false" useTarOption="true"/>
+                """
+            ).asInpurtStream())
+
+            val saved = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            ).savePNML().toString()
+            val reloaded = TapnXmlLoader().load(saved.asInpurtStream())
+
+            val originalTemplate = loaded.templates().first()
+            val roundTrippedTemplate = reloaded.templates().first()
+            Assertions.assertEquals(originalTemplate.model().name(), roundTrippedTemplate.model().name())
+            Assertions.assertEquals(originalTemplate.model().places().size, roundTrippedTemplate.model().places().size)
+            Assertions.assertEquals(originalTemplate.model().transitions().size, roundTrippedTemplate.model().transitions().size)
+            Assertions.assertEquals(originalTemplate.model().inputArcs().count(), roundTrippedTemplate.model().inputArcs().count())
+            Assertions.assertEquals(
+                originalTemplate.model().getPlaceByName("Start").tokens().map { it.age() },
+                roundTrippedTemplate.model().getPlaceByName("Start").tokens().map { it.age() }
+            )
+
+            val originalPlace = originalTemplate.guiModel().getPlaceByName("Start")
+            val roundTrippedPlace = roundTrippedTemplate.guiModel().getPlaceByName("Start")
+            Assertions.assertEquals(originalPlace.positionX, roundTrippedPlace.positionX)
+            Assertions.assertEquals(originalPlace.positionY, roundTrippedPlace.positionY)
+            Assertions.assertEquals(originalPlace.nameOffsetX, roundTrippedPlace.nameOffsetX)
+            Assertions.assertEquals(originalPlace.nameOffsetY, roundTrippedPlace.nameOffsetY)
+
+            val originalTransition = originalTemplate.guiModel().transitions.first()
+            val roundTrippedTransition = roundTrippedTemplate.guiModel().transitions.first()
+            Assertions.assertEquals(originalTransition.positionX, roundTrippedTransition.positionX)
+            Assertions.assertEquals(originalTransition.positionY, roundTrippedTransition.positionY)
+            Assertions.assertEquals(originalTransition.nameOffsetX, roundTrippedTransition.nameOffsetX)
+            Assertions.assertEquals(originalTransition.nameOffsetY, roundTrippedTransition.nameOffsetY)
+
+            Assertions.assertEquals(originalTemplate.guiModel().getArcs().size, roundTrippedTemplate.guiModel().getArcs().size)
+            Assertions.assertEquals(
+                originalTemplate.guiModel().getArcs().first().getArcPath().getArcPathDetails().contentDeepToString(),
+                roundTrippedTemplate.guiModel().getArcs().first().getArcPath().getArcPathDetails().contentDeepToString()
+            )
+
+            Assertions.assertEquals(loaded.queries().size, reloaded.queries().size)
+            val originalQuery = loaded.queries().first()
+            val roundTrippedQuery = reloaded.queries().first()
+            Assertions.assertEquals(originalQuery.getName(), roundTrippedQuery.getName())
+            Assertions.assertEquals(originalQuery.getQuery(), roundTrippedQuery.getQuery())
+            Assertions.assertEquals(originalQuery.getCapacity(), roundTrippedQuery.getCapacity())
+            Assertions.assertEquals(originalQuery.getTraceOption(), roundTrippedQuery.getTraceOption())
+            Assertions.assertEquals(originalQuery.getSearchOption(), roundTrippedQuery.getSearchOption())
+            Assertions.assertEquals(originalQuery.getReductionOption(), roundTrippedQuery.getReductionOption())
+            Assertions.assertEquals(originalQuery.isActive(), roundTrippedQuery.isActive())
+        }
     }
 
+    @Tag("gui")
     class Transition {
         @Test
         fun `Parse Transition`() {
@@ -273,6 +345,34 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
+    class NetworkModel {
+        @Test
+        fun `Native tapn round trip preserves network model data`() {
+            val loaded = TapnXmlLoader().load(
+                javaClass.getResourceAsStream("/Example nets/workflow-medical.tapn")!!
+            )
+            val saved = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            ).savePNML().toString()
+            val reloaded = TapnXmlLoader().load(saved.asInpurtStream())
+
+            Assertions.assertEquals(
+                loaded.network().sharedPlaces().map { it.name() },
+                reloaded.network().sharedPlaces().map { it.name() }
+            )
+            Assertions.assertEquals(
+                loaded.network().sharedTransitions().map { it.name() to it.isUrgent() },
+                reloaded.network().sharedTransitions().map { it.name() to it.isUrgent() }
+            )
+            Assertions.assertEquals(
+                loaded.network().constants().map { it.name() },
+                reloaded.network().constants().map { it.name() }
+            )
+        }
+    }
+
+    @Tag("gui")
     class InputArc {
         @Test
         fun `Parse Input Arc`() {
@@ -292,6 +392,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class OutputArc {
         @Test
         fun `Parse Output Arc`() {
@@ -311,7 +412,37 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class InhibitorArc {
+        @Test
+        fun `Specific colored inhibitor expression survives save and load`() {
+            val loaded = TapnXmlLoader().load(
+                javaClass.getResourceAsStream("/Example nets/fireflies.tapn")!!
+            )
+            val inhibitor = loaded.templates().first().guiModel().arcs
+                .filterIsInstance<TimedInhibitorArcComponent>()
+                .single { it.source.name == "charged" && it.target.name == "all_fired" }
+            val colors = Vector<ColorExpression>()
+            colors.add(inhibitor.underlyingTimedInhibitorArc().source().colorType.createColorExpressionForFirstColor())
+            val expression = NumberOfExpression(2, colors)
+            inhibitor.setExpression(expression)
+            inhibitor.setWeight(IntWeight(2))
+
+            val saved = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            ).savePNML().toString()
+            val reloaded = TapnXmlLoader().load(saved.asInpurtStream())
+            val model = reloaded.templates().first().model()
+            val restored = model.getInhibitorArcFromPlaceAndTransition(
+                model.getPlaceByName("charged"), model.getTransitionByName("all_fired")
+            )
+
+            Assertions.assertNotNull(restored.arcExpression)
+            Assertions.assertEquals(expression.toString(), restored.arcExpression.toString())
+            Assertions.assertTrue(restored.hasSpecificColorExpression())
+            Assertions.assertEquals(2, restored.weight.value())
+        }
+
         @Test
         fun `Any color expression is not shown on inhibitor arc`() {
             val loaded = TapnXmlLoader().load(
@@ -323,6 +454,17 @@ internal class TapnXmlLoaderTest {
 
             Assertions.assertEquals("1'dot.all", inhibitor.expression.toString())
             Assertions.assertEquals("", inhibitor.nameLabel.text)
+
+            val saved = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            ).savePNML().toString()
+            val reloaded = TapnXmlLoader().load(saved.asInpurtStream())
+            val restored = reloaded.templates().first().guiModel().arcs
+                .filterIsInstance<TimedInhibitorArcComponent>()
+                .single { it.source.name == "firing" && it.target.name == "fire_alone" }
+
+            Assertions.assertEquals(inhibitor.expression.toString(), restored.expression.toString())
+            Assertions.assertEquals("", restored.nameLabel.text)
         }
 
         @Test
@@ -343,6 +485,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class TransportArc {
         @Test
         fun `Transport Arc`() {
@@ -382,6 +525,7 @@ internal class TapnXmlLoaderTest {
         }
     }
 
+    @Tag("gui")
     class ArcPathPoints {
         @Test
         fun `Parse Arc without arcpathpoints`() {

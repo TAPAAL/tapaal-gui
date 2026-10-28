@@ -11,8 +11,8 @@ import dk.aau.cs.model.tapn.Constant;
 import dk.aau.cs.model.tapn.TimedToken;
 
 import net.tapaal.gui.petrinet.Context;
+import pipe.gui.petrinet.PetriNetTab;
 import pipe.gui.petrinet.dataLayer.DataLayer;
-import pipe.gui.TAPAALGUI;
 import pipe.gui.petrinet.graphicElements.*;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent;
 import pipe.gui.petrinet.graphicElements.tapn.TimedInputArcComponent;
@@ -29,11 +29,13 @@ public class TikZExporter {
 	private final DataLayer net;
 	private final String fullpath;
 	private final TikZOutputOption option;
+	private final PetriNetTab tab;
 
-	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option) {
+	public TikZExporter(DataLayer net, String fullpath, TikZOutputOption option, PetriNetTab tab) {
 		this.net = net;
 		this.fullpath = fullpath;
 		this.option = option;
+		this.tab = tab;
 	}
 
 	public void ExportToTikZ() {
@@ -265,7 +267,7 @@ public class TikZExporter {
         final double tTopY = 7;
         final double tBotY = 7;
 
-        boolean isTimed = TAPAALGUI.getCurrentTab().getLens().isTimed();
+        boolean isTimed = tab.getLens().isTimed();
 
         double placeXpos = (place.getPositionX());
         double placeYpos = (place.getPositionY() * (-1));
@@ -402,7 +404,7 @@ public class TikZExporter {
     private StringBuffer exportGlobalVariables() {
         StringBuffer out = new StringBuffer();
 
-	    Context context = new Context(TAPAALGUI.getCurrentTab());
+	    Context context = new Context(tab);
         List<ColorType> listColorTypes = context.network().colorTypes();
         List<Constant> constantsList = new ArrayList<>(context.network().constants());
         List<Variable> variableList = context.network().variables();

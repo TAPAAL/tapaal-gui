@@ -5,7 +5,6 @@ import dk.aau.cs.model.CPN.Expressions.*;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.tapn.*;
-import net.tapaal.gui.petrinet.editor.ConstantsPane;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,28 +15,28 @@ public class UpdateColorTypeCommand implements Command {
     private final ColorType oldColorType;
     private final ColorType newColorType;
     private final Integer index;
-    private final ConstantsPane.ColorTypesListModel colorTypesListModel;
+    private final Runnable onChange;
 
-    public UpdateColorTypeCommand(TimedArcPetriNetNetwork network, ColorType oldColorType, ColorType newColorType, Integer index, ConstantsPane.ColorTypesListModel colorTypesListModel) {
+    public UpdateColorTypeCommand(TimedArcPetriNetNetwork network, ColorType oldColorType, ColorType newColorType, Integer index, Runnable onChange) {
         this.network = network;
         this.oldColorType = oldColorType;
         this.newColorType = newColorType;
         this.index = index;
-        this.colorTypesListModel = colorTypesListModel;
+        this.onChange = onChange == null ? () -> {} : onChange;
     }
 
     @Override
     public void undo() {
         performUpdate(oldColorType, newColorType);
         network.colorTypes().set(index, oldColorType);
-        colorTypesListModel.updateName();
+        onChange.run();
     }
 
     @Override
     public void redo() {
         network.colorTypes().set(index, newColorType);
         performUpdate(newColorType, oldColorType);
-        colorTypesListModel.updateName();
+        onChange.run();
     }
 
     private void performUpdate(ColorType targetType, ColorType sourceType) {
