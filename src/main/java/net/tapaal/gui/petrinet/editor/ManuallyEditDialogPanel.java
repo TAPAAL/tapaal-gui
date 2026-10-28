@@ -187,7 +187,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
     private void save() {
         try {
             NetworkState oldState = new NetworkState(network);
-            boolean resultOk = ConstantsParser.parse(constantsArea.getText(), network);
+            boolean resultOk = ConstantsParser.parse(constantsArea.getText(), network, lens.isColored());
             if (resultOk) {
                 Command command = new EditConstantsCommand(oldState, network, colorTypesListModel, variablesListModel);
                 command.redo();

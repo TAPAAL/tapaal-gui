@@ -101,7 +101,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		Require.that(delay.compareTo(BigDecimal.ZERO) >= 0, "cannot delay with negative numbers");
 		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			for (TimedToken token : entry.getValue()) {
-				TimeInvariant invariant = token.place().invariant();
+				TimeInvariant invariant = token.place().invariantFor(token.color());
 				if (!invariant.isSatisfied(token.age().add(delay))) {
 					return false;
 				}
@@ -117,7 +117,7 @@ public class LocalTimedMarking implements TimedMarking { // TODO: Consider remov
 		for (Entry<TimedPlace, List<TimedToken>> entry : placesToTokensMap.entrySet()) {
 			boolean blocked = false;
 			for (TimedToken token : entry.getValue()) {
-				TimeInvariant invariant = token.place().invariant();
+				TimeInvariant invariant = token.place().invariantFor(token.color());
 				if (!invariant.isSatisfied(token.age().add(delay))) {
 					blocked = true;
 				}

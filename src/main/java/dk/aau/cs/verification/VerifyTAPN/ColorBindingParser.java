@@ -153,7 +153,7 @@ public class ColorBindingParser extends DefaultHandler {
             @Override
             public void endElement(String uri, String localName, String qName) {
                 if ("color".equals(qName)) {
-                    Variable variable = tapnNetwork.getVariableByName(varId);
+                    Variable variable = tapnNetwork.getVariableById(varId);
                     Color color = tapnNetwork.getColorByName(colorValue);
                     result.put(variable, color);
                 } else if ("variable".equals(qName)) {

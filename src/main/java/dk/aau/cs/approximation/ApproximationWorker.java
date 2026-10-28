@@ -67,14 +67,16 @@ public class ApproximationWorker {
 			return new VerificationResult<>(result.errorMessage(), result.verificationTime());
 		}
 		else if (options.enabledOverApproximation()) {
+            var mappingAndNetwork = resolveMappingAndNetwork(result, transformedModel, model, isColored);
+            var nameMapping = mappingAndNetwork.value1();
+            var netNetwork = mappingAndNetwork.value2();
+
 			// Over-approximation
 			//ApproximationDenominator should not be able to be 1, if its one its the same as an exact analyses. --kyrke 2020-03-25
 			if (options.approximationDenominator() == 1) {
 				// If r = 1
 				// No matter what it answered -> return that answer
 				QueryResult queryResult = result.getQueryResult();
-                NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
-                TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
                 toReturn = new VerificationResult<>(
                     queryResult,
                     decomposeTrace(result.getTrace(),  nameMapping, netNetwork),
@@ -93,8 +95,6 @@ public class ApproximationWorker {
                     // If we have a trace AND ((EF OR EG) AND satisfied) OR ((AG OR AF) AND not satisfied)
                     // The results are inconclusive, but we get a trace and can use trace TAPN for verification.
                     VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-                    NameMapping nameMapping = isColored ? result.getUnfoldedModel().value2() : transformedModel.value2();
-                    TimedArcPetriNetNetwork netNetwork = isColored ? result.getUnfoldedModel().value1().parentNetwork() : model;
                     toReturn = new VerificationResult<>(
                         result.getQueryResult(),
                         decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -219,8 +219,6 @@ public class ApproximationWorker {
                         queryResult.setApproximationInconclusive(true);
                     }
 
-                    NameMapping nameMapping = isColored ? result.getUnfoldedModel().value2() : transformedModel.value2();
-                    TimedArcPetriNetNetwork netNetwork = isColored ? result.getUnfoldedModel().value1().parentNetwork() : model;
                     toReturn = new VerificationResult<>(
                         result.getQueryResult(),
                         decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -237,8 +235,6 @@ public class ApproximationWorker {
                     QueryResult queryResult = result.getQueryResult();
                     queryResult.setApproximationInconclusive(true);
 
-                    NameMapping nameMapping = isColored ? result.getUnfoldedModel().value2() : transformedModel.value2();
-                    TimedArcPetriNetNetwork netNetwork = isColored ? result.getUnfoldedModel().value1().parentNetwork() : model;
                     toReturn = new VerificationResult<>(
                         result.getQueryResult(),
                         decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -253,6 +249,10 @@ public class ApproximationWorker {
                 }
             }
 		} else if (options.enabledUnderApproximation()) {
+            var mappingAndNetwork = resolveMappingAndNetwork(result, transformedModel, model, isColored);
+            var nameMapping = mappingAndNetwork.value1();
+            var netNetwork = mappingAndNetwork.value2();
+
 			// Under-approximation
 			if (result.getTrace() != null) {
 				for (PetriNetStep k : result.getTrace()) {
@@ -271,8 +271,6 @@ public class ApproximationWorker {
 				// If r = 1
 				// No matter it answered -> return that answer
 				QueryResult queryResult= result.getQueryResult();
-                NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
-                TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
                 toReturn =  new VerificationResult<>(
                     queryResult,
                     decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -291,8 +289,6 @@ public class ApproximationWorker {
 					// If ((EF OR EG) AND not satisfied) OR ((AG OR AF) and satisfied) -> Inconclusive
 					QueryResult queryResult= result.getQueryResult();
 					queryResult.setApproximationInconclusive(true);
-                    NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
-                    TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
                     toReturn =  new VerificationResult<>(
                         queryResult,
                         decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -311,8 +307,6 @@ public class ApproximationWorker {
 						// If query does have deadlock or EG or AF a trace -> create trace TAPN
 						//Create the verification satisfied result for the approximation
 						VerificationResult<TimedArcPetriNetTrace> approxResult = result;
-                        NameMapping nameMapping = isColored || lens.isColored()? result.getUnfoldedModel().value2(): transformedModel.value2();
-                        TimedArcPetriNetNetwork netNetwork = isColored || lens.isColored()? result.getUnfoldedModel().value1().parentNetwork(): model;
                         toReturn = new VerificationResult<>(
                             approxResult.getQueryResult(),
                             decomposeTrace(approxResult.getTrace(), nameMapping, netNetwork),
@@ -431,9 +425,6 @@ public class ApproximationWorker {
 						QueryResult queryResult = result.getQueryResult();
 						queryResult.setApproximationInconclusive(true);
 
-                        NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
-                        TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
-
 						toReturn = new VerificationResult<>(
                             result.getQueryResult(),
                             decomposeTrace(result.getTrace(), nameMapping, netNetwork),
@@ -449,8 +440,9 @@ public class ApproximationWorker {
 				}
 			}
 		} else {
-            NameMapping nameMapping = isColored? result.getUnfoldedModel().value2(): transformedModel.value2();
-            TimedArcPetriNetNetwork netNetwork = isColored? result.getUnfoldedModel().value1().parentNetwork(): model;
+            var mappingAndNetwork = resolveMappingAndNetwork(result, transformedModel, model, isColored);
+            var nameMapping = mappingAndNetwork.value1();
+            var netNetwork = mappingAndNetwork.value2();
             if (dataLayerQuery != null && (dataLayerQuery.getCategory() == QueryCategory.HyperLTL || dataLayerQuery.getCategory() == QueryCategory.SMC)) {
                 toReturn =  new VerificationResult<>(
                     result.getQueryResult(),
@@ -1124,4 +1116,15 @@ public class ApproximationWorker {
 		}, false);
         return composer.transformModel(model.network());
 	}
+
+    private Tuple<NameMapping, TimedArcPetriNetNetwork> resolveMappingAndNetwork(
+        VerificationResult<TimedArcPetriNetTrace> result, 
+        Tuple<TimedArcPetriNet, NameMapping> transformedModel,
+        TimedArcPetriNetNetwork model,
+        boolean isColored
+    ) {
+        NameMapping nameMapping = isColored && result.getUnfoldedModel() != null ? result.getUnfoldedModel().value2() : transformedModel.value2();
+        TimedArcPetriNetNetwork netNetwork = isColored && result.getUnfoldedModel() != null ? result.getUnfoldedModel().value1().parentNetwork() : model;
+        return new Tuple<>(nameMapping, netNetwork);
+    }
 }
