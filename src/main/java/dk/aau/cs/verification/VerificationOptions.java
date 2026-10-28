@@ -34,6 +34,7 @@ public abstract class VerificationOptions {
     protected static String unfoldedQueriesPath;
     protected boolean isSimulate;
     protected boolean useExplicitSearch;
+    protected boolean traceInOriginalNet;
 
 	public abstract String toString();
 
@@ -78,5 +79,9 @@ public abstract class VerificationOptions {
 
     public boolean useExplicitSearch() {
         return useExplicitSearch;
+    }
+
+    public boolean traceInOriginalNet() {
+        return traceInOriginalNet;
     }
 }

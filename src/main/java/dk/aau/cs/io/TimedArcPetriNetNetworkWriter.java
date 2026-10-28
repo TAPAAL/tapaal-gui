@@ -242,6 +242,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		queryElement.setAttribute("colorFixpoint", "" + query.useColorFixpoint());
         queryElement.setAttribute("symmetricVars", "" + query.useSymmetricVars());
         queryElement.setAttribute("useExplicitSearch" , "" + query.useExplicitSearch());
+        queryElement.setAttribute("traceInOriginalNet", "" + query.traceInOriginalNet());
 
         return queryElement;
 	}
@@ -284,6 +285,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
         queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
         queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+        queryElement.setAttribute("traceInOriginalNet", "" + query.traceInOriginalNet());
 
         return queryElement;
     }
@@ -326,6 +328,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("useStubbornReduction", "" + query.isStubbornReductionEnabled());
         queryElement.setAttribute("useTarOption", "" + query.isTarOptionEnabled());
         queryElement.setAttribute("useTarjan", "" + query.isTarjan());
+        queryElement.setAttribute("traceInOriginalNet", "" + query.traceInOriginalNet());
 
         return queryElement;
     }
@@ -372,6 +375,7 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
         queryElement.setAttribute("verificationType", query.getVerificationType().toString());
         queryElement.setAttribute("numberOfTraces", "" + query.getNumberOfTraces());
         queryElement.setAttribute("smcTraceType", query.getSmcTraceType().toString());
+        queryElement.setAttribute("traceInOriginalNet", "" + query.traceInOriginalNet());
 
         query.getSmcSettings().getSmcSeed().ifPresent(seed -> queryElement.setAttribute("smcSeed", Long.toUnsignedString(seed)));
 

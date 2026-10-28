@@ -1,6 +1,7 @@
 package dk.aau.cs.model.CPN.Expressions;
 
 import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprValues;
 import dk.aau.cs.model.CPN.Variable;
@@ -31,6 +32,13 @@ public class OrExpression extends GuardExpression {
 
     public GuardExpression getRightExpression() {
         return right;
+    }
+
+    @Override
+    public void setColorTypeRecursively(ColorType colorType) {
+        super.setColorTypeRecursively(colorType);
+        left.setColorTypeRecursively(colorType);
+        right.setColorTypeRecursively(colorType);
     }
 
     @Override
@@ -73,6 +81,7 @@ public class OrExpression extends GuardExpression {
     public GuardExpression copy() {
         OrExpression copy = new OrExpression(left, right);
         copy.setSimpleProperty(isSimpleProperty());
+        copy.setColorType(colorType);
 
         return copy;
     }

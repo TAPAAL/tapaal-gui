@@ -388,6 +388,8 @@ public class QueryDialog extends JPanel {
     private JCheckBox useTraceRefinement;
     private JCheckBox useTarjan;
     private JCheckBox useExplicitSearch;
+    private JRadioButton traceInOriginalNet;
+    private JRadioButton traceInUnfoldedNet;
     // Raw verification options panel
     private JPanel rawVerificationOptionsPanel;
     private JTextArea rawVerificationOptionsTextArea;
@@ -464,6 +466,7 @@ public class QueryDialog extends JPanel {
     private UndoableEditSupport undoSupport;
     private final boolean isNetDegree2;
     private final int highestNetDegree;
+    private final int tokensInModel;
     private final boolean hasInhibitorArcs;
     private InclusionPlaces inclusionPlaces;
     private final TAPNLens lens;
@@ -676,8 +679,11 @@ public class QueryDialog extends JPanel {
         inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
         newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
         rootPane = me.getRootPane();
-        isNetDegree2 = NetworkAnalysis.isDegree2(tapnNetwork);
-        highestNetDegree = NetworkAnalysis.highestNetDegree(tapnNetwork);
+        var composer = new TAPNModelComposer(new MessengerImpl(), false);
+        var composedModel = composer.transformModel(tapnNetwork).value1();
+        isNetDegree2 = composedModel.isDegree2();
+        highestNetDegree = composedModel.getHighestNetDegree();
+        tokensInModel = composedModel.getNumberOfTokensInNet();
         hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
 
         setLayout(new GridBagLayout());
@@ -717,11 +723,7 @@ public class QueryDialog extends JPanel {
         int capacity = oldCapacity;
 
         if (rawVerificationOptionsEnabled.isSelected()) {
-            TAPNModelComposer composer = new TAPNModelComposer(false);
-            Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-            int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
-
-            String rawOptions = rawVerificationOptionsTextArea.getText();
+            var rawOptions = rawVerificationOptionsTextArea.getText();
             capacity = VerificationArguments.getKBound(rawOptions).orElse(tokensInModel) - tokensInModel;
         }
 
@@ -781,6 +783,7 @@ public class QueryDialog extends JPanel {
         query.setOldCapacity(oldCapacity);
 
         query.setUseStubbornReduction(useStubbornReduction.isSelected());
+        query.setTraceInOriginalNet(lens.isColored() && supportsUnfoldedTraceInOriginalNet() && traceInOriginalNet.isSelected());
 
         if (reductionOptionToSet != null && reductionOptionToSet.equals(ReductionOption.VerifyTAPN)) {
             query.setDiscreteInclusion(discreteInclusion.isSelected());
@@ -833,9 +836,9 @@ public class QueryDialog extends JPanel {
             /* enableOverApproximation */false,
             /* enableUnderApproximation */false,
             0,
-            lens.isColored()? usePartitioning.isSelected(): false,
-            lens.isColored()? useColorFixpoint.isSelected() : false,
-            lens.isColored()? useSymmetricvars.isSelected() : false,
+            lens.isColored() && usePartitioning.isSelected(),
+            lens.isColored() && useColorFixpoint.isSelected(),
+            lens.isColored() && useSymmetricvars.isSelected(),
             lens.isColored(),
             coloredReduction,
             rawVerificationOptionsEnabled.isSelected(),
@@ -855,6 +858,7 @@ public class QueryDialog extends JPanel {
         query.setUseTarOption(useTraceRefinement.isSelected());
         query.setUseTarjan(useTarjan.isSelected());
         query.setUseExplicitSearch(useExplicitSearch.isSelected());
+        query.setTraceInOriginalNet(lens.isColored() && supportsUnfoldedTraceInOriginalNet() && traceInOriginalNet.isSelected());
         return query;
     }
 
@@ -1522,7 +1526,13 @@ public class QueryDialog extends JPanel {
         String place = (String) placeTransitionBox.getSelectedItem();
         
         if (place != null) {
-            replaceCurrentSelectionWith(selectedPlaceNode(template));
+            TCTLAbstractStateProperty placeNode = selectedPlaceNode(template);
+            if (queryType.getSelectedIndex() == 2) {
+                if (traceBox.getSelectedItem() == null) return;
+                placeNode = new HyperLTLPathScopeNode(placeNode, traceBox.getSelectedItem().toString());
+            }
+
+            replaceCurrentSelectionWith(placeNode);
         }
     }
 
@@ -1812,6 +1822,7 @@ public class QueryDialog extends JPanel {
         if (newProperty.hasNestedPathQuantifiers()) requiredFeatures.add(EngineFeature.NESTED_QUANTIFICATIONS);
         if (lens.isColored()) requiredFeatures.add(EngineFeature.COLORED);
         if (lens.isColored() && !lens.isTimed()) requiredFeatures.add(EngineFeature.ONLY_UNTIMED);
+        if (useExplicitSearch.isSelected()) requiredFeatures.add(EngineFeature.EXPLICIT_SEARCH);
         if (lens.isStochastic()) requiredFeatures.add(EngineFeature.SMC);
         if (hasColorSpecificPlaces(newProperty)) requiredFeatures.add(EngineFeature.COLORED_PLACE_QUERIES);
         if (hasNonzeroInitialTokenAges()) requiredFeatures.add(EngineFeature.NONZERO_INITIAL_TOKEN_AGES);
@@ -1830,11 +1841,7 @@ public class QueryDialog extends JPanel {
                 hasForcedDisabledStubbornReduction = false;
                 useStubbornReduction.setSelected(true);
             }
-            if(queryType.getSelectedIndex() == 2) {
-                useStubbornReduction.setEnabled(false);
-            } else {
-                useStubbornReduction.setEnabled(true);
-            }
+            useStubbornReduction.setEnabled(true);
         }
 
         if(useGCD != null){
@@ -2274,23 +2281,14 @@ public class QueryDialog extends JPanel {
             TCTLAbstractStateProperty property;
 
             if (!lens.isTimed() && transitionIsSelected()) {
-                if(isHyperLTL)
-                    property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), selectedTrace);
-                else
-                    property = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
+                var transition = new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem());
+                property = isHyperLTL ? new HyperLTLPathScopeNode(transition, selectedTrace) : transition;
             } else {
-                if (isHyperLTL) {
-                    var pathScope = new HyperLTLPathScopeNode(selectedPlaceNode(template), selectedTrace);
-                    property =  new TCTLAtomicPropositionNode(
-                        pathScope,
-                        (String) relationalOperatorBox.getSelectedItem(),
-                        new TCTLConstNode((Integer) placeMarking.getValue()));
-                } else {
-                    property =  new TCTLAtomicPropositionNode(
-                        selectedPlaceNode(template),
-                        (String) relationalOperatorBox.getSelectedItem(),
-                        new TCTLConstNode((Integer) placeMarking.getValue()));
-                }
+                TCTLAbstractStateProperty place = selectedPlaceNode(template);
+                if (isHyperLTL) place = new HyperLTLPathScopeNode(place, selectedTrace);
+                property = new TCTLAtomicPropositionNode(place,
+                    (String)relationalOperatorBox.getSelectedItem(),
+                    new TCTLConstNode((Integer)placeMarking.getValue()));
             }
 
             if (!property.equals(currentSelection.getObject())) {
@@ -2448,6 +2446,7 @@ public class QueryDialog extends JPanel {
         setupTarOptionsFromQuery(queryToCreateFrom);
         setupTarjanOptionsFromQuery(queryToCreateFrom);
         setupExplicitSearch(queryToCreateFrom.useExplicitSearch());
+        setupTraceInOriginalNet(queryToCreateFrom.traceInOriginalNet());
 
         if (queryToCreateFrom.getCategory() == QueryCategory.HyperLTL) {
             setupTraceListFromQuery(queryToCreateFrom);
@@ -2456,10 +2455,17 @@ public class QueryDialog extends JPanel {
     }
 
     private void setupExplicitSearch(boolean selectExplicitSearch) {
-        if (lens.isColored() && !lens.isGame() && !lens.isStochastic() && !lens.isTimed()) {
+        if (lens.isColored() && !lens.isTimed() && !lens.isGame()) {
             useExplicitSearch.setSelected(selectExplicitSearch);
-            setComponentEnabledRecursively(unfoldingOptionsPanel, !selectExplicitSearch);
+            setUnfoldingOptimizationsEnabled(!selectExplicitSearch);
             oldExplicitSearchState = selectExplicitSearch;
+        }
+    }
+
+    private void setupTraceInOriginalNet(boolean selected) {
+        if (lens.isColored()) {
+            traceInOriginalNet.setSelected(selected);
+            traceInUnfoldedNet.setSelected(!selected);
         }
     }
 
@@ -2631,6 +2637,8 @@ public class QueryDialog extends JPanel {
         if (queryToCreateFrom.discreteInclusion()) {
             selectInclusionPlacesButton.setEnabled(true);
         }
+
+        setupTraceInOriginalNet(queryToCreateFrom.traceInOriginalNet());
     }
 
     private void setupUntimedReductionOptions(TAPNQuery queryToCreateFrom) {
@@ -2839,9 +2847,7 @@ public class QueryDialog extends JPanel {
         Point location = guiDialog.getLocation();
 
         searchOptionsPanel.setVisible(!isSmc);
-        if(lens.isColored() && !lens.isTimed()){
-            unfoldingOptionsPanel.setVisible(advancedView);
-        }
+        updateUnfoldingOptionsVisibility();
 
         reductionOptionsPanel.setVisible(advancedView && !isSmc);
         if (lens.isTimed()) {
@@ -2891,7 +2897,6 @@ public class QueryDialog extends JPanel {
 
             showLTLButtons(true);
             showHyperLTL(true);
-            updateSiphonTrap(true);
             queryChanged();
 
             wasCTLType = false;
@@ -2927,7 +2932,6 @@ public class QueryDialog extends JPanel {
             }
 
             showLTLButtons(true);
-            updateSiphonTrap(true);
             showHyperLTL(false);
             queryChanged();
             wasHyperLTLType = false;
@@ -2948,7 +2952,6 @@ public class QueryDialog extends JPanel {
 
             showLTLButtons(false);
             showHyperLTL(false);
-            updateSiphonTrap(false);
             
             wasCTLType = true;
             wasLTLType = false;
@@ -3538,6 +3541,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcConfidence = new JTextField(7);
+        smcConfidence.setMinimumSize(smcConfidence.getPreferredSize());
         smcConfidence.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcConfidence.getText().length();
@@ -3566,6 +3570,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
+        smcEstimationIntervalWidth.setMinimumSize(smcEstimationIntervalWidth.getPreferredSize());
         smcEstimationIntervalWidth.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcEstimationIntervalWidth.getText().length();
@@ -3600,6 +3605,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
+        smcTimeExpected.setMinimumSize(smcTimeExpected.getPreferredSize());
         smcTimeExpected.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcTimeExpected.getText().length();
@@ -3757,7 +3763,7 @@ public class QueryDialog extends JPanel {
                                                            new SMCTraceType("Not satisfied") });
         smcTraceType.setToolTipText(TOOL_TIP_TRACE_TYPE);
         smcTracePanel.add(smcTraceType, subPanelGbc);
-  
+
         smcSettingsPanel.add(smcTracePanel, gbc);
 
         smcVerificationType.addActionListener(evt -> {
@@ -4300,7 +4306,11 @@ public class QueryDialog extends JPanel {
     }
 
     private void updateSiphonTrap(boolean isCTL) {
-        useSiphonTrap.setEnabled(isCTL);
+        boolean supported = isCTL && !lens.isGame();
+        useSiphonTrap.setEnabled(supported);
+        if (!supported) {
+            useSiphonTrap.setSelected(false);
+        }
     }
 
     private void addPropertyToQuery(TCTLAbstractPathProperty property) {
@@ -5492,7 +5502,8 @@ public class QueryDialog extends JPanel {
             if ((!lens.isTimed()) && transitionIsSelected()) {
                 if (queryType.getSelectedIndex() == 2) {
                     String trace = traceBox.getSelectedItem().toString();
-                    addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem(), trace));
+                    addPropertyToQuery(new HyperLTLPathScopeNode(
+                        new TCTLTransitionNode(template, (String)placeTransitionBox.getSelectedItem()), trace));
                 } else {
                     addPropertyToQuery(new TCTLTransitionNode(template, (String) placeTransitionBox.getSelectedItem()));
                 }
@@ -5719,6 +5730,9 @@ public class QueryDialog extends JPanel {
                 newProperty = ph;
                 resetQuantifierSelectionButtons();
                 updateSelection(newProperty);
+                if (queryType.getSelectedIndex() == 2 && traceBoxQuantification.getItemCount() > 0) {
+                    traceBoxQuantification.setSelectedIndex(0);
+                }
                 undoSupport.postEdit(edit);
             }
         });
@@ -5946,7 +5960,7 @@ public class QueryDialog extends JPanel {
         verificationPanel = new JPanel(new GridBagLayout());
 
         initReductionOptionsPanel();
-        if(lens.isColored() && !lens.isTimed()){
+        if(lens.isColored()){
             initUnfoldingOptionsPanel();
         }
         
@@ -6018,27 +6032,34 @@ public class QueryDialog extends JPanel {
         unfoldingOptionsPanel.setVisible(false);
 
         unfoldingOptionsPanel.setBorder(BorderFactory.createTitledBorder("Unfolding Options"));
-        usePartitioning = new JCheckBox("Use partitioning of the colored net");
-        useColorFixpoint = new JCheckBox("Use color fixpoint analysis");
-        useSymmetricvars = new JCheckBox("Use reduction of symmetric variables");
-
-        usePartitioning.setToolTipText(TOOL_TIP_PARTITIONING);
-        useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
-        useSymmetricvars.setToolTipText(TOOL_TIP_SYMMETRIC_VARIABLES);
-
-        usePartitioning.setSelected(true);
-        useColorFixpoint.setSelected(true);
-        useSymmetricvars.setSelected(true);
-
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        unfoldingOptionsPanel.add(usePartitioning, gridBagConstraints);
-        gridBagConstraints.gridy = 1;
-        unfoldingOptionsPanel.add(useColorFixpoint, gridBagConstraints);
-        gridBagConstraints.gridy = 2;
-        unfoldingOptionsPanel.add(useSymmetricvars, gridBagConstraints);
+        if (!lens.isTimed()) {
+            usePartitioning = new JCheckBox("Use partitioning of the colored net");
+            useColorFixpoint = new JCheckBox("Use color fixpoint analysis");
+            useSymmetricvars = new JCheckBox("Use reduction of symmetric variables");
+
+            usePartitioning.setToolTipText(TOOL_TIP_PARTITIONING);
+            useColorFixpoint.setToolTipText(TOOL_TIP_COLOR_FIXPOINT);
+            useSymmetricvars.setToolTipText(TOOL_TIP_SYMMETRIC_VARIABLES);
+
+            usePartitioning.setSelected(true);
+            useColorFixpoint.setSelected(true);
+            useSymmetricvars.setSelected(true);
+
+            unfoldingOptionsPanel.add(usePartitioning, gridBagConstraints);
+            gridBagConstraints.gridy = 1;
+            unfoldingOptionsPanel.add(useColorFixpoint, gridBagConstraints);
+            gridBagConstraints.gridy = 2;
+            unfoldingOptionsPanel.add(useSymmetricvars, gridBagConstraints);
+        }
+
+        if (!lens.isTimed()) gridBagConstraints.gridy++;
+        unfoldingOptionsPanel.add(traceInOriginalNet, gridBagConstraints);
+        gridBagConstraints.gridy++;
+        unfoldingOptionsPanel.add(traceInUnfoldedNet, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -6225,10 +6246,19 @@ public class QueryDialog extends JPanel {
         useTraceRefinement = new JCheckBox("Use trace abstraction refinement");
         useTarjan = new JCheckBox("Use Tarjan");
         useExplicitSearch = new JCheckBox("Use explicit search");
+        traceInOriginalNet = new JRadioButton("Show trace in original net");
+        traceInUnfoldedNet = new JRadioButton("Show trace in unfolded net");
+        traceInOriginalNet.setToolTipText("Maps the trace back to the original colored net");
+        traceInUnfoldedNet.setToolTipText("Opens the trace in an unfolded net tab");
+        ButtonGroup traceLocationGroup = new ButtonGroup();
+        traceLocationGroup.add(traceInOriginalNet);
+        traceLocationGroup.add(traceInUnfoldedNet);
 
         useExplicitSearch.addActionListener(e -> {
             refreshHeuristicButtonText();
-            setComponentEnabledRecursively(unfoldingOptionsPanel, !useExplicitSearch.isSelected());
+            if (!lens.isTimed()) {
+                setUnfoldingOptimizationsEnabled(!useExplicitSearch.isSelected());
+            }
             oldExplicitSearchState = useExplicitSearch.isSelected();
         });
 
@@ -6247,6 +6277,7 @@ public class QueryDialog extends JPanel {
         useTraceRefinement.setSelected(false);
         useTarjan.setSelected(true);
         setupExplicitSearch(true);
+        traceInOriginalNet.setSelected(true);
 
         useReduction.setToolTipText(TOOL_TIP_USE_STRUCTURALREDUCTION);
         useColoredReduction.setToolTipText(TOOL_TIP_USE_COLORED_STRUCTURALREDUCTION);
@@ -6316,6 +6347,7 @@ public class QueryDialog extends JPanel {
         selectInclusionPlacesButton.addActionListener(e -> inclusionPlaces = ChooseInclusionPlacesDialog.showInclusionPlacesDialog(tapnNetwork, inclusionPlaces));
 
         useTimeDarts.addActionListener(e -> setEnabledOptionsAccordingToCurrentReduction());
+
     }
 
     private void initUntimedReductionOptions() {
@@ -6488,6 +6520,7 @@ public class QueryDialog extends JPanel {
             refreshDiscreteOptions();
             refreshDiscreteInclusion();
             refreshOverApproximationOption();
+            refreshExplicitSearch();
         } else if (!lens.isTimed()) {
             refreshTraceRefinement();
             refreshTarjan();
@@ -6508,6 +6541,7 @@ public class QueryDialog extends JPanel {
     
         updateSearchStrategies();
 		refreshExportButtonText();
+		updateUnfoldingOptionsVisibility();
 
         guiDialog.pack();
 	}
@@ -6541,9 +6575,7 @@ public class QueryDialog extends JPanel {
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
 
-        TAPNModelComposer composer = new TAPNModelComposer(false);
-        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-        verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
+        verifytapnOptions.setTokensInModel(tokensInModel);
 
         String rawVerificationOptions = verifytapnOptions.toString();
 
@@ -6565,27 +6597,32 @@ public class QueryDialog extends JPanel {
         rawVerificationOptionsTextArea.setText(rawVerificationOptions.trim());
     }
 
-	private void refreshTraceRefinement() {
-	    ReductionOption reduction = getReductionOption();
+    private void refreshTraceRefinement() {
+        ReductionOption reduction = getReductionOption();
 
-        if (queryType.getSelectedIndex() == 0 && !lens.isGame() &&
+        boolean isSupported = queryType.getSelectedIndex() == 0 && !lens.isGame() &&
             reduction != null && reduction.equals(ReductionOption.VerifyPN) &&
             (newProperty.toString().startsWith("AG") || newProperty.toString().startsWith("EF")) &&
-            !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers()) {
-	        useTraceRefinement.setEnabled(true);
-        } else {
-            useTraceRefinement.setEnabled(false);
+            !hasInhibitorArcs && !newProperty.hasNestedPathQuantifiers();
+
+        useTraceRefinement.setEnabled(isSupported);
+        if (!isSupported) {
+            useTraceRefinement.setSelected(false);
         }
     }
 
     private void refreshTarjan() {
-        int selectedIndex = queryType.getSelectedIndex();
-        switch (selectedIndex) {
+        switch (queryType.getSelectedIndex()) {
             case 1:
                 useTarjan.setVisible(true);
                 useTarjan.setEnabled(true);
                 break;
             case 2:
+                useTarjan.setVisible(true);
+                useTarjan.setEnabled(false);
+                useTarjan.setSelected(false);
+                break;
+            case 3:
                 useTarjan.setVisible(true);
                 useTarjan.setEnabled(false);
                 useTarjan.setSelected(false);
@@ -6600,39 +6637,52 @@ public class QueryDialog extends JPanel {
     private boolean oldExplicitSearchState;
 
     private void refreshExplicitSearch() {
-        if (canUseExplicitSearch()) {
-            useExplicitSearch.setSelected(oldExplicitSearchState);
-            useExplicitSearch.setEnabled(true);
+        if (lens.isTimed()) {
+            boolean canMap = lens.isColored() && supportsUnfoldedTraceInOriginalNet();
+            traceInOriginalNet.setEnabled(canMap);
         } else {
-            if (useExplicitSearch.isEnabled()) {
-                oldExplicitSearchState = useExplicitSearch.isSelected();
+            if (canUseExplicitSearch()) {
+                useExplicitSearch.setSelected(oldExplicitSearchState);
+                useExplicitSearch.setEnabled(true);
+            } else {
+                if (useExplicitSearch.isEnabled()) {
+                    oldExplicitSearchState = useExplicitSearch.isSelected();
+                }
+                
+                useExplicitSearch.setSelected(false);
+                useExplicitSearch.setEnabled(false);
             }
-            
-            useExplicitSearch.setSelected(false);
-            useExplicitSearch.setEnabled(false);
         }
     }
 
-    private void setComponentEnabledRecursively(Component component, boolean enabled) {
-        if (component == null) {
-            return;
-        }
+    private void updateUnfoldingOptionsVisibility() {
+        if (unfoldingOptionsPanel == null) return;
 
-        if (component instanceof Container) {
-            for (Component child : ((Container) component).getComponents()) {
-                setComponentEnabledRecursively(child, enabled);
-            }
-        }
+        boolean supportsOriginalNetTrace = supportsUnfoldedTraceInOriginalNet();
+        traceInOriginalNet.setVisible(supportsOriginalNetTrace);
+        traceInUnfoldedNet.setVisible(supportsOriginalNetTrace);
+        unfoldingOptionsPanel.setVisible(advancedView && (!lens.isTimed() || supportsOriginalNetTrace));
+    }
 
-        if (!enabled && component instanceof AbstractButton) {
-            ((AbstractButton) component).setSelected(false);
-        }
+    private boolean supportsUnfoldedTraceInOriginalNet() {
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(getReductionOption());
+        return engine != null && engine.supports(EngineFeature.UNFOLDED_TRACE_IN_ORIGINAL_NET);
+    }
 
-        component.setEnabled(enabled);
+    private void setUnfoldingOptimizationsEnabled(boolean enabled) {
+        if (usePartitioning != null) usePartitioning.setEnabled(enabled);
+        if (useColorFixpoint != null) useColorFixpoint.setEnabled(enabled);
+        if (useSymmetricvars != null) useSymmetricvars.setEnabled(enabled);
+        traceInOriginalNet.setEnabled(enabled);
+        traceInUnfoldedNet.setEnabled(enabled);
+        if (!enabled) traceInOriginalNet.setSelected(true);
     }
 
     private boolean canUseExplicitSearch() {
-        return (newProperty.toString().contains("AG") || newProperty.toString().contains("EF")) && !newProperty.hasNestedPathQuantifiers();
+        EngineSupportOptions engine = EngineSupportOptions.fromReductionOption(getReductionOption());
+        return engine != null && engine.supports(EngineFeature.EXPLICIT_SEARCH)
+            && (newProperty.toString().contains("AG") || newProperty.toString().contains("EF"))
+            && !newProperty.hasNestedPathQuantifiers();
     }
 
     private void refreshColoredReduction() {
@@ -6823,10 +6873,7 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshStubbornReduction(){
-        if(queryType.getSelectedIndex() == 2) {
-            useStubbornReduction.setSelected(false);
-            useStubbornReduction.setEnabled(false);
-        } else if(useTimeDarts.isSelected()) {
+        if(useTimeDarts.isSelected()) {
             useStubbornReduction.setSelected(false);
             useStubbornReduction.setEnabled(false);
         } else {
@@ -6890,8 +6937,11 @@ public class QueryDialog extends JPanel {
             templateBox.setEnabled(isLeaf);
             placeTransitionBox.setEnabled(isLeaf);
             placeMarking.setEnabled(isLeaf);
+            addPlaceButton.setEnabled(isLeaf);
+            addConstantButton.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
             traceBox.setEnabled(isLeaf && traceBox.getModel().getSize() > 0);
+            colorBox.setEnabled(isLeaf);
         } else {
             boolean isQuantifier = currentSelection.getObject() instanceof LTLANode || currentSelection.getObject() instanceof LTLENode;
             boolean allowQuantifiers = enable && (isQuantifier || containsOnlyPathProperties(newProperty));
@@ -6952,7 +7002,10 @@ public class QueryDialog extends JPanel {
             templateBox.setEnabled(isLeaf);
             placeTransitionBox.setEnabled(isLeaf);
             placeMarking.setEnabled(isLeaf);
+            addPlaceButton.setEnabled(isLeaf);
+            addConstantButton.setEnabled(isLeaf);
             searchBar.setEnabled(isLeaf);
+            colorBox.setEnabled(isLeaf);
         } else {
             aButton.setEnabled(false);
             eButton.setEnabled(false);

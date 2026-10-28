@@ -75,6 +75,7 @@ public class TAPNQuery {
     private boolean useTarOption = false;
     private boolean useTarjan = false;
     private boolean useExplicitSearch = false;
+    private boolean traceInOriginalNet = true;
 	private boolean useRawVerification = false;
 	private String rawVerificationPrompt;
 
@@ -192,6 +193,14 @@ public class TAPNQuery {
 
     public void setUseExplicitSearch(boolean useExplicitSearch) {
         this.useExplicitSearch = useExplicitSearch;
+    }
+
+    public boolean traceInOriginalNet() {
+        return traceInOriginalNet;
+    }
+
+    public void setTraceInOriginalNet(boolean traceInOriginalNet) {
+        this.traceInOriginalNet = traceInOriginalNet;
     }
 
 	public int approximationDenominator() {
@@ -531,6 +540,7 @@ public class TAPNQuery {
 		useStubbornReduction = newQuery.isStubbornReductionEnabled();
 		useTarOption = newQuery.isTarOptionEnabled();
         useExplicitSearch = newQuery.useExplicitSearch();
+        traceInOriginalNet = newQuery.traceInOriginalNet();
         useRawVerification = newQuery.getRawVerification();
         rawVerificationPrompt = newQuery.getRawVerificationPrompt();
 	}
@@ -568,6 +578,7 @@ public class TAPNQuery {
         setGranularity(getGranularity());
         setMaxGranularity(isMaxGranularity());
         setUseExplicitSearch(query.useExplicitSearch());
+        setTraceInOriginalNet(query.traceInOriginalNet());
     }
 
     public void setProperty(TCTLAbstractProperty property) {
@@ -600,6 +611,7 @@ public class TAPNQuery {
         copy.setBenchmarkRuns(this.getBenchmarkRuns());
         copy.setParallel(this.isParallel());
         copy.setUseExplicitSearch(this.useExplicitSearch());
+        copy.setTraceInOriginalNet(this.traceInOriginalNet());
 		return copy;
 	}
 	
