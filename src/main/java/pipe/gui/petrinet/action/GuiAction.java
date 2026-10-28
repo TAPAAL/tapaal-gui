@@ -22,6 +22,8 @@ import net.tapaal.resourcemanager.ResourceManager;
  *         ChangeListeners to be notified of changes
  */
 public abstract class GuiAction extends AbstractAction {
+	public static final String SHORTCUT_DESCRIPTION = "shortcutDescription";
+
 	public GuiAction(String name, String tooltip) {
 		this(name, tooltip, (KeyStroke)null);
 	}
@@ -91,6 +93,16 @@ public abstract class GuiAction extends AbstractAction {
 		}
 	}
 
+	/**
+	 * Creates an action with an optional description for the keyboard shortcuts dialog.
+	 * The description is kept separate from the tooltip because it can be more useful
+	 * to users looking up a shortcut than the short hover text.
+	 */
+	public GuiAction(String name, String tooltip, KeyStroke keyStroke, String shortcutDescription) {
+		this(name, tooltip, keyStroke);
+		setShortcutDescription(shortcutDescription);
+	}
+
 	public boolean isSelected() {
 		Boolean b = (Boolean) getValue(SELECTED_KEY);
 
@@ -112,7 +124,11 @@ public abstract class GuiAction extends AbstractAction {
 	    putValue(NAME, newName);
     }
 
-    public void setTooltip(String newTooltip){
+	public void setTooltip(String newTooltip){
         putValue(SHORT_DESCRIPTION, newTooltip);
     }
+
+	public void setShortcutDescription(String description) {
+		putValue(SHORTCUT_DESCRIPTION, description);
+	}
 }
