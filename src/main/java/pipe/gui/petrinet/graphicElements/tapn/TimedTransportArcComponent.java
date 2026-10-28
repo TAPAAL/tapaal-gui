@@ -9,6 +9,7 @@ import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import pipe.gui.TAPAALGUI;
 import pipe.gui.Constants;
+import pipe.gui.petrinet.graphicElements.Arc;
 import pipe.gui.petrinet.graphicElements.PlaceTransitionObject;
 import pipe.gui.petrinet.undo.ArcTimeIntervalEditCommand;
 import net.tapaal.gui.petrinet.undo.Command;
@@ -102,11 +103,38 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
 		return getGroup();
 	}
 
+	// The group number is the pairing key stored in the file. Draw " : n" only when this
+	// transition has more than one transport pair, so a single pair stays unambiguous without an index.
+	private String groupSuffix() {
+		if (underlyingTransportArc != null
+				&& underlyingTransportArc.transition().getNumberOfTransportArcsGoingThrough() > 1) {
+			return " : " + getGroup();
+		}
+		return "";
+	}
+
+	public void refreshTransportLabelsOnTransition() {
+		PlaceTransitionObject transition = isInPreSet ? getTarget() : getSource();
+		if (transition == null) {
+			return;
+		}
+		for (Arc arc : transition.getPreset()) {
+			if (arc instanceof TimedTransportArcComponent) {
+				arc.updateLabel(true);
+			}
+		}
+		for (Arc arc : transition.getPostset()) {
+			if (arc instanceof TimedTransportArcComponent) {
+				arc.updateLabel(true);
+			}
+		}
+	}
+
 	@Override
 	public void updateLabel(boolean displayConstantNames) {
         if (isInPreSet && underlyingTransportArc != null) {
             if (TAPAALGUI.getApp() != null && TAPAALGUI.getAppGui().showZeroToInfinityIntervals()) {
-                getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + " : " + getGroup());
+                getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + groupSuffix());
 
                 if (getNameLabel().getText().contains("inf")) {
                     String intervalStringWithInfSymbol = getNameLabel().getText().replace("inf", Character.toString('\u221e'));
@@ -114,9 +142,9 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
                 }
             } else {
                 if (underlyingTransportArc.interval().toString(displayConstantNames).equals("[0,inf)")) {
-                    getNameLabel().setText(" : " + getGroup());
+                    getNameLabel().setText(groupSuffix());
                 } else {
-                    getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + " : " + getGroup());
+                    getNameLabel().setText(underlyingTransportArc.interval().toString(displayConstantNames) + groupSuffix());
                 }
             }
 
@@ -154,7 +182,7 @@ public class TimedTransportArcComponent extends TimedInputArcComponent {
             }
             pnName.setVisible(isvisible);
         } else if (!isInPreSet) {
-            getNameLabel().setText(" : " + getGroup());
+            getNameLabel().setText(groupSuffix());
         } else {
             getNameLabel().setText("");
         }

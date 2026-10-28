@@ -439,7 +439,7 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
             TAPNLens lens = getCurrentTab().getLens();
             if (lens.isColored() && !getCurrentTab().isInAnimationMode()) {
                 PetriNetTab oldTab = getCurrentTab();
-                boolean useExplicit = !lens.isGame() && !lens.isStochastic() && !lens.isTimed();
+                boolean useExplicit = !lens.isGame();
                 ColoredSimulationDialog.showSimulationDialog(oldTab, useExplicit);
                 if (!ColoredSimulationDialog.wasCancelled() && (oldTab != getCurrentTab() || ColoredSimulationDialog.explicitSimulationMode())) {
                     currentTab.ifPresent(tab -> tab.toggleAnimationMode(ColoredSimulationDialog.explicitSimulationMode()));
@@ -1424,10 +1424,11 @@ public class GuiFrame extends JFrame implements GuiFrameActions, SafeGuiFrameAct
         appTab.remove(tab);
 
         if (appTab.getTabCount() == 0) {
-           for (GuiAction action : tab.getAvailableToolActions()) {
+            for (var action : tab.getAvailableToolActions()) {
                 action.setEnabled(false);
             }
             setGUIMode(GUIMode.noNet);
+            setTitle(null);
         }
     }
 

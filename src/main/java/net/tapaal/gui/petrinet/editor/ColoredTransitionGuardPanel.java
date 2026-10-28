@@ -6,6 +6,7 @@ import net.tapaal.gui.petrinet.undo.Command;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.ExpressionSupport.ExprStringPosition;
 import dk.aau.cs.model.CPN.Expressions.*;
+import dk.aau.cs.model.CPN.GuardExpressionParser.ParseException;
 import dk.aau.cs.model.CPN.GuardExpressionParser.GuardExpressionParser;
 import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
@@ -531,14 +532,13 @@ public class ColoredTransitionGuardPanel  extends JPanel {
                     } else if (newExpression instanceof AndExpression) {
                         ((AndExpression) newExpression).setSimpleProperty(true);
                     }
-                } catch (Throwable ex) {
+                } catch (ParseException ex) {
                     int choice = JOptionPane.showConfirmDialog(
                         TAPAALGUI.getApp(),
-                        "TAPAAL encountered an error trying to parse the specified Expression with the following error: \n\n" + ex.getMessage()+ ".\n\nWe recommend using the expression construction buttons unless you are an experienced user.\n\n The specified expression has not been saved. Do you want to edit it again?",
+                        "Could not parse the guard expression.\n\n" + ex.getMessage() + "\n\nThe expression has not been saved. Do you want to edit it again?",
                         "Error Parsing Expression",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE);
-                    System.out.println(ex.getMessage());
                     if (choice == JOptionPane.NO_OPTION)
                         returnFromManualEdit(null);
                     else
@@ -885,7 +885,9 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     private void addColorTypesToCombobox(List<ColorType> types) {
         colorTypeCombobox.removeAllItems();
         for (ColorType type : types) {
-            colorTypeCombobox.addItem(type);
+            if (!(type instanceof ProductType)) {
+                colorTypeCombobox.addItem(type);
+            }
         }
         colorTypeCombobox.removeItem(ColorType.COLORTYPE_DOT);
     }
@@ -1160,5 +1162,4 @@ public class ColoredTransitionGuardPanel  extends JPanel {
     }
 
 }
-
 
