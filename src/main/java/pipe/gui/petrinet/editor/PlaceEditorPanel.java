@@ -591,6 +591,10 @@ public class PlaceEditorPanel extends JPanel {
 
 		constantInvRadioButton = new JRadioButton("Constant");
 		constantInvRadioButton.addActionListener(e -> {
+			if (!isUrgencyOK()) {
+				normalInvRadioButton.setSelected(true);
+				return;
+			}
 			disableInvariantComponents();
 			enableConstantInvariantComponents();
 		});
@@ -758,8 +762,8 @@ public class PlaceEditorPanel extends JPanel {
 	}
 
 	private boolean doOK() {
-		// Check urgent constrain
-		if(!invariantInf.isSelected() && !isUrgencyOK()){
+		// Check urgent constrain. An invariant that uses a constant leaves the infinity checkbox selected.
+		if((constantInvRadioButton.isSelected() || !invariantInf.isSelected()) && !isUrgencyOK()){
 			return false;
 		}
 

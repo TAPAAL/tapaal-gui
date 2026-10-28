@@ -463,6 +463,7 @@ public class QueryDialog extends JPanel {
     private UndoableEditSupport undoSupport;
     private final boolean isNetDegree2;
     private final int highestNetDegree;
+    private final int tokensInModel;
     private final boolean hasInhibitorArcs;
     private InclusionPlaces inclusionPlaces;
     private final TAPNLens lens;
@@ -677,8 +678,11 @@ public class QueryDialog extends JPanel {
         // query stored in the tab untouched until the replacement is saved.
         newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty().copy();
         rootPane = me.getRootPane();
-        isNetDegree2 = tapnNetwork.isDegree2();
-        highestNetDegree = tapnNetwork.getHighestNetDegree();
+        var composer = new TAPNComposer(new MessengerImpl(), false);
+        var composedModel = composer.transformModel(tapnNetwork).value1();
+        isNetDegree2 = composedModel.isDegree2();
+        highestNetDegree = composedModel.getHighestNetDegree();
+        tokensInModel = composedModel.getNumberOfTokensInNet();
         hasInhibitorArcs = tapnNetwork.hasInhibitorArcs();
 
         setLayout(new GridBagLayout());
@@ -718,11 +722,7 @@ public class QueryDialog extends JPanel {
         int capacity = oldCapacity;
 
         if (rawVerificationOptionsEnabled.isSelected()) {
-            ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-            Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-            int tokensInModel = transformedModel.value1().getNumberOfTokensInNet();
-
-            String rawOptions = rawVerificationOptionsTextArea.getText();
+            var rawOptions = rawVerificationOptionsTextArea.getText();
             capacity = VerificationArguments.getKBound(rawOptions).orElse(tokensInModel) - tokensInModel;
         }
 
@@ -3540,6 +3540,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Confidence : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcConfidence = new JTextField(7);
+        smcConfidence.setMinimumSize(smcConfidence.getPreferredSize());
         smcConfidence.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcConfidence.getText().length();
@@ -3568,6 +3569,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(new JLabel("Precision : "), subPanelGbc);
         subPanelGbc.gridx = 1;
         smcEstimationIntervalWidth = new JTextField(7);
+        smcEstimationIntervalWidth.setMinimumSize(smcEstimationIntervalWidth.getPreferredSize());
         smcEstimationIntervalWidth.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcEstimationIntervalWidth.getText().length();
@@ -3602,6 +3604,7 @@ public class QueryDialog extends JPanel {
         quantitativePanel.add(verifTimeLabel, subPanelGbc);
         subPanelGbc.gridx = 1;
         smcTimeExpected = new JTextField(7);
+        smcTimeExpected.setMinimumSize(smcTimeExpected.getPreferredSize());
         smcTimeExpected.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent evt) {
                 int endIdx = smcTimeExpected.getText().length();
@@ -6571,9 +6574,7 @@ public class QueryDialog extends JPanel {
         boolean isColored = (lens != null && lens.isColored() || tapnNetwork.isColored());
         VerifyTAPNOptions verifytapnOptions = Verifier.getVerificationOptions(query, isColored);
 
-        ITAPNComposer composer = new TAPNComposer(new MessengerImpl(), false);
-        Tuple<TimedArcPetriNet, NameMapping> transformedModel = composer.transformModel(QueryDialog.this.tapnNetwork);
-        verifytapnOptions.setTokensInModel(transformedModel.value1().getNumberOfTokensInNet());
+        verifytapnOptions.setTokensInModel(tokensInModel);
 
         String rawVerificationOptions = verifytapnOptions.toString();
 

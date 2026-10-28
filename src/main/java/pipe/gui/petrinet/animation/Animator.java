@@ -1079,44 +1079,41 @@ public class Animator {
         try {
             BigDecimal delay = tab.getAnimationController().getCurrentDelay();
 
-            if (isUrgentTransitionEnabled && !delay.equals(BigDecimal.ZERO) ) {
+            if (delay.signum() < 0) {
                 tab.getAnimationController().getOkButton().setEnabled(false);
-
-                StringBuilder sb = new StringBuilder();
-                sb.append("<html>Time delay is disabled due to the<br /> following enabled urgent transitions:<br /><br />");
-                for (Template template : tab.activeTemplates()) {
-                    for (Transition t : template.guiModel().transitions()) {
-                        if (t.isTransitionEnabled() && template.model().getTransitionByName(t.getName()).isUrgent()) {
-                            sb.append(template + "." + t.getName() + "<br />");
-                        }
-                    }
-                }
-                sb.append("</html>");
-
-                tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
-
+                tab.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
                 return;
             }
 
-            if (delay.compareTo(new BigDecimal(0)) < 0) {
-                tab.getAnimationController().getOkButton().setEnabled(false);
-                tab.getAnimationController().getOkButton().setToolTipText("Time delay is possible only for nonnegative rational numbers");
-            } else {
-                List<TimedPlace> blockingPlaces = currentMarking().getBlockingPlaces(delay);
-                if (blockingPlaces.size() == 0) {
-                    tab.getAnimationController().getOkButton().setEnabled(true);
-                    tab.getAnimationController().getOkButton().setToolTipText("Press to add the delay");
-                } else {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<html>Time delay of " + delay + " time unit(s) is disabled due to <br /> age invariants in the following places:<br /><br />");
-                    for (TimedPlace t : blockingPlaces) {
-                        sb.append(t.toString() + "<br />");
+            var reasons = new StringBuilder();
+            if (isUrgentTransitionEnabled && delay.signum() > 0) {
+                reasons.append("Enabled urgent transitions:<br />");
+                for (Template template : tab.activeTemplates()) {
+                    for (var transition : template.model().transitions()) {
+                        if (transition.isUrgent() && (tab.getLens().isColored()
+                            ? isColoredTransitionEnabled(transition) : transition.isEnabled())) {
+                            reasons.append(template + "." + transition.name() + "<br />");
+                        }
                     }
-                    sb.append("</html>");
-                    tab.getAnimationController().getOkButton().setEnabled(false);
-                    tab.getAnimationController().getOkButton().setToolTipText(sb.toString());
                 }
             }
+
+            var blockingPlaces = currentMarking().getBlockingPlaces(delay);
+            if (!blockingPlaces.isEmpty()) {
+                if (reasons.length() > 0) {
+                    reasons.append("<br />");
+                }
+                reasons.append("Age invariants in the following places:<br />");
+                for (var place : blockingPlaces) {
+                    reasons.append(place.toString()).append("<br />");
+                }
+            }
+
+            var delayPossible = reasons.length() == 0;
+            tab.getAnimationController().getOkButton().setEnabled(delayPossible);
+            tab.getAnimationController().getOkButton().setToolTipText(delayPossible
+                ? "Press to add the delay"
+                : "<html>Time delay of " + delay + " time unit(s) is disabled due to:<br /><br />" + reasons + "</html>");
         } catch (ParseException | NumberFormatException e) {
             tab.getAnimationController().getOkButton().setEnabled(false);
             tab.getAnimationController().getOkButton().setToolTipText("The text in the input field is not a number");
