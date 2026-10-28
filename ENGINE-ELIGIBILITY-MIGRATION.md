@@ -36,6 +36,12 @@ The browser prototype at `src/main/java/net/tapaal/gui/petrinet/verification/PRO
 
 The remaining Swing code is intentionally an adapter for stateful restoration flags and raw-verification mode. Those flags are kept in the dialog until a later migration can give them an explicit owner without changing saved-query behavior.
 
-## Full-suite note
+## Full-suite validation
 
-The focused suite passes. The repository-wide suite currently has 13 pre-existing `TapnXmlLoaderTest` failures caused by `TAPAALGUI` static initialization throwing `HeadlessException` in this environment; the eligibility suite itself is independent of that Swing initialization path.
+The eligibility suite is independent of Swing initialization. Run the full build and GUI-dependent loader tests under Xvfb:
+
+```text
+xvfb-run -a ./gradlew -Djava.awt.headless=false build --no-daemon
+```
+
+The policy follows current `main`, including explicit-search feature requirements, SMC Tarjan disabling, trace-refinement selection clearing, and stubborn reduction availability for HyperLTL when Time Darts is off. Timed original-net trace controls remain in the Swing adapter.
