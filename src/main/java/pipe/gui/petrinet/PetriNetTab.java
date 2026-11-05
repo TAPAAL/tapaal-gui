@@ -157,6 +157,7 @@ public class PetriNetTab extends JSplitPane implements TabActions {
 
     private final Animator animator = new Animator(this);
     private boolean netChanged = false;
+    private boolean nonUndoableChange = false;
 
     @Override
     public boolean getNetChanged() {
@@ -164,7 +165,38 @@ public class PetriNetTab extends JSplitPane implements TabActions {
     }
 
     public void setNetChanged(boolean _netChanged) {
-        netChanged = _netChanged;
+		if (_netChanged) {
+			markNonUndoableChange();
+		} else {
+			nonUndoableChange = false;
+			updateNetChanged(false);
+		}
+    }
+
+	/**
+	 * Marks a model change that is not represented by the normal undo manager.
+	 * Undoing normal edits must not clear the dirty state while this flag is set.
+	 */
+	public void markNonUndoableChange() {
+		nonUndoableChange = true;
+		updateNetChangedFromUndoManager();
+	}
+
+    public void updateNetChangedFromUndoManager() {
+		updateNetChanged(nonUndoableChange || undoManager.hasAppliedNormalEdits());
+	}
+
+	private void updateNetChanged(boolean changed) {
+		if (netChanged == changed) {
+			return;
+		}
+		netChanged = changed;
+		Runnable updateTabState = () -> safeApp.ifPresent(tab -> tab.updatedTabState(this));
+		if (SwingUtilities.isEventDispatchThread()) {
+			updateTabState.run();
+		} else {
+			SwingUtilities.invokeLater(updateTabState);
+		}
     }
     private final NameGenerator nameGenerator = new NameGenerator();
 

@@ -9,4 +9,6 @@ public interface SafeGuiFrameActions {
 
     void updatedTabName(PetriNetTab tab);
 
+    void updatedTabState(PetriNetTab tab);
+
 }
