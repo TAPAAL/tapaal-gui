@@ -33,6 +33,7 @@ import pipe.gui.TAPAALGUI;
 import net.tapaal.gui.petrinet.dialog.QueryDialog;
 import net.tapaal.gui.petrinet.verification.Verifier;
 import net.tapaal.gui.petrinet.undo.RemoveQueriesCommand;
+import net.tapaal.gui.petrinet.undo.EditQueryCommand;
 import pipe.gui.petrinet.undo.UndoManager;
 import net.tapaal.gui.petrinet.dialog.QueryDialog.QueryDialogueOption;
 import dk.aau.cs.Messenger;
@@ -362,8 +363,12 @@ public class QueryPane extends JPanel implements SidePane {
 		if(q.isActive()) {
             newQuery = QueryDialog.showQueryDialogue(QueryDialogueOption.Save, q, tabContent.network(), tabContent.getGuiModels(), tabContent.getLens(), tabContent);
 
-			if (newQuery != null)
-				updateQuery(q, newQuery);
+			if (newQuery != null) {
+				int index = listModel.indexOf(q);
+				Command command = new EditQueryCommand(this, q, newQuery, index);
+				undoManager.addNewEdit(command);
+				command.redo();
+			}
 		}
 	}
 
@@ -371,9 +376,9 @@ public class QueryPane extends JPanel implements SidePane {
 		listModel.addElement(query);
 	}
 
-	private void updateQuery(TAPNQuery oldQuery, TAPNQuery newQuery) {
-		newQuery.setActive(oldQuery.isActive());
-		listModel.set(listModel.indexOf(oldQuery), newQuery);
+	public void replaceQuery(int index, TAPNQuery query) {
+		listModel.set(index, query);
+		queryList.setSelectedIndex(index);
 	}
 
 	public Iterable<TAPNQuery> getQueries() {
