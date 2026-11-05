@@ -49,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import net.tapaal.gui.petrinet.TAPNLens;
@@ -274,6 +275,12 @@ public class WorkflowDialog extends JDialog {
 		setLocationRelativeTo(TAPAALGUI.getApp());
 		setResizable(true);
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+	}
+
+	private void packResults() {
+		SwingUtilities.invokeLater(() -> {
+			if (isDisplayable()) pack();
+		});
 	}
 
 	private void initComponents() {
@@ -950,7 +957,7 @@ public class WorkflowDialog extends JDialog {
 		unusedTransitions.setText("");
 		resultPanel.setVisible(true);
 
-		pack();
+		packResults();
 
 		verificationQueue.clear();
 		isSound = false;
@@ -978,6 +985,7 @@ public class WorkflowDialog extends JDialog {
 				// Check preliminary conditions
 				if(!isSound){
 					setStrongSoundnessResult(false,isConclusive?"The workflow is not sound.":"The soundness check was inconclusive.", isConclusive);
+					packResults();
 					return;
 				}
 
@@ -1014,6 +1022,7 @@ public class WorkflowDialog extends JDialog {
 						c,
                         model.isColored()
 				);
+				q.setTraceInOriginalNet(false);
 				Verifier.runVerifyTAPNVerification(model, q, result -> {
 					if(result.isQuerySatisfied()){
 
@@ -1040,7 +1049,7 @@ public class WorkflowDialog extends JDialog {
 					}else{
 						setStrongSoundnessResult(true, null);
 						if(max.isSelected()){
-							setMaxResult(model, result.stats().maximumExecutionTime());
+							setMaxResult(result.stats().maximumExecutionTime());
 							maxResultTrace = mapTraceToRealModel(result.getTrace());
 							maxResultTraceButton.setVisible(true);
 						}
@@ -1053,18 +1062,17 @@ public class WorkflowDialog extends JDialog {
 							+ MemoryMonitor.getPeakMemory());
 					strongSoundnessVerificationStats.setVisible(true);
 
-					pack();
+					packResults();
 				});
 			}
 		};
 	}
 
-	private void setMaxResult(TimedArcPetriNetNetwork model, int value){
+	private void setMaxResult(int value){
 		maxResult.setText(value + " time units.");
 		maxResult.setForeground(Constants.QUERY_SATISFIED_COLOR);
 		maxResult.setVisible(true);
 		maxResultLabel.setVisible(true);
-		pack();
 	}
 
 	private void setStrongSoundnessResult(boolean satisfied, String explanation) {
@@ -1097,8 +1105,6 @@ public class WorkflowDialog extends JDialog {
 		}
 		strongSoundnessResultLabel.setVisible(true);
 		strongSoundnessResult.setVisible(true);
-
-		pack();
 	}
 
 	private Runnable getSoundnessRunnable() {
@@ -1120,6 +1126,8 @@ public class WorkflowDialog extends JDialog {
                     WorkflowMode.WORKFLOW_SOUNDNESS,
                     model.isColored()
             );
+  
+            q.setTraceInOriginalNet(false);
             Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
                 @Override
@@ -1205,7 +1213,7 @@ public class WorkflowDialog extends JDialog {
 
                     m = result.stats().exploredStates();
 
-                    pack();
+                    packResults();
                 }
 
                 private void completeSoundnessTrace(final VerificationResult<TAPNNetworkTrace> soundnessResult1, final NetworkMarking coveredMarking) {
@@ -1231,6 +1239,7 @@ public class WorkflowDialog extends JDialog {
                             ExtrapolationOption.AUTOMATIC,
                             model.isColored()
                     );
+                    q.setTraceInOriginalNet(false);
                     Verifier.runVerifyTAPNVerification(model, q, new VerificationCallback() {
 
                         @Override
@@ -1250,6 +1259,8 @@ public class WorkflowDialog extends JDialog {
                                     soundnessResultExplanation.setText("<html>The monotonic workflow net has a reachable marking covering another one.<br/>Try to increase the number of extra tokens so that a trace can be generated.</html>");
                                 }
                             }
+
+                            packResults();
                         }
 
                         private void appendTrace(TAPNNetworkTrace trace) {
