@@ -117,6 +117,7 @@ public class KBoundAnalyzer {
         TCTLAbstractProperty property = new TCTLAGNode(child);
 
         TAPNQuery query = new TAPNQuery(property, k);
+        query.setUseGameSemantics(false);
         dataLayerQuery.setCategory(QueryCategory.CTL);
 
         return query;
