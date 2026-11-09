@@ -23,6 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
+import dk.aau.cs.io.NamePurifier;
 
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
@@ -217,7 +218,12 @@ public class VerifyTAPNTraceParser {
     }
 
 	private TimedTransitionStep parseTransitionStep(Element element) {
-		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
+        String transitionId = element.getAttribute("id");
+        TimedTransition transition = tapn.getTransitionByName(transitionId);
+        if (transition == null) {
+            transition = tapn.getTransitionByName(NamePurifier.purify(transitionId));
+        }
+
 		NodeList tokenNodes = element.getChildNodes();
 		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
 		for (int i = 0; i < tokenNodes.getLength(); ++i) {
@@ -226,7 +232,12 @@ public class VerifyTAPNTraceParser {
 				Element tokenElement = (Element)node;
                 if (!tokenElement.getTagName().equals("token")) continue;
 
-				TimedPlace place = tapn.getPlaceByName(tokenElement.getAttribute("place"));
+                String placeId = tokenElement.getAttribute("place");
+                TimedPlace place = tapn.getPlaceByName(placeId);
+                if (place == null) {
+                    place = tapn.getPlaceByName(NamePurifier.purify(placeId));
+                }
+                
 				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
 				boolean greaterThanOrEqual = Boolean.parseBoolean(tokenElement.getAttribute("greaterThanOrEqual"));
 				consumedTokens.add(new TraceToken(place, age, greaterThanOrEqual, ColorType.COLORTYPE_DOT.getFirstColor()));
