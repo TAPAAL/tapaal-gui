@@ -107,7 +107,9 @@ public class KBoundAnalyzer {
 
 	protected TAPNQuery getBoundednessQuery() {
 		TCTLAbstractProperty property = new TCTLAGNode(new TCTLTrueNode());
-		return new TAPNQuery(property, k);
+		TAPNQuery query = new TAPNQuery(property, k);
+		query.setUseGameSemantics(false);
+		return query;
 	}
 
 	protected TAPNQuery getPNBoundednessQuery() {
