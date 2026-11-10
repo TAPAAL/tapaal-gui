@@ -23,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
 import dk.aau.cs.model.CPN.Variable;
-import dk.aau.cs.io.NamePurifier;
 
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
@@ -219,10 +218,7 @@ public class VerifyTAPNTraceParser {
 
 	private TimedTransitionStep parseTransitionStep(Element element) {
         String transitionId = element.getAttribute("id");
-        TimedTransition transition = tapn.getTransitionByName(transitionId);
-        if (transition == null) {
-            transition = tapn.getTransitionByName(NamePurifier.purify(transitionId));
-        }
+        TimedTransition transition = EngineNameResolver.findTransition(tapn, transitionId);
 
 		NodeList tokenNodes = element.getChildNodes();
 		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
@@ -233,10 +229,7 @@ public class VerifyTAPNTraceParser {
                 if (!tokenElement.getTagName().equals("token")) continue;
 
                 String placeId = tokenElement.getAttribute("place");
-                TimedPlace place = tapn.getPlaceByName(placeId);
-                if (place == null) {
-                    place = tapn.getPlaceByName(NamePurifier.purify(placeId));
-                }
+                TimedPlace place = EngineNameResolver.findPlace(tapn, placeId);
                 
 				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
 				boolean greaterThanOrEqual = Boolean.parseBoolean(tokenElement.getAttribute("greaterThanOrEqual"));
@@ -249,7 +242,7 @@ public class VerifyTAPNTraceParser {
     private ColoredTransitionStep parseColoredTransitionStep(Element element) {
         ColorBindingParser colorBindingParser = new ColorBindingParser();
         Node bindingsNode = element.getElementsByTagName("bindings").item(0);
-        TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
+        TimedTransition transition = EngineNameResolver.findTransition(tapn, element.getAttribute("id"));
         Map<Variable, Color> bindings = colorBindingParser.parseBindingsForSingleTransition(
             nodeToString(bindingsNode), transition.name(), tapn.parentNetwork()
         );
