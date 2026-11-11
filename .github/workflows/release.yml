@@ -198,7 +198,7 @@ jobs:
           chmod +x "$D"/bin/*
           cp tools/distribution-info/linux/tapaal "$D/tapaal"
           chmod +x "$D/tapaal"
-          cp tools/distribution-info/LICENSE.txt "$D/"
+          sed -E "1s/^TAPAAL [^ ]+ is licensed/TAPAAL $VERSION is licensed/" tools/distribution-info/LICENSE.txt > "$D/LICENSE.txt"
           sed -e "1s/.*/TAPAAL v$VERSION/" -e "2s/.*/$(LC_ALL=C date +'%B %Y')/" \
             tools/distribution-info/linux/README.txt > "$D/README.txt"
           mkdir -p out
@@ -230,7 +230,7 @@ jobs:
           cp gui-lib/*.jar "$D/lib/"
           cp engines-win64/* "$D/bin/"
           cp l4j/tapaal.exe "$D/"
-          cp tools/distribution-info/LICENSE.txt "$D/"
+          sed -E "1s/^TAPAAL [^ ]+ is licensed/TAPAAL $VERSION is licensed/" tools/distribution-info/LICENSE.txt > "$D/LICENSE.txt"
           sed -e "1s/.*/TAPAAL v$VERSION/" -e "2s/.*/$(LC_ALL=C date +'%B %Y')/" \
             tools/distribution-info/win/README.txt > "$D/README.txt"
           zip -r -X "out/$D.zip" "$D"
@@ -293,7 +293,7 @@ jobs:
           # Ad-hoc signature (no notarization)
           codesign --force --deep -s - "$APP"
 
-          cp tools/distribution-info/LICENSE.txt stage/
+          sed -E "1s/^TAPAAL [^ ]+ is licensed/TAPAAL $VERSION is licensed/" tools/distribution-info/LICENSE.txt > stage/LICENSE.txt
           sed -e "1s/.*/TAPAAL v$VERSION/" -e "2s/.*/$(LC_ALL=C date +'%B %Y')/" \
             tools/distribution-info/mac/README.txt > stage/README.txt
           ln -s /Applications stage/Applications
