@@ -5,18 +5,18 @@ TAPAAL 3.9.1 is licensed under five licenses.
 2. The translations part and TAPN libraries and net.tapaal parts are   
    licensed under the Simplified BSD License. 
    
-Source files can be downloaded from http://code.launchpad.net/tapaal
+Source files can be downloaded from https://github.com/TAPAAL/tapaal-gui
 
 3.The verification engine verifytapn is licensed under GLP v2 license:
   http://www.gnu.org/licenses/gpl-2.0.txt
-  Source files can be downloaded from http://code.launchpad.net/verifytapn
+  Source files can be downloaded from https://github.com/TAPAAL/verifytapn
 
 4. The discrete verification engine verifydtapn is licensed under the    
    Simplified BSD License
-   Source files can be downloaded from http://code.launchpad.net/verifydtapn
+   Source files can be downloaded from https://github.com/TAPAAL/verifydtapn
 
 5. The untimed verification engine verifypn is licensed under GNU GPLv3 or later.
-   Source files can be downloaded from http://code.launchpad.net/verifypn
+   Source files can be downloaded from https://github.com/TAPAAL/verifypn
 
 The users of TAPAAL agree to comply with these licenses. If a development 
 of a new branch of TAPAAL is initiated, which is a very welcome activity,
