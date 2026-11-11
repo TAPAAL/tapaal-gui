@@ -1,12 +1,15 @@
 name: Build Release
 
-# Builds the TAPAAL release packages:
+# Builds the TAPAAL release packages, each uploaded as its own artifact:
 #   tapaal-<V>-linux64.zip, tapaal-<V>-win64.zip,
 #   tapaal-<V>-mac-intel64.dmg, tapaal-<V>-mac-arm64.dmg
 #
 # The engines (verifypn, verifydtapn, verifytapn) are NOT rebuilt here. The binaries
 # are taken from the latest successful run on the main branch of each engine's build
 # workflows, so run those workflows first if you need fresh engine builds.
+#
+# Each packaging job is self-contained (fetches its own engines and builds the GUI),
+# so no intermediate artifacts are created - only the four release files.
 
 on:
   workflow_dispatch:
@@ -43,93 +46,23 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Building TAPAAL release **$VERSION**" >> "$GITHUB_STEP_SUMMARY"
 
-  fetch-engines:
-    runs-on: ubuntu-latest
-    env:
-      # An optional secret ENGINES_TOKEN (with actions:read on the engine repos) can be
-      # provided if the default token cannot read the engine artifacts.
-      GH_TOKEN: ${{ secrets.ENGINES_TOKEN || github.token }}
-    steps:
-      - name: Download latest engine binaries from main
-        run: |
-          set -euo pipefail
-          declare -A WORKFLOW=( [linux64]=build-linux.yml [win64]=build-win.yml [osx64]=build-macos.yml [arm64]=build-macos-arm.yml )
-          {
-            echo "### Engine builds used"
-            echo "| Engine | Platform | Run | Commit | Date |"
-            echo "|---|---|---|---|---|"
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          for engine in verifypn verifydtapn verifytapn; do
-            for platform in linux64 win64 osx64 arm64; do
-              wf="${WORKFLOW[$platform]}"
-              repo="$ENGINE_OWNER/$engine"
-              run_json=$(gh run list -R "$repo" --workflow "$wf" --branch main --status success --limit 1 \
-                         --json databaseId,headSha,createdAt,url)
-              run_id=$(jq -r '.[0].databaseId // empty' <<< "$run_json")
-              if [ -z "$run_id" ]; then
-                echo "::error::No successful run of $wf on main in $repo"
-                exit 1
-              fi
-              sha=$(jq -r '.[0].headSha' <<< "$run_json")
-              date=$(jq -r '.[0].createdAt' <<< "$run_json")
-              url=$(jq -r '.[0].url' <<< "$run_json")
-
-              dl="dl/$engine-$platform"
-              if ! gh run download "$run_id" -R "$repo" -n "$engine-$platform" -D "$dl"; then
-                echo "::error::Could not download artifact $engine-$platform from $url (expired?). Re-run $wf in $repo."
-                exit 1
-              fi
-
-              src=$(find "$dl" -type f | head -n 1)
-              mkdir -p "engines-$platform"
-              if [ "$platform" = win64 ]; then
-                dst="engines-$platform/${engine}64.exe"
-              else
-                dst="engines-$platform/${engine}64"
-              fi
-              mv "$src" "$dst"
-              chmod +x "$dst"
-              echo "$engine $platform <- run $run_id ($sha)"
-              echo "| $engine | $platform | [$run_id]($url) | \`${sha:0:10}\` | $date |" >> "$GITHUB_STEP_SUMMARY"
-            done
-          done
-          ls -l engines-*
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: engines-linux64
-          path: engines-linux64
-      - uses: actions/upload-artifact@v4
-        with:
-          name: engines-win64
-          path: engines-win64
-      - uses: actions/upload-artifact@v4
-        with:
-          name: engines-osx64
-          path: engines-osx64
-      - uses: actions/upload-artifact@v4
-        with:
-          name: engines-arm64
-          path: engines-arm64
-
-  build-gui:
+  package-linux:
     needs: prepare
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
+      # Optional secret ENGINES_TOKEN (actions:read on the engine repos) if the
+      # default token cannot read the engine artifacts.
+      GH_TOKEN: ${{ secrets.ENGINES_TOKEN || github.token }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v5
+      - uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: 'temurin'
-          java-package: jdk
 
-      - name: Cache Gradle packages
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -138,72 +71,63 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Set release version
-        run: |
-          sed -i 's/VERSION = "DEV";/VERSION = "'"$VERSION"'";/' src/main/java/net/tapaal/TAPAAL.java
-          grep -q "VERSION = \"$VERSION\";" src/main/java/net/tapaal/TAPAAL.java || { echo "::error::Failed to set version"; exit 1; }
+      - name: Fetch engines
+        run: tools/release/fetch-engines.sh linux64 engines
 
-      - name: Build
-        run: |
-          chmod +x gradlew
-          ./gradlew installDist -x test
+      - name: Build GUI
+        run: tools/release/build-gui.sh "$VERSION" gui-lib
 
-      - name: Collect jars
-        run: |
-          mkdir -p gui/lib
-          cp build/install/TAPAAL/lib/*.jar gui/lib/
-          mv gui/lib/TAPAAL-*.jar gui/lib/tapaal.jar
-          ls -l gui/lib
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gui-lib
-          path: gui/lib
-
-  package-zips:
-    needs: [prepare, fetch-engines, build-gui]
-    runs-on: ubuntu-latest
-    env:
-      VERSION: ${{ needs.prepare.outputs.version }}
-      LAUNCH4J_VERSION: "3.50"
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: gui-lib
-          path: gui-lib
-      - uses: actions/download-artifact@v4
-        with:
-          name: engines-linux64
-          path: engines-linux64
-      - uses: actions/download-artifact@v4
-        with:
-          name: engines-win64
-          path: engines-win64
-
-      - name: Set up JDK 17 (for launch4j)
-        uses: actions/setup-java@v5
-        with:
-          java-version: 17
-          distribution: 'temurin'
-
-      - name: Package Linux
+      - name: Package
         run: |
           set -euo pipefail
           D="tapaal-$VERSION-linux64"
-          mkdir -p "$D/bin" "$D/lib"
+          mkdir -p "$D/bin" "$D/lib" out
           cp gui-lib/*.jar "$D/lib/"
-          cp engines-linux64/* "$D/bin/"
+          cp engines/* "$D/bin/"
           chmod +x "$D"/bin/*
           cp tools/distribution-info/linux/tapaal "$D/tapaal"
           chmod +x "$D/tapaal"
           sed -E "1s/^TAPAAL [^ ]+ is licensed/TAPAAL $VERSION is licensed/" tools/distribution-info/LICENSE.txt > "$D/LICENSE.txt"
           sed -e "1s/.*/TAPAAL v$VERSION/" -e "2s/.*/$(LC_ALL=C date +'%B %Y')/" \
             tools/distribution-info/linux/README.txt > "$D/README.txt"
-          mkdir -p out
           zip -r -X "out/$D.zip" "$D"
           unzip -l "out/$D.zip"
+
+      - uses: actions/upload-artifact@v7.0.1
+        with:
+          path: out/tapaal-${{ env.VERSION }}-linux64.zip
+          archive: false
+          if-no-files-found: error
+
+  package-windows:
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      GH_TOKEN: ${{ secrets.ENGINES_TOKEN || github.token }}
+      LAUNCH4J_VERSION: "3.50"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 17
+          distribution: 'temurin'
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Fetch engines
+        run: tools/release/fetch-engines.sh win64 engines
+
+      - name: Build GUI
+        run: tools/release/build-gui.sh "$VERSION" gui-lib
 
       - name: Build tapaal.exe with launch4j
         run: |
@@ -222,13 +146,13 @@ jobs:
           java -jar launch4j/launch4j.jar "$PWD/l4j/tapaal.xml"
           ls -l l4j/tapaal.exe
 
-      - name: Package Windows
+      - name: Package
         run: |
           set -euo pipefail
           D="tapaal-$VERSION-win64"
-          mkdir -p "$D/bin" "$D/lib"
+          mkdir -p "$D/bin" "$D/lib" out
           cp gui-lib/*.jar "$D/lib/"
-          cp engines-win64/* "$D/bin/"
+          cp engines/* "$D/bin/"
           cp l4j/tapaal.exe "$D/"
           sed -E "1s/^TAPAAL [^ ]+ is licensed/TAPAAL $VERSION is licensed/" tools/distribution-info/LICENSE.txt > "$D/LICENSE.txt"
           sed -e "1s/.*/TAPAAL v$VERSION/" -e "2s/.*/$(LC_ALL=C date +'%B %Y')/" \
@@ -236,13 +160,14 @@ jobs:
           zip -r -X "out/$D.zip" "$D"
           unzip -l "out/$D.zip"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
-          name: tapaal-zips
-          path: out/*.zip
+          path: out/tapaal-${{ env.VERSION }}-win64.zip
+          archive: false
+          if-no-files-found: error
 
   package-mac:
-    needs: [prepare, fetch-engines, build-gui]
+    needs: prepare
     runs-on: macos-latest
     strategy:
       matrix:
@@ -253,17 +178,29 @@ jobs:
             engines: arm64
     env:
       VERSION: ${{ needs.prepare.outputs.version }}
+      GH_TOKEN: ${{ secrets.ENGINES_TOKEN || github.token }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/setup-java@v5
         with:
-          name: gui-lib
-          path: gui-lib
-      - uses: actions/download-artifact@v4
+          java-version: 17
+          distribution: 'temurin'
+
+      - uses: actions/cache@v4
         with:
-          name: engines-${{ matrix.engines }}
-          path: engines
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Fetch engines
+        run: tools/release/fetch-engines.sh ${{ matrix.engines }} engines
+
+      - name: Build GUI
+        run: tools/release/build-gui.sh "$VERSION" gui-lib
 
       - name: Build Tapaal.app
         run: |
@@ -307,30 +244,8 @@ jobs:
           hdiutil create -volname "$NAME" -srcfolder stage -fs HFS+ -format UDZO -ov "out/$NAME.dmg"
           ls -l out
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
-          name: tapaal-dmg-${{ matrix.arch }}
-          path: out/*.dmg
-
-  collect:
-    needs: [prepare, package-zips, package-mac]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: tapaal-*
-          path: release
-          merge-multiple: true
-
-      - name: List release files
-        run: |
-          ls -l release
-          {
-            echo "### Release files"
-            for f in release/*; do echo "- \`$(basename "$f")\` ($(du -h "$f" | cut -f1))"; done
-          } >> "$GITHUB_STEP_SUMMARY"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: tapaal-${{ needs.prepare.outputs.version }}-release
-          path: release/*
+          path: out/tapaal-${{ env.VERSION }}-mac-${{ matrix.arch }}.dmg
+          archive: false
+          if-no-files-found: error
