@@ -18,6 +18,15 @@ public class TAPNQuery {
 	private ArrayList<String> traceList;
     private SMCSettings smcSettings;
     private VerificationType smcVerificationType;
+    private boolean useGameSemantics = true;
+
+    public boolean useGameSemantics() {
+        return useGameSemantics;
+    }
+
+    public void setUseGameSemantics(boolean useGameSemantics) {
+        this.useGameSemantics = useGameSemantics;
+    }
 
 	public TCTLAbstractProperty getProperty() {
 		return property;
