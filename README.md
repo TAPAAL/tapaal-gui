@@ -4,7 +4,15 @@ This repo container the source files for the TAPAAL GUI.
 
 ## Run source
 
-To run TAPAAL from sources make sure you have a java runtime installed. You can start tapaal by running: 
+Install JDK 25 (recommended) or JDK 17 to run Gradle. The build uses a Temurin Java 25
+toolchain for compilation, tests, and running TAPAAL from source. Gradle
+automatically downloads that toolchain if it is not already installed. CI
+also uses Temurin Java 25.
+
+Java and Kotlin compilation target Java 17 bytecode and APIs, so the packaged
+application continues to support Java 17 or newer.
+
+You can start TAPAAL by running:
 
 ``` bash 
 ./gradlew run
@@ -29,6 +37,8 @@ To run TAPAAL from IntelliJ select the Gradle tab (normally in the right pane), 
 From now on you can run and debug using the play/debug button in the tool menu.
 
 ## Gradle
+The bundled wrapper uses Gradle 9.8.0; no global Gradle installation is needed.
+
 To run gradle from commandline use the gradle bootstrap scripts. (gradlew for unix, gradlew.bat for Windows).
 You might need to set JAVA_HOME to point to the location of your JDK.
 
