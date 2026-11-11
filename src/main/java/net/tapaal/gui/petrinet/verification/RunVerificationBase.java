@@ -85,6 +85,7 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         }
 
         clonedQuery = new TAPNQuery(query.getProperty().copy(), query.getExtraTokens(), query.getSMCSettings());
+        clonedQuery.setUseGameSemantics(query.useGameSemantics());
         MapQueryToNewNames(clonedQuery, transformedModel.value2());
 
         if (dataLayerQuery != null) {
