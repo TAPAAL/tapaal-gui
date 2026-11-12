@@ -6,6 +6,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public class EngineSupportOptions {
+    public static final String CONTINUOUS_ENGINE_NAME = "TAPAAL: Continuous Engine (verifytapn)";
+    public static final String UNTIMED_ENGINE_NAME = "TAPAAL: Untimed Engine (verifypn)";
+
     private final String nameString;
     private final Set<EngineFeature> supportedFeatures;
 

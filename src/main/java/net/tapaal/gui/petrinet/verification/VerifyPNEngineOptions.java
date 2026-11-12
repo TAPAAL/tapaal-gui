@@ -6,7 +6,7 @@ public class VerifyPNEngineOptions extends EngineSupportOptions {
 
     public VerifyPNEngineOptions() {
         super(
-            "TAPAAL: Untimed Engine (verifypn)",
+            UNTIMED_ENGINE_NAME,
             EnumSet.of(
                 EngineFeature.DEADLOCK_NET_DEGREE_2_EXP,
                 EngineFeature.DEADLOCK_EG_OR_AF,

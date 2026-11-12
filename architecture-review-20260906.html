@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Architecture review for tapaal-gui</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, theme: "neutral", securityLevel: "loose", flowchart: { curve: "basis" } });
+    </script>
+    <style>
+      .seam-line { border-top: 2px dashed #94a3b8; }
+      .deep { background: linear-gradient(145deg, #0f172a, #1e293b); }
+      .paper-shadow { box-shadow: 0 18px 45px -34px rgba(15, 23, 42, .6); }
+      .leak-arrow { color: #dc2626; font-weight: 800; }
+      .mass-interface { background: #fef2f2; border: 2px solid #ef4444; }
+      .mass-implementation { background: #f8fafc; border: 2px solid #cbd5e1; }
+      .mass-deep-interface { background: #ecfdf5; border: 2px solid #10b981; }
+      .mass-deep-implementation { background: linear-gradient(145deg, #0f172a, #334155); color: white; border: 2px solid #0f172a; }
+    </style>
+  </head>
+  <body class="bg-stone-50 text-slate-900 font-sans">
+    <main class="max-w-6xl mx-auto px-6 py-12 space-y-12">
+      <header class="border-b border-slate-300 pb-7">
+        <div class="flex flex-wrap items-end justify-between gap-5">
+          <div>
+            <p class="text-xs uppercase tracking-[.24em] text-emerald-700 font-semibold">Architecture review</p>
+            <h1 class="mt-2 text-4xl font-serif tracking-tight">tapaal-gui</h1>
+          </div>
+          <p class="font-mono text-sm text-slate-500">06 September 2026 · query construction hot spot</p>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-x-7 gap-y-3 text-xs text-slate-600">
+          <span class="inline-flex items-center gap-2"><i class="block h-5 w-8 rounded border-2 border-slate-500 bg-white"></i>module</span>
+          <span class="inline-flex items-center gap-2"><i class="block w-9 border-t-2 border-dashed border-slate-400"></i>seam</span>
+          <span class="inline-flex items-center gap-2"><b class="text-red-600 text-lg">→</b>leakage</span>
+          <span class="inline-flex items-center gap-2"><i class="block h-5 w-8 rounded bg-slate-900"></i>deep module</span>
+        </div>
+      </header>
+
+      <section id="candidates" class="space-y-12">
+        <article id="candidate-editor" class="rounded-2xl border border-slate-200 bg-white p-7 md:p-9 paper-shadow">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Candidate 1</p>
+              <h2 class="mt-1 text-2xl font-serif">Deepen query-tree editing</h2>
+            </div>
+            <div class="flex gap-2">
+              <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">in-process</span>
+            </div>
+          </div>
+          <div class="mt-5 rounded-lg bg-slate-50 px-4 py-3 font-mono text-xs leading-6 text-slate-650">
+            src/main/java/net/tapaal/gui/petrinet/dialog/QueryDialog.java:1198–3318, 3938–5910, 6833–7007<br />
+            src/test/java/net/tapaal/gui/petrinet/dialog/QueryDialogArithmeticTest.java
+          </div>
+
+          <div class="mt-7 grid gap-5 md:grid-cols-2">
+            <section class="rounded-xl border border-red-200 bg-red-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-red-700">Before · tree rules leak into Swing</p>
+              <div class="mt-4 h-[315px] overflow-hidden rounded-lg border border-red-100 bg-white p-2">
+                <pre class="mermaid">
+flowchart TB
+  UI["Swing controls"] --> SEL["selection + caret"]
+  UI --> MUT["tree replacement"]
+  UI --> TYPE["CTL / LTL / HyperLTL conversion"]
+  UI --> UNDO["undo edits"]
+  SEL --> EN["button enabledness"]
+  MUT --> EN
+  TYPE --> EN
+  UNDO --> EN
+  EN --> UI
+  classDef leak fill:#fff1f2,stroke:#dc2626,stroke-width:2px;
+  class SEL,MUT,TYPE,UNDO,EN leak;
+                </pre>
+              </div>
+            </section>
+            <section class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-800">After · tree behavior gains locality</p>
+              <div class="relative mt-4 h-[315px] rounded-lg border border-emerald-100 bg-white p-5">
+                <div class="mx-auto mt-2 w-3/4 rounded-lg border-2 border-slate-500 bg-white px-4 py-3 text-center">
+                  <p class="text-xs uppercase tracking-wider text-slate-500">Swing module</p>
+                  <p class="mt-1 text-sm">renders state and sends intent</p>
+                </div>
+                <div class="mx-auto my-5 w-4/5 seam-line text-center"><span class="relative -top-3 bg-white px-3 text-[10px] uppercase tracking-widest text-slate-500">seam</span></div>
+                <div class="deep mx-auto h-40 w-11/12 rounded-xl border-4 border-slate-950 px-5 py-4 text-white shadow-xl">
+                  <p class="text-xs uppercase tracking-wider text-emerald-300">Deep query editing module</p>
+                  <div class="mt-4 grid grid-cols-2 gap-2 text-center text-[11px] text-slate-300">
+                    <span class="rounded bg-white/10 p-2">selection</span><span class="rounded bg-white/10 p-2">replacement</span>
+                    <span class="rounded bg-white/10 p-2">conversion</span><span class="rounded bg-white/10 p-2">undo state</span>
+                    <span class="col-span-2 rounded bg-white/10 p-2">valid next edits</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <dl class="mt-7 grid gap-5 md:grid-cols-2">
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Problem</dt><dd class="mt-1 text-sm leading-6">The query editing module is shallow: tree mutation, selection, conversion, undo, and control state share one 7,555-line Swing implementation, so query rules leak across the seam.</dd></div>
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Solution</dt><dd class="mt-1 text-sm leading-6">Deepen one query editing module that absorbs tree behavior and leaves Swing responsible for rendering and events.</dd></div>
+          </dl>
+          <div class="mt-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Benefits</p>
+            <ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <li>locality: tree rules concentrate</li>
+              <li>leverage: all query categories</li>
+              <li>tests cross one seam</li>
+              <li>Swing fixtures disappear</li>
+            </ul>
+          </div>
+          <p class="mt-5 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-4 py-3 text-xs text-slate-600"><b>Deletion test:</b> deleting this deep module would spread selection, conversion, undo, and valid-edit rules back through every event handler.</p>
+        </article>
+
+        <article id="candidate-engines" class="rounded-2xl border border-slate-200 bg-white p-7 md:p-9 paper-shadow">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Candidate 2</p>
+              <h2 class="mt-1 text-2xl font-serif">Concentrate engine eligibility</h2>
+            </div>
+            <div class="flex gap-2">
+              <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Strong</span>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">local-substitutable</span>
+            </div>
+          </div>
+          <div class="mt-5 rounded-lg bg-slate-50 px-4 py-3 font-mono text-xs leading-6 text-slate-650">
+            src/main/java/net/tapaal/gui/petrinet/dialog/QueryDialog.java:481–503, 1459–1488, 1784–1960, 6472–6865<br />
+            src/main/java/net/tapaal/gui/petrinet/verification/EngineSupportOptions.java<br />
+            src/main/java/net/tapaal/gui/petrinet/verification/EngineFeature.java<br />
+            src/main/java/net/tapaal/gui/petrinet/verification/*EngineOptions.java
+          </div>
+
+          <div class="mt-7 grid gap-5 md:grid-cols-2">
+            <section class="rounded-xl border border-red-200 bg-red-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-red-700">Before · facts and policy separated</p>
+              <div class="mt-4 h-[315px] overflow-hidden rounded-lg border border-red-100 bg-white p-2">
+                <pre class="mermaid">
+flowchart LR
+  D["QueryDialog"] -->|"derives 19 features"| F["EngineFeature"]
+  D -->|"matches names"| C["8 engine modules"]
+  D -->|"mutates options"| O["15 refresh methods"]
+  C -->|"feature sets"| D
+  O -->|"selection changes"| D
+  classDef leak fill:#fff1f2,stroke:#dc2626,stroke-width:2px;
+  class D,F,C,O leak;
+                </pre>
+              </div>
+            </section>
+            <section class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-800">After · eligibility owns its policy</p>
+              <div class="relative mt-4 h-[315px] rounded-lg border border-emerald-100 bg-white p-5">
+                <div class="mx-auto mt-2 flex w-11/12 justify-between gap-3">
+                  <div class="w-1/2 rounded border-2 border-slate-400 p-3 text-center text-xs"><b>model + lens facts</b><br /><span class="text-slate-500">timed, colored, arcs</span></div>
+                  <div class="w-1/2 rounded border-2 border-slate-400 p-3 text-center text-xs"><b>query facts</b><br /><span class="text-slate-500">category, trace, property</span></div>
+                </div>
+                <div class="mx-auto my-5 w-4/5 seam-line text-center"><span class="relative -top-3 bg-white px-3 text-[10px] uppercase tracking-widest text-slate-500">seam</span></div>
+                <div class="deep mx-auto h-36 w-11/12 rounded-xl border-4 border-slate-950 p-5 text-center text-white shadow-xl">
+                  <p class="text-xs uppercase tracking-wider text-emerald-300">Deep engine eligibility module</p>
+                  <p class="mt-4 text-sm text-slate-200">catalog · required features · available engines · valid options</p>
+                  <p class="mt-3 text-[11px] text-slate-400">one implementation pays back in dialog, verifier, and tests</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <dl class="mt-7 grid gap-5 md:grid-cols-2">
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Problem</dt><dd class="mt-1 text-sm leading-6">Engine facts live in eight shallow modules, while eligibility and option policy leak into the dialog through duplicated names, property strings, forced state, and repeated refresh paths.</dd></div>
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Solution</dt><dd class="mt-1 text-sm leading-6">Deepen engine eligibility so the catalog, query/model facts, and valid verification choices have one implementation behind one seam.</dd></div>
+          </dl>
+          <div class="mt-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Benefits</p>
+            <ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <li>locality: policy stops leaking</li>
+              <li>leverage: engines share evaluation</li>
+              <li>tests need no Swing</li>
+              <li>names live once</li>
+            </ul>
+          </div>
+          <p class="mt-5 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-4 py-3 text-xs text-slate-600"><b>Deletion test:</b> deleting this deep module would duplicate engine catalog and compatibility policy across the dialog and verification callers.</p>
+        </article>
+
+        <article id="candidate-semantics" class="rounded-2xl border border-slate-200 bg-white p-7 md:p-9 paper-shadow">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Candidate 3</p>
+              <h2 class="mt-1 text-2xl font-serif">Deepen query classification</h2>
+            </div>
+            <div class="flex gap-2">
+              <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Worth exploring</span>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">in-process</span>
+            </div>
+          </div>
+          <div class="mt-5 rounded-lg bg-slate-50 px-4 py-3 font-mono text-xs leading-6 text-slate-650">
+            src/main/java/net/tapaal/gui/petrinet/dialog/QueryDialog.java:1122–1136, 1784–1960, 2996–3050, 6564–6808<br />
+            src/main/java/dk/aau/cs/TCTL/visitors/IsReachabilityVisitor.java<br />
+            src/main/java/dk/aau/cs/TCTL/visitors/HasDeadlockVisitor.java<br />
+            src/main/java/dk/aau/cs/TCTL/*Node.java
+          </div>
+
+          <div class="mt-7 grid gap-5 md:grid-cols-2">
+            <section class="rounded-xl border border-red-200 bg-red-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-red-700">Before · three interpretations</p>
+              <div class="mt-4 h-[315px] overflow-hidden rounded-lg border border-red-100 bg-white p-2">
+                <pre class="mermaid">
+flowchart TB
+  Q["query tree"] --> S["serialized text checks"]
+  Q --> V["visitor checks"]
+  Q --> T["direct node checks"]
+  S --> E["engine choices"]
+  V --> E
+  T --> E
+  S --> B["editing controls"]
+  V --> B
+  T --> B
+  classDef leak fill:#fff1f2,stroke:#dc2626,stroke-width:2px;
+  class S,V,T leak;
+                </pre>
+              </div>
+            </section>
+            <section class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-800">After · formatting stays internal</p>
+              <div class="relative mt-4 h-[315px] rounded-lg border border-emerald-100 bg-white p-5">
+                <div class="mx-auto mt-2 w-2/3 rounded-lg border-2 border-slate-500 bg-white px-4 py-3 text-center text-xs"><b>query tree</b></div>
+                <div class="mx-auto my-5 w-4/5 seam-line text-center"><span class="relative -top-3 bg-white px-3 text-[10px] uppercase tracking-widest text-slate-500">seam</span></div>
+                <div class="deep mx-auto h-36 w-11/12 rounded-xl border-4 border-slate-950 p-5 text-center text-white shadow-xl">
+                  <p class="text-xs uppercase tracking-wider text-emerald-300">Deep query classification module</p>
+                  <p class="mt-4 text-sm text-slate-200">traversal · converters · quantifiers · reachability · deadlock</p>
+                  <p class="mt-3 text-[11px] text-slate-400">one interpretation for editing and verification</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <dl class="mt-7 grid gap-5 md:grid-cols-2">
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Problem</dt><dd class="mt-1 text-sm leading-6">Query meaning is inferred through serialized text, visitors, and direct node checks, so formatting and tree-shape knowledge leak across the seam into option and editing policy.</dd></div>
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Solution</dt><dd class="mt-1 text-sm leading-6">Deepen query classification so traversal and converter knowledge stay in one implementation shared by editing and verification modules.</dd></div>
+          </dl>
+          <div class="mt-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Benefits</p>
+            <ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <li>locality: meaning lives once</li>
+              <li>leverage: every query caller</li>
+              <li>format changes stay internal</li>
+              <li>table-driven tests fit</li>
+            </ul>
+          </div>
+          <p class="mt-5 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-4 py-3 text-xs text-slate-600"><b>Deletion test:</b> deleting this deep module would force each caller to rediscover traversal, converter, and quantifier rules.</p>
+        </article>
+
+        <article id="candidate-query" class="rounded-2xl border border-slate-200 bg-white p-7 md:p-9 paper-shadow">
+          <div class="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Candidate 4</p>
+              <h2 class="mt-1 text-2xl font-serif">Make query configuration whole</h2>
+            </div>
+            <div class="flex gap-2">
+              <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">Worth exploring</span>
+              <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">in-process</span>
+            </div>
+          </div>
+          <div class="mt-5 rounded-lg bg-slate-50 px-4 py-3 font-mono text-xs leading-6 text-slate-650">
+            src/main/java/net/tapaal/gui/petrinet/verification/TAPNQuery.java:12–740<br />
+            src/main/java/net/tapaal/gui/petrinet/dialog/QueryDialog.java:707–855, 2354–2700<br />
+            src/main/java/dk/aau/cs/io/queries/TAPNQueryLoader.java<br />
+            src/main/java/dk/aau/cs/io/TimedArcPetriNetNetworkWriter.java<br />
+            src/main/java/net/tapaal/gui/petrinet/verification/Verifier.java
+          </div>
+
+          <div class="mt-7 grid gap-5 md:grid-cols-2">
+            <section class="rounded-xl border border-red-200 bg-red-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-red-700">Before · interface nearly matches state</p>
+              <div class="mt-4 h-[315px] rounded-lg border border-red-100 bg-white px-7 py-5">
+                <div class="flex h-full items-end justify-center gap-6">
+                  <div class="flex h-[250px] w-2/5 flex-col gap-2">
+                    <div class="mass-interface flex h-[118px] items-center justify-center rounded-lg px-3 text-center text-xs font-semibold text-red-700">6 constructors<br />many getters/setters<br />set · copyOptions · copy</div>
+                    <div class="mass-implementation flex h-[122px] items-center justify-center rounded-lg px-3 text-center text-xs text-slate-600">~40 mutable fields<br />manual defaults<br />partial copying</div>
+                  </div>
+                  <div class="pb-20 text-center text-3xl leak-arrow">→</div>
+                  <div class="mb-7 w-2/5 space-y-2 text-center text-[11px]">
+                    <div class="rounded border-2 border-red-300 bg-red-50 p-3">dialog assembly</div>
+                    <div class="rounded border-2 border-red-300 bg-red-50 p-3">loader mutation</div>
+                    <div class="rounded border-2 border-red-300 bg-red-50 p-3">verifier copying</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-800">After · construction and copying deepen</p>
+              <div class="mt-4 h-[315px] rounded-lg border border-emerald-100 bg-white px-8 py-5">
+                <div class="flex h-full items-end justify-center">
+                  <div class="flex h-[255px] w-3/4 flex-col gap-2">
+                    <div class="mass-deep-interface flex h-12 items-center justify-center rounded-lg text-center text-xs font-semibold text-emerald-800">small, complete query interface</div>
+                    <div class="mass-deep-implementation flex flex-1 items-center justify-center rounded-xl px-6 text-center">
+                      <div>
+                        <p class="text-xs uppercase tracking-wider text-emerald-300">Deep query configuration module</p>
+                        <p class="mt-4 text-sm text-slate-200">defaults · invariants · variants · complete copies · persistence mapping</p>
+                        <p class="mt-5 text-[11px] text-slate-400">callers cannot assemble partial query state</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <dl class="mt-7 grid gap-5 md:grid-cols-2">
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Problem</dt><dd class="mt-1 text-sm leading-6">The query configuration module is shallow: its interface exposes nearly every field, and assembly, copying, conversion, loading, and saving must each remember the same state.</dd></div>
+            <div><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">Solution</dt><dd class="mt-1 text-sm leading-6">Deepen query configuration so defaults, invariants, complete copying, and persistence mapping stay together while timed, untimed, HyperLTL, and SMC variation remains internal.</dd></div>
+          </dl>
+          <div class="mt-6">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Benefits</p>
+            <ul class="mt-2 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
+              <li>locality: fields move together</li>
+              <li>leverage: callers inherit defaults</li>
+              <li>round-trip tests gain depth</li>
+              <li>partial copies become impossible</li>
+            </ul>
+          </div>
+          <p class="mt-5 rounded-lg border-l-4 border-amber-400 bg-amber-50 px-4 py-3 text-xs text-amber-900"><b>Concrete signal:</b> <span class="font-mono">copy()</span> assigns siphon-trap state from query-reduction state and leaves several query fields behind; no query-copy tests cover this seam.</p>
+          <p class="mt-3 rounded-lg border-l-4 border-slate-400 bg-slate-50 px-4 py-3 text-xs text-slate-600"><b>Deletion test:</b> deleting this deep module would force every creator, converter, and persistence adapter to reconstruct query defaults and invariants.</p>
+        </article>
+      </section>
+
+      <section id="top-recommendation" class="rounded-2xl bg-slate-950 p-8 text-white shadow-2xl">
+        <p class="text-xs font-bold uppercase tracking-[.2em] text-emerald-300">Top recommendation</p>
+        <a href="#candidate-editor" class="mt-2 inline-block text-3xl font-serif underline decoration-emerald-400 decoration-2 underline-offset-8">Deepen query-tree editing</a>
+        <p class="mt-5 max-w-3xl text-sm leading-6 text-slate-300">It targets the hottest file and the recent arithmetic, HyperLTL, selection, enabledness, and freeze fixes; one deep module would create the highest immediate locality and a test surface independent of Swing.</p>
+      </section>
+    </main>
+  </body>
+</html>
