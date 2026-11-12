@@ -10,6 +10,12 @@ name: Build Release
 #
 # Each packaging job is self-contained (fetches its own engines and builds the GUI),
 # so no intermediate artifacts are created - only the four release files.
+#
+# If the "publish" option is ticked (off by default) and all packages are built, the
+# "publish" job replaces the rolling GitHub release "latest-build" with these files plus
+# copies with fixed names, giving permanent links:
+#   https://github.com/<owner>/<repo>/releases/download/latest-build/tapaal-linux64.zip
+#   (also tapaal-win64.zip, tapaal-mac-intel64.dmg, tapaal-mac-arm64.dmg)
 
 on:
   workflow_dispatch:
@@ -18,6 +24,10 @@ on:
         description: "Release version (leave empty to use VERSION from src/main/java/net/tapaal/TAPAAL.java on the main branch)"
         required: false
         default: ""
+      publish:
+        description: "Publish to the latest-build release (fixed download links)"
+        type: boolean
+        default: false
 
 env:
   ENGINE_OWNER: TAPAAL
@@ -265,3 +275,78 @@ jobs:
           path: out/tapaal-${{ env.VERSION }}-mac-${{ matrix.arch }}.dmg
           archive: false
           if-no-files-found: error
+
+  publish:
+    needs: [prepare, package-linux, package-windows, package-mac]
+    if: ${{ inputs.publish }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # create the release and tag
+      actions: read     # read this run's artifacts
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      VERSION: ${{ needs.prepare.outputs.version }}
+      TAG: latest-build
+    steps:
+      - name: Download release files of this run
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          artifacts=$(gh api "repos/$GH_REPO/actions/runs/$GITHUB_RUN_ID/artifacts?per_page=100")
+          for os in linux64 win64 mac-intel64 mac-arm64; do
+            case "$os" in mac-*) ext=dmg ;; *) ext=zip ;; esac
+            f="tapaal-$VERSION-$os.$ext"
+            id=$(jq -r --arg n "$f" '.artifacts[] | select(.name == $n) | .id' <<< "$artifacts")
+            if [ -z "$id" ]; then
+              echo "::error::Artifact $f not found in this run"
+              exit 1
+            fi
+            # Artifacts were uploaded with archive: false, so this is the file itself
+            gh api "repos/$GH_REPO/actions/artifacts/$id/zip" > "dist/$f"
+
+            # Sanity checks: do not publish a wrapped or broken file
+            if [ "$ext" = zip ]; then
+              unzip -l "dist/$f" | grep -q " tapaal-$VERSION-$os/" \
+                || { echo "::error::$f does not contain tapaal-$VERSION-$os/"; exit 1; }
+            else
+              [ "$(head -c 2 "dist/$f")" != "PK" ] \
+                || { echo "::error::$f is a zip, not a dmg"; exit 1; }
+              [ "$(tail -c 512 "dist/$f" | head -c 4)" = "koly" ] \
+                || { echo "::error::$f is not a valid dmg"; exit 1; }
+            fi
+
+            # Copy with a version-free name for permanent download links
+            cp "dist/$f" "dist/tapaal-$os.$ext"
+          done
+          ls -l dist
+
+      - name: Replace the rolling release
+        run: |
+          set -euo pipefail
+          base="$GITHUB_SERVER_URL/$GH_REPO/releases/download/$TAG"
+          {
+            echo "Latest build of TAPAAL **$VERSION**, built $(date -u +'%Y-%m-%d %H:%M UTC') from commit $GITHUB_SHA."
+            echo
+            echo "Engine builds used are listed in the [workflow run]($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID)."
+            echo
+            echo "Permanent download links (always point to the latest build):"
+            for f in tapaal-linux64.zip tapaal-win64.zip tapaal-mac-intel64.dmg tapaal-mac-arm64.dmg; do
+              echo "- $base/$f"
+            done
+          } > notes.md
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release delete "$TAG" --cleanup-tag --yes
+          fi
+          # Remove a leftover tag (without release) so the new tag points to this commit
+          if gh api "repos/$GH_REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            gh api -X DELETE "repos/$GH_REPO/git/refs/tags/$TAG"
+          fi
+          gh release create "$TAG" dist/* --target "$GITHUB_SHA" --latest=false \
+            --title "TAPAAL $VERSION (latest build)" --notes-file notes.md
+
+          {
+            echo "### Published to release \`$TAG\`"
+            tail -n +5 notes.md
+          } >> "$GITHUB_STEP_SUMMARY"
