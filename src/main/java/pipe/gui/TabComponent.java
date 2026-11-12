@@ -38,6 +38,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -48,9 +49,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.JToolTip;
 
 import dk.aau.cs.util.Require;
+import net.tapaal.swinghelpers.ExtendedJTabbedPane;
 import pipe.gui.petrinet.PetriNetTab;
 import net.tapaal.gui.swingcomponents.MultiLineAutoWrappingToolTip;
 
@@ -64,6 +67,9 @@ public abstract class TabComponent extends JPanel {
 	private static final int MAX_TAB_TITLE_WIDTH = 400;
 
 	private final JTabbedPane pane;
+	private final JLabel changedIndicator;
+	private Point dragStart;
+	private boolean dragged;
 
 	public TabComponent(final JTabbedPane pane) {
 		super(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -72,6 +78,12 @@ public abstract class TabComponent extends JPanel {
 		
 		this.pane = pane;
 		setOpaque(false);
+
+		changedIndicator = new JLabel("●");
+		changedIndicator.setForeground(new Color(180, 0, 0));
+		changedIndicator.setToolTipText("Unsaved changes");
+		changedIndicator.setVisible(false);
+		add(changedIndicator);
 
 		// make JLabel read titles from JTabbedPane
 		JLabel label = new JLabel() {
@@ -119,10 +131,18 @@ public abstract class TabComponent extends JPanel {
 			}
 		});
 		label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+		label.addMouseListener(tabMouseListener);
+		label.addMouseMotionListener(tabMouseListener);
 
 		JButton button = new TabButton();
 		add(button);
 		setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
+	}
+
+	public void setChanged(boolean changed) {
+		changedIndicator.setVisible(changed);
+		revalidate();
+		repaint();
 	}
 
 	private class TabButton extends JButton {
@@ -167,6 +187,55 @@ public abstract class TabComponent extends JPanel {
 	}
 
 	protected abstract void closeTab(PetriNetTab tab);
+
+	private final MouseAdapter tabMouseListener = new MouseAdapter() {
+		@Override
+		public void mousePressed(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON1) {
+				dragStart = e.getPoint();
+				dragged = false;
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			if (dragStart == null || !SwingUtilities.isLeftMouseButton(e)) {
+				return;
+			}
+
+			if (!dragged && dragStart.distance(e.getPoint()) < 5) {
+				return;
+			}
+			dragged = true;
+
+			Point point = SwingUtilities.convertPoint((Component) e.getSource(), e.getPoint(), pane);
+			int currentIndex = pane.indexOfTabComponent(TabComponent.this);
+			int targetIndex = pane.indexAtLocation(point.x, point.y);
+			if (currentIndex < 0 || targetIndex < 0 || currentIndex == targetIndex) {
+				return;
+			}
+
+			if (pane instanceof ExtendedJTabbedPane<?> extendedPane) {
+				extendedPane.moveTab(currentIndex, targetIndex);
+			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			dragStart = null;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			if (e.getButton() == MouseEvent.BUTTON1 && !dragged) {
+				int index = pane.indexOfTabComponent(TabComponent.this);
+				if (index >= 0) {
+					pane.setSelectedIndex(index);
+				}
+			}
+			dragged = false;
+		}
+	};
 
 	private static final MouseListener buttonMouseListener = new MouseAdapter() {
 		@Override
