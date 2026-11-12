@@ -85,11 +85,11 @@ public class VersionChecker {
 	}
 
     private boolean isCurrentPreRelease(String versionString) {
-        return versionString.contains(" ");
+        return versionString.contains(" ") || versionString.contains("-");
     }
 
 	private int[] getVersionNumbers(String version) {
-        version = version.split("\\s+")[0]; // Remove pre-release suffix
+        version = version.split("[\\s-]+")[0]; // Remove pre-release suffix (space or '-')
 
 		String delimiter = "\\.";
 		String[] split = version.split(delimiter);

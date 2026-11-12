@@ -3,7 +3,7 @@
   <dontWrapJar>true</dontWrapJar>
   <headerType>gui</headerType>
   <jar>%EXEDIR%\lib\tapaal.jar</jar>
-  <outfile>C:\Users\kyrke\Downloads\tapaal.exe</outfile>
+  <outfile>tapaal.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir></chdir>
@@ -13,7 +13,7 @@
   <stayAlive>false</stayAlive>
   <restartOnCrash>false</restartOnCrash>
   <manifest></manifest>
-  <icon>C:\Users\kyrke\Downloads\tapaal-4-0_512x512x32.ico</icon>
+  <icon>tapaal.ico</icon>
   <classPath>
     <mainClass>TAPAAL</mainClass>
     <cp>%EXEDIR%/lib/*</cp>
@@ -27,12 +27,12 @@
     <opt>-Dlaunch4j.exedir=&quot;%EXEDIR%&quot;</opt>
   </jre>
   <versionInfo>
-    <fileVersion>4.0.0.0</fileVersion>
-    <txtFileVersion>4.0.0.0</txtFileVersion>
+    <fileVersion>@VERSION4@</fileVersion>
+    <txtFileVersion>@VERSION4@</txtFileVersion>
     <fileDescription>TAPAAL</fileDescription>
-    <copyright>TAPAAL Team 2008-2023</copyright>
-    <productVersion>4.0.0.0</productVersion>
-    <txtProductVersion>4.0.0.0</txtProductVersion>
+    <copyright>TAPAAL Team 2008-@YEAR@</copyright>
+    <productVersion>@VERSION4@</productVersion>
+    <txtProductVersion>@VERSION4@</txtProductVersion>
     <productName>TAPAAL</productName>
     <companyName></companyName>
     <internalName>tapaal</internalName>
