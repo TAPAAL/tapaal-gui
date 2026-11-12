@@ -46,11 +46,7 @@ public class ColorBindingParser extends DefaultHandler {
         Map<String, List<String>> bindings = parseBindings(output);
 
         for (Template net : loadedModel.templates()) {
-            for (Transition transition : net.guiModel().getTransitions()) {
-                if (bindings.containsKey(transition.getName())) {
-                    transition.setToolTipText(createTooltip(bindings, transition));
-                }
-            }
+            addBindings(net.guiModel(), bindings);
         }
     }
 
@@ -62,19 +58,24 @@ public class ColorBindingParser extends DefaultHandler {
     public void addBindings(DataLayer guiModel, String output) {
         Map<String, List<String>> bindings = parseBindings(output);
 
-        for (Transition transition : guiModel.getTransitions()) {
-            if (bindings.containsKey(transition.getName())) {
-                transition.setToolTipText(createTooltip(bindings, transition));
+        addBindings(guiModel, bindings);
+    }
+
+    private void addBindings(DataLayer guiModel, Map<String, List<String>> bindings) {
+        for (Map.Entry<String, List<String>> entry : bindings.entrySet()) {
+            Transition transition = EngineNameResolver.findTransition(guiModel, entry.getKey());
+            if (transition != null) {
+                transition.setToolTipText(createTooltip(entry.getValue()));
             }
         }
     }
 
-    public static String createTooltip(Map<String, List<String>> bindings, Transition transition) {
+    private static String createTooltip(List<String> bindings) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>");
 
-        for (String binding : bindings.get(transition.getName())) {
+        for (String binding : bindings) {
             sb.append(binding);
             sb.append("<br>");
         }
