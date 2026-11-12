@@ -70,10 +70,6 @@ public class ColorBindingParser extends DefaultHandler {
         }
     }
 
-    public static String createTooltip(Map<String, List<String>> bindings, Transition transition) {
-        return createTooltip(bindings.get(transition.getName()));
-    }
-
     private static String createTooltip(List<String> bindings) {
         StringBuilder sb = new StringBuilder();
 
