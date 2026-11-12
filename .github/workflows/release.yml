@@ -15,13 +15,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version (leave empty to use TAPAAL_VERSION from the workflow file)"
+        description: "Release version (leave empty to use VERSION from src/main/java/net/tapaal/TAPAAL.java on the main branch)"
         required: false
         default: ""
 
 env:
-  # Release version of tapaal-gui - update before running a new release
-  TAPAAL_VERSION: "4.0.5"
   ENGINE_OWNER: TAPAAL
 
 permissions:
@@ -34,11 +32,29 @@ jobs:
     outputs:
       version: ${{ steps.v.outputs.version }}
     steps:
+      - name: Check out TAPAAL.java from main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: src/main/java/net/tapaal/TAPAAL.java
+          sparse-checkout-cone-mode: false
+
       - id: v
         env:
           INPUT_VERSION: ${{ inputs.version }}
         run: |
-          VERSION="${INPUT_VERSION:-$TAPAAL_VERSION}"
+          SRC=src/main/java/net/tapaal/TAPAAL.java
+          MAIN_VERSION=$(sed -nE 's/.*public static final String VERSION = "([^"]*)";.*/\1/p' "$SRC")
+          echo "VERSION on main in $SRC: '$MAIN_VERSION'"
+          if [ -n "$INPUT_VERSION" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION="$MAIN_VERSION"
+            if [ -z "$VERSION" ] || [ "$VERSION" = "DEV" ]; then
+              echo "::error::VERSION in $SRC on main is '$VERSION'. Set a release version there or enter one when running the workflow."
+              exit 1
+            fi
+          fi
           if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?([-.][A-Za-z0-9.]+)?$ ]]; then
             echo "::error::Invalid version '$VERSION'"
             exit 1
