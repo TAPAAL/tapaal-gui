@@ -61,6 +61,7 @@ public class EngineDialogPanel {
 	private final Insets buttonInsets = new Insets(0, 5, 0, 0);
 
 	private final String toolTipSelect = "Select a path to the verification engine.";
+	private final String toolTipDownload = "Download the verification engine.";
 	private final String toolTipReset = "Reset the path to the verification engine.";
 
 	public EngineDialogPanel() {
@@ -328,9 +329,15 @@ public class EngineDialogPanel {
 		tapaalSelectButton.setMnemonic(KeyEvent.VK_E);
 		tapaalSelectButton.setToolTipText(toolTipSelect);
 		JButton tapaalResetButton = new JButton("Reset");
+		JButton tapaalDownloadButton = new JButton("Download");
+		tapaalDownloadButton.setToolTipText(toolTipDownload);
 		tapaalResetButton.setToolTipText(toolTipReset);
 		tapaalResetButton.setMnemonic(KeyEvent.VK_T);
 		tapaalSelectButton.addActionListener(e -> selectTapnEngine());
+		tapaalDownloadButton.addActionListener(e -> {
+			new VerifyTAPN(new FileFinder(), new MessengerImpl()).downloadEngine();
+			setPathsAndVersionNumbers();
+		});
 		tapaalResetButton.addActionListener(e -> resetVerifytapnEngine());
 		JPanel tapaalButtonPanel = new JPanel();
 		tapaalButtonPanel.setLayout(new GridBagLayout());
@@ -342,6 +349,11 @@ public class EngineDialogPanel {
 		tapaalButtonPanel.add(tapaalSelectButton,gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
+		gbc.insets = buttonInsets;
+		gbc.anchor = GridBagConstraints.EAST;
+		tapaalButtonPanel.add(tapaalDownloadButton,gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.insets = buttonInsets;
 		gbc.anchor = GridBagConstraints.EAST;		
@@ -405,9 +417,15 @@ public class EngineDialogPanel {
 		SelectButton.setMnemonic(KeyEvent.VK_E);
 		SelectButton.setToolTipText(toolTipSelect);
 		JButton ResetButton = new JButton("Reset");
+		JButton downloadButton = new JButton("Download");
+		downloadButton.setToolTipText(toolTipDownload);
 		ResetButton.setToolTipText(toolTipReset);
 		ResetButton.setMnemonic(KeyEvent.VK_T);
 		SelectButton.addActionListener(e -> selectdTapnEngine());
+		downloadButton.addActionListener(e -> {
+			new VerifyDTAPN(new FileFinder(), new MessengerImpl()).downloadEngine();
+			setPathsAndVersionNumbers();
+		});
 		ResetButton.addActionListener(e -> resetVerifydtapnEngine());
 		JPanel ButtonPanel = new JPanel();
 		ButtonPanel.setLayout(new GridBagLayout());
@@ -419,6 +437,12 @@ public class EngineDialogPanel {
 		ButtonPanel.add(SelectButton,gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.insets = buttonInsets;
+		gbc.anchor = GridBagConstraints.EAST;
+		ButtonPanel.add(downloadButton,gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.insets = buttonInsets;
 		gbc.anchor = GridBagConstraints.EAST;		
@@ -482,9 +506,15 @@ public class EngineDialogPanel {
 		SelectButton.setMnemonic(KeyEvent.VK_E);
 		SelectButton.setToolTipText(toolTipSelect);
 		JButton ResetButton = new JButton("Reset");
+		JButton downloadButton = new JButton("Download");
+		downloadButton.setToolTipText(toolTipDownload);
 		ResetButton.setToolTipText(toolTipReset);
 		ResetButton.setMnemonic(KeyEvent.VK_T);
 		SelectButton.addActionListener(e -> selectVerifypnEngine());
+		downloadButton.addActionListener(e -> {
+			new VerifyPN(new FileFinder(), new MessengerImpl()).downloadEngine();
+			setPathsAndVersionNumbers();
+		});
 		ResetButton.addActionListener(e -> resetVerifypnEngine());
 		JPanel ButtonPanel = new JPanel();
 		ButtonPanel.setLayout(new GridBagLayout());
@@ -496,6 +526,12 @@ public class EngineDialogPanel {
 		ButtonPanel.add(SelectButton,gbc);
 		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.insets = buttonInsets;
+		gbc.anchor = GridBagConstraints.EAST;
+		ButtonPanel.add(downloadButton,gbc);
+		gbc = new GridBagConstraints();
+		gbc.gridx = 2;
 		gbc.gridy = 0;
 		gbc.insets = buttonInsets;
 		gbc.anchor = GridBagConstraints.EAST;		
