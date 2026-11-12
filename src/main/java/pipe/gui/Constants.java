@@ -7,8 +7,8 @@ public class Constants {
     // Engine
     public static final String VERIFYTA_MIN_REV = "4.1.19";
     public static final String VERIFYTAPN_MIN_REV = "1.4.0";
-    public static final String VERIFYDTAPN_MIN_REV = "3.7.0";
-    public static final String VERIFYPN_MIN_REV = "4.5.0";
+    public static final String VERIFYDTAPN_MIN_REV = "3.7.1";
+    public static final String VERIFYPN_MIN_REV = "4.5.1";
 
     // GUI
     public static final int PLACE_TRANSITION_HEIGHT = 30;
