@@ -12,6 +12,13 @@ To run TAPAAL from sources make sure you have a java runtime installed. You can 
 
 On windows use `gradlew.bat`. Gradle will automatically download and configure all development dependencies. 
 
+When the native TAPAAL verification engines are not included in the installation,
+TAPAAL offers to download them when verification is requested. The default
+location is the user's `.tapaal/engines` directory, and an alternative location
+can be selected. The chosen engine paths are remembered automatically. The UPPAAL
+`verifyta` engine is not downloaded because it is a separately licensed component
+and must still be selected from the Engine selection dialog.
+
 ## IDE
 Please feel free to use the IDE or editor of your choice to develop TAPAAL. Please be careful not to include any project or configuration files to source control, feel free to add files to .gitignore.
 The TAPAAL development team encourages to use JetBrains IntelliJ IDEA. The IDE can be freely downloaded on https://www.jetbrains.com/idea/download/
