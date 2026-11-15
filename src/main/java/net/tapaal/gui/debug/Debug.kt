@@ -28,6 +28,21 @@ object DEBUG {
                 override fun actionPerformed(e: ActionEvent) = throw RuntimeException("Casted Exception from DEBUG")
             })
 
+            add(object : GuiAction(
+                "Inspect net",
+                "Inspect net",
+                KeyStroke.getKeyStroke('I'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)
+            ) {
+                override fun actionPerformed(e: ActionEvent?) {
+                    val tab = runCatching { TAPAALGUI.getCurrentTab() }.getOrNull()
+                    if (tab == null) {
+                        JOptionPane.showMessageDialog(null, "No net is open to inspect.", "Net inspector", JOptionPane.INFORMATION_MESSAGE)
+                    } else {
+                        InspectSpy.open(tab)
+                    }
+                }
+            })
+
             add(object : AbstractAction("Show undo/redo stack") {
                 override fun actionPerformed(e: ActionEvent) = UndoRedoSpy().show()
             })
