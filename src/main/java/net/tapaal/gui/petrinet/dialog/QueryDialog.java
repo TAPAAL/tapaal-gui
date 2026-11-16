@@ -7257,7 +7257,7 @@ public class QueryDialog extends JPanel {
 
                     exit();
                    
-                    Verifier.runVerifyTAPNVerification(tapnNetwork, query,null, guiModels, true, null);
+                    Verifier.runVerifyTAPNVerification(tapnNetwork, query, null, guiModels, true, lens);
 
                     File reducedNetFile = new File(Verifier.getReducedNetFilePath());
 

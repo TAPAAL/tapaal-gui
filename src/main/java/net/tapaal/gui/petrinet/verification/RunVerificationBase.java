@@ -64,8 +64,22 @@ public abstract class RunVerificationBase extends SwingWorker<VerificationResult
         this.options = options;
         this.query = query;
         this.dataLayerQuery = dataLayerQuery;
-        this.lens = lens;
+        this.lens = lens != null ? lens : lensFor(model);
         execute();
+    }
+
+    // Composition builds place and transition components that call TAPNLens.isTimed().
+    // Callers that omit the lens still need one taken from the net being verified.
+    static TAPNLens lensFor(TimedArcPetriNetNetwork model) {
+        if (model == null) {
+            return null;
+        }
+        return new TAPNLens(
+            model.isTimed(),
+            model.hasUncontrollableTransitions(),
+            model.isColored(),
+            model.isStochastic()
+        );
     }
     public void execute(VerificationOptions options, TimedArcPetriNetNetwork model, TAPNQuery query, net.tapaal.gui.petrinet.verification.TAPNQuery dataLayerQuery) {
         execute(options, model, query, dataLayerQuery, null);

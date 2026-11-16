@@ -214,7 +214,7 @@ public class TimedTransitionComponent extends Transition {
 			getNameLabel().setName(transition.name());
 			getNameLabel().setVisible(attributesVisible);
 			getNameLabel().zoomUpdate(getZoom());
-            if(lens.isStochastic()) {
+            if(lens != null && lens.isStochastic()) {
                 getNameLabel().setText("\n" + underlyingTransition().getDistribution().summary() +
                     (   underlyingTransition().getWeight() instanceof ConstantProbability ||
                         underlyingTransition().getWeight().value() != 1 ?
@@ -227,7 +227,7 @@ public class TimedTransitionComponent extends Transition {
                     )
                 );
             }
-			if(underlyingTransition().getGuard() != null && lens.isColored()) {
+			if(lens != null && underlyingTransition().getGuard() != null && lens.isColored()) {
                 pnName.setText(pnName.getText() + "\n" + buildGuardString(this.underlyingTransition().getGuard().toString()));
             }
 		}

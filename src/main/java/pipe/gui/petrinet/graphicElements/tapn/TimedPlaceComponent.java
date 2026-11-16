@@ -280,7 +280,7 @@ public class TimedPlaceComponent extends Place {
                 }
             }
         }
-        if(!lens.isTimed()){
+        if(lens != null && !lens.isTimed()){
             drawDots = (marking > 0 && marking < 6);
         }
         // structure sees how many markings there are and fills the place in
@@ -499,7 +499,7 @@ public class TimedPlaceComponent extends Place {
                     buffer.append(place.invariant().toString(displayConstantNames));
                 }
                 
-                if (isTimed() && !isColored() && hasNonZeroTokenAge()) {
+                if (lens != null && isTimed() && !isColored() && hasNonZeroTokenAge()) {
                     buffer.append("\nAges: ").append(getStringOfTokens());
                 }
                 getNameLabel().setText(buffer.toString());
@@ -554,7 +554,7 @@ public class TimedPlaceComponent extends Place {
             }
 
             getNameLabel().displayName(attributesVisible);
-            setToolTipText(isTimed() && !isColored() ? "Token ages: " + getStringOfTokens() : null);
+            setToolTipText(lens != null && isTimed() && !isColored() ? "Token ages: " + getStringOfTokens() : null);
 
             for (var arc : getPostset()) {
                 if (arc instanceof TimedInhibitorArcComponent) {
