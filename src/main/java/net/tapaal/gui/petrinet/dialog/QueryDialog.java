@@ -481,14 +481,14 @@ public class QueryDialog extends JPanel {
     private JButton addConstantButton;
     private Component constantRowStrut;
 
-    private static final String name_verifyTAPN = "TAPAAL: Continuous Engine (verifytapn)";
-	private static final String name_COMBI = "UPPAAL: Optimized Broadcast Reduction";
-	private static final String name_OPTIMIZEDSTANDARD = "UPPAAL: Optimized Standard Reduction";
-	private static final String name_STANDARD = "UPPAAL: Standard Reduction";
-	private static final String name_BROADCAST = "UPPAAL: Broadcast Reduction";
-	private static final String name_BROADCASTDEG2 = "UPPAAL: Broadcast Degree 2 Reduction";
-	private static final String name_DISCRETE = "TAPAAL: Discrete Engine (verifydtapn)";
-	private static final String name_UNTIMED = "TAPAAL: Untimed Engine (verifypn)";
+    private static final String name_verifyTAPN = new VerifyTAPNEngineOptions().getNameString();
+	private static final String name_COMBI = new UPPAALCombiOptions().getNameString();
+	private static final String name_OPTIMIZEDSTANDARD = new UPPAALOptimizedStandardOptions().getNameString();
+	private static final String name_STANDARD = new UPPAALStandardOptions().getNameString();
+	private static final String name_BROADCAST = new UPPAALBroadcastOptions().getNameString();
+	private static final String name_BROADCASTDEG2 = new UPPAALBroadcastDegree2Options().getNameString();
+	private static final String name_DISCRETE = new VerifyDTAPNEngineOptions().getNameString();
+	private static final String name_UNTIMED = new VerifyPNEngineOptions().getNameString();
 	private boolean userChangedAtomicPropSelection = true;
 	private boolean updatingQueryControls;
 
@@ -906,7 +906,7 @@ public class QueryDialog extends JPanel {
         return getReductionOption(getReductionOptionAsString());
     }
 
-    private ReductionOption getReductionOption(String reductionOptionString) {
+    static ReductionOption getReductionOption(String reductionOptionString) {
         if (reductionOptionString == null)
             return null;
         else if (reductionOptionString.equals(name_STANDARD))
