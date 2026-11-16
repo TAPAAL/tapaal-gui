@@ -906,7 +906,7 @@ public class QueryDialog extends JPanel {
         return getReductionOption(getReductionOptionAsString());
     }
 
-    static ReductionOption getReductionOption(String reductionOptionString) {
+    private ReductionOption getReductionOption(String reductionOptionString) {
         if (reductionOptionString == null)
             return null;
         else if (reductionOptionString.equals(name_STANDARD))
