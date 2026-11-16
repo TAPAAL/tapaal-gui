@@ -41,15 +41,11 @@ public class TCTLPlaceNode extends TCTLAbstractStateProperty {
 		}
 	}
 
-    @Override
-    public void convertForReducedNet(String templateName) {
-	    if (template.isEmpty()) {
-            place = "Shared__" + place;
-        } else {
-            place = template + "__" + place;
-        }
-        template = templateName;
-    }
+	@Override
+	public void convertForReducedNet(String templateName) {
+		place = NamePurifier.purifiedComposedName(template, place);
+		template = templateName;
+	}
 
     @Override
 	public TCTLAbstractStateProperty copy() {

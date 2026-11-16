@@ -17,4 +17,10 @@ public class NamePurifier {
 
 		return purified;
 	}
+
+	// Reduced-net PNML ids are component__name or Shared__name. The loader then collapses underscores.
+	public static String purifiedComposedName(String template, String name) {
+		String owner = template == null || template.isEmpty() ? "Shared" : template;
+		return purify(owner + "__" + name);
+	}
 }
