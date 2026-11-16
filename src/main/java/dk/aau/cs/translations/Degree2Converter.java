@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.tapn.IntBound;
 import dk.aau.cs.model.tapn.LocalTimedPlace;
 import dk.aau.cs.model.tapn.TimeInterval;
@@ -223,14 +224,16 @@ public class Degree2Converter {
 			return;
 		
 		for(TimedInhibitorArc inhibArc : t.getInhibitorArcs()) {
+			ArcExpression expression = inhibArc.getArcExpression();
+			ArcExpression copiedExpression = expression == null ? null : expression.copy();
 			if(t.presetSizeWithoutInhibitorArcs() == 1) {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_MAX_FORMAT, t.name(), 1)), 
-						inhibArc.interval().copy(), inhibArc.getArcExpression().copy()));
+						inhibArc.interval().copy(), copiedExpression));
 			} else {
 				degree2Model.add(new TimedInhibitorArc(degree2Model.getPlaceByName(inhibArc.source().name()), 
 						degree2Model.getTransitionByName(String.format(T_I_IN_FORMAT, t.name(), 1)), 
-						inhibArc.interval().copy(), inhibArc.getArcExpression().copy()));
+						inhibArc.interval().copy(), copiedExpression));
 			}
 		}
 	}
