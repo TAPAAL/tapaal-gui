@@ -94,7 +94,7 @@ public class KBoundAnalyzer {
 		if(modelChecker instanceof VerifyPN){
 			return new VerifyPNOptions(k, TraceOption.NONE, SearchOption.BFS, false, ModelReduction.BOUNDPRESERVING, false, false, 1, QueryCategory.CTL, AlgorithmOption.CERTAIN_ZERO, false, QueryReductionTime.NoTime,false, null, false, true, lens.isColored(), false, true, true, true, useRawVerification, rawVerificationPrompt);
 		} else if(modelChecker instanceof VerifyTAPN){
-			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1, dataLayerQuery.getRawVerification(), dataLayerQuery.getRawVerificationPrompt());
+			return new VerifyTAPNOptions(k, TraceOption.NONE, SearchOption.BFS, true, false, true, false, false, 1, useRawVerification, rawVerificationPrompt);
 		} else if(modelChecker instanceof VerifyDTAPN){
             //gdc and dart can be used together with game
             boolean gcd = !lens.isGame() && !lens.isStochastic();
