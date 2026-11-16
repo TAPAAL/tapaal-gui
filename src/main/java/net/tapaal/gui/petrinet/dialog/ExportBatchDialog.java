@@ -549,7 +549,7 @@ public class ExportBatchDialog extends JDialog {
 		for(Template template : loadedModel.templates()) {
 			guiModel.put(template.model(), template.guiModel());
 		}
-		PNMLWriter pnmlWriter = new PNMLWriter(loadedModel.network(), guiModel, null);
+		PNMLWriter pnmlWriter = new PNMLWriter(loadedModel.network(), guiModel, loadedModel.getLens());
 		pnmlWriter.savePNML(f);
 	}
 	
