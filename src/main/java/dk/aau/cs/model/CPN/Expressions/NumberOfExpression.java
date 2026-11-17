@@ -195,8 +195,11 @@ public class NumberOfExpression extends ArcExpression {
         Vector<ColorExpression> colorExpressions = new Vector<>();
         ColorExpression colorExpression = color.get(0);
 
-        if (colorExpression.colorType == null || colorExpression.colorType.getName().equals(oldCt.getName()) || colorInColorType(colorExpression, oldCt)) {
-            colorExpressions.add(colorExpression.getExprWithNewColorType(newCt));
+        // A product tuple is typed as the product, not as the constituent being
+        // renamed, and AllExpression.containsColor is always false. Walk the
+        // tuple anyway so its constants are rebound before the marking is evaluated.
+        if (colorExpression instanceof TupleExpression || colorExpression.colorType == null || colorExpression.colorType.getName().equals(oldCt.getName()) || colorInColorType(colorExpression, oldCt)) {
+            colorExpressions.add(colorExpression.getExprConverted(oldCt, newCt));
         } else {
             colorExpressions.add(colorExpression);
         }
