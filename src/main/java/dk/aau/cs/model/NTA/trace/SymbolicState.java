@@ -2,6 +2,7 @@ package dk.aau.cs.model.NTA.trace;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,8 +63,10 @@ public class SymbolicState {
 		String[] stateLines = state.split("\n");
 
 		HashMap<String, String> locations = parseLocations(stateLines[1]);
-		HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables = parseLocalClocksAndVariables(stateLines[2]);
-		HashMap<String, ValueRange> globalClocksAndVariables = parseGlobalClocksAndVariables(stateLines[2]);
+		// verifyta 5 prints variables and clock constraints on separate lines.
+		String clocksAndVariables = String.join(" ", Arrays.copyOfRange(stateLines, 2, stateLines.length));
+		HashMap<String, HashMap<String, ValueRange>> localClocksAndVariables = parseLocalClocksAndVariables(clocksAndVariables);
+		HashMap<String, ValueRange> globalClocksAndVariables = parseGlobalClocksAndVariables(clocksAndVariables);
 		return new SymbolicState(locations, localClocksAndVariables,
 				globalClocksAndVariables);
 	}
