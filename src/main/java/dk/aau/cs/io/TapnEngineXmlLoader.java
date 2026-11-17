@@ -183,7 +183,7 @@ public class TapnEngineXmlLoader {
 	}
 
 	private SharedPlace parseSharedPlace(Element element, TimedArcPetriNetNetwork network, ConstantStore constants) {
-		String name = element.getAttribute("name");
+		String name = NamePurifier.purify(element.getAttribute("name"));
 		TimeInvariant invariant = TimeInvariant.parse(element.getAttribute("invariant"), constants);
 		//int numberOfTokens = Integer.parseInt(element.getAttribute("initialMarking"));
 
@@ -218,7 +218,7 @@ public class TapnEngineXmlLoader {
 	}
 
 	private SharedTransition parseSharedTransition(Element element, ConstantStore constants) {
-		String name = element.getAttribute("name");
+		String name = NamePurifier.purify(element.getAttribute("name"));
 		boolean urgent = Boolean.parseBoolean(element.getAttribute("urgent"));
         boolean isUncontrollable = element.getAttribute("player").equals("1");
         String distrib = element.getAttribute("distribution");
@@ -471,8 +471,6 @@ public class TapnEngineXmlLoader {
 
 		String player = transition.getAttribute("player");
 
-		idResolver.add(tapn.name(), idInput, nameInput);
-
 		boolean infiniteServer = transition.getAttribute("infiniteServer").equals("true");
 
 		boolean displayName = transition.getAttribute("displayName").equals("false") ? false : true;
@@ -485,6 +483,12 @@ public class TapnEngineXmlLoader {
 		if (nameInput.length() == 0 && idInput.length() > 0) {
 			nameInput = idInput;
 		}
+		// Engine unfolded names use "__" between the component and the place or transition.
+		// Queries collapse that to a single underscore, so the loaded net must use the same names.
+		String lookupId = idInput;
+		nameInput = NamePurifier.purify(nameInput);
+		idInput = nameInput;
+		idResolver.add(tapn.name(), lookupId, nameInput);
         GuardExpression guardExpr = null;
 
         Node conditionNode = getFirstDirectChild(transition, "condition");
@@ -569,7 +573,10 @@ public class TapnEngineXmlLoader {
 			}
 		}
 
-		idResolver.add(tapn.name(), idInput, nameInput);
+		String lookupId = idInput;
+		nameInput = NamePurifier.purify(nameInput);
+		idInput = nameInput;
+		idResolver.add(tapn.name(), lookupId, nameInput);
 
 		TimedPlace p;
 		if(network.isNameUsedForShared(nameInput)){

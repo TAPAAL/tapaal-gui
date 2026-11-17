@@ -1,6 +1,7 @@
 package dk.aau.cs.approximation;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,15 +12,25 @@ import net.tapaal.gui.petrinet.verification.TAPNQuery.TraceOption;
 import net.tapaal.gui.petrinet.verification.RunVerificationBase;
 import net.tapaal.gui.petrinet.verification.InclusionPlaces;
 import dk.aau.cs.Messenger;
+import dk.aau.cs.io.NamePurifier;
 import dk.aau.cs.io.batchProcessing.LoadedBatchProcessingModel;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.tapn.TAPNQuery;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedArcPetriNetNetwork;
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.ColoredTAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkColoredTransitionStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTrace;
+import dk.aau.cs.model.tapn.simulation.TAPNNetworkTraceStep;
 import dk.aau.cs.model.tapn.simulation.TimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.PetriNetStep;
 import dk.aau.cs.model.tapn.simulation.TimedArcPetriNetTrace;
+import dk.aau.cs.model.tapn.simulation.TimedTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TimedTransitionStep;
 import dk.aau.cs.util.MemoryMonitor;
 import dk.aau.cs.util.Tuple;
@@ -32,6 +43,8 @@ import dk.aau.cs.verification.TAPNComposer;
 import dk.aau.cs.verification.TAPNTraceDecomposer;
 import dk.aau.cs.verification.VerificationOptions;
 import dk.aau.cs.verification.VerificationResult;
+import dk.aau.cs.verification.VerifyTAPN.ColorBindingParser;
+import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import dk.aau.cs.verification.VerifyTAPN.VerifyTAPNOptions;
 
 public class ApproximationWorker {
@@ -58,7 +71,10 @@ public class ApproximationWorker {
 		if ((options.enabledOverApproximation() || options.enabledUnderApproximation())) {
 			options.setTraceOption(TraceOption.SOME);
 		}
-		
+
+		boolean oldTraceInOriginalNet = options.traceInOriginalNet();
+		boolean unfoldColoredApproximation = prepareUnfoldedModel(options, isColored);
+		try {
 		VerificationResult<TAPNNetworkTrace> toReturn = null;
 		VerificationResult<TimedArcPetriNetTrace> result = modelChecker.verify(options, transformedModel, clonedQuery, guiModel, dataLayerQuery, lens);
 		if (result == null) return null;
@@ -472,6 +488,12 @@ public class ApproximationWorker {
 		}
 		
 		options.setTraceOption(oldTraceOption);
+		// The confirmed witness is a firing sequence in the unfolded net. The original colored
+		// net plays colored steps, so map that same witness back using the engine binding table.
+		if (unfoldColoredApproximation && oldTraceInOriginalNet && toReturn != null) {
+			toReturn.setTrace(mapUnfoldedTraceToOriginalNet(toReturn.getTrace(), model, toReturn.getRawOutput()));
+			toReturn.setSecondaryTrace(mapUnfoldedTraceToOriginalNet(toReturn.getSecondaryTrace(), model, toReturn.getRawOutput()));
+		}
 		// if the old traceoption was none, we need to set the results traces to null so GUI doesn't try to display the traces later
 		if (oldTraceOption == TraceOption.NONE && toReturn != null && (dataLayerQuery == null || dataLayerQuery.getCategory() != QueryCategory.SMC)) {
 			toReturn.setTrace(null);
@@ -479,6 +501,11 @@ public class ApproximationWorker {
 		}
 		
 		return toReturn;
+		} finally {
+			if (unfoldColoredApproximation) {
+				options.setTraceInOriginalNet(oldTraceInOriginalNet);
+			}
+		}
 	}
 
 	public VerificationResult<TimedArcPetriNetTrace> batchWorker(
@@ -518,6 +545,9 @@ public class ApproximationWorker {
 
         TAPNLens lens = new TAPNLens(modelIsTimed, modelIsGame, modelIsColored, modelIsStochastic);
 
+		boolean oldTraceInOriginalNet = options.traceInOriginalNet();
+		boolean unfoldColoredApproximation = prepareUnfoldedModel(options, modelIsColored);
+		try {
 		VerificationResult<TimedArcPetriNetTrace> verificationResult = modelChecker.verify(options, composedModel, queryToVerify, null, query, lens);
 		
 		VerificationResult<TAPNNetworkTrace> valueNetwork;	//The final result is meant to be a PetriNetTrace but to make traceTAPN we make a networktrace
@@ -813,6 +843,11 @@ public class ApproximationWorker {
 	    }
 		options.setTraceOption(oldTraceOption);
 		return value;
+		} finally {
+			if (unfoldColoredApproximation) {
+				options.setTraceInOriginalNet(oldTraceInOriginalNet);
+			}
+		}
 	}
 
     public VerificationResult<TimedArcPetriNetTrace> batchWorker(
@@ -1116,6 +1151,160 @@ public class ApproximationWorker {
 		}, false);
         return composer.transformModel(model.network());
 	}
+
+    private boolean prepareUnfoldedModel(VerificationOptions options, boolean isColored) {
+        if (!isColored || options.useExplicitSearch() || options.approximationDenominator() <= 1) {
+            return false;
+        }
+        if (!options.enabledOverApproximation() && !options.enabledUnderApproximation()) {
+            return false;
+        }
+        if (!(options instanceof VerifyTAPNOptions)) {
+            return false;
+        }
+        ((VerifyTAPNOptions) options).useUnfoldedModel();
+        return true;
+    }
+
+    private TAPNNetworkTrace mapUnfoldedTraceToOriginalNet(TAPNNetworkTrace trace, TimedArcPetriNetNetwork original, String rawOutput) {
+        if (trace == null || original == null || traceUsesNetwork(trace, original)) {
+            return trace;
+        }
+
+        Map<String, TimedTransition> byComposedName = new HashMap<>();
+        for (TimedArcPetriNet tapn : original.activeTemplates()) {
+            for (TimedTransition transition : tapn.transitions()) {
+                String composedName = transition.isShared()
+                    ? "Shared__" + transition.name()
+                    : tapn.name() + "__" + transition.name();
+                byComposedName.putIfAbsent(composedName, transition);
+            }
+        }
+
+        Map<String, LinkedHashMap<String, String>> engineBindings = ColorBindingParser.parseUnfoldedBindings(rawOutput);
+        Map<String, OriginalColoredStep> byPurifiedName = new HashMap<>();
+        Map<String, Integer> matchLength = new HashMap<>();
+        for (Map.Entry<String, LinkedHashMap<String, String>> entry : engineBindings.entrySet()) {
+            String baseName = composedBaseName(entry.getKey(), byComposedName);
+            if (baseName == null) {
+                continue;
+            }
+            String purifiedName = NamePurifier.purify(entry.getKey());
+            int length = baseName.length();
+            Integer previous = matchLength.get(purifiedName);
+            if (previous != null && previous >= length) {
+                continue;
+            }
+            byPurifiedName.put(purifiedName, new OriginalColoredStep(byComposedName.get(baseName), resolveBindings(original, entry.getValue())));
+            matchLength.put(purifiedName, length);
+        }
+
+        int loopToIndex = -1;
+        TraceType traceType = TraceType.NOT_EG;
+        if (trace instanceof TimedTAPNNetworkTrace timedTrace) {
+            loopToIndex = timedTrace.getLoopToIndex();
+            if (timedTrace.getTraceType() != null) {
+                traceType = timedTrace.getTraceType();
+            }
+        }
+
+        ColoredTAPNNetworkTrace coloredTrace = new ColoredTAPNNetworkTrace(loopToIndex);
+        coloredTrace.setTraceType(traceType);
+        for (TAPNNetworkTraceStep step : trace) {
+            if (step instanceof TAPNNetworkTimeDelayStep delayStep) {
+                coloredTrace.add(new TAPNNetworkTimeDelayStep(delayStep.getDelay()));
+            } else {
+                TimedTransition unfoldedTransition = transitionOf(step);
+                if (unfoldedTransition == null) {
+                    throw new IllegalStateException("Unsupported trace step " + step.getClass().getSimpleName());
+                }
+                OriginalColoredStep coloredStep = byPurifiedName.get(unfoldedTransition.name());
+                if (coloredStep == null) {
+                    coloredStep = byPurifiedName.get(NamePurifier.purify(unfoldedTransition.name()));
+                }
+                if (coloredStep == null) {
+                    throw new IllegalStateException(
+                        "No color binding for unfolded transition \"" + unfoldedTransition.name()
+                            + "\" (" + engineBindings.size() + " bindings in the engine output)");
+                }
+                coloredTrace.add(new TAPNNetworkColoredTransitionStep(coloredStep.transition, coloredStep.bindings, null));
+            }
+        }
+        return coloredTrace;
+    }
+
+    private static boolean traceUsesNetwork(TAPNNetworkTrace trace, TimedArcPetriNetNetwork network) {
+        boolean sawTransition = false;
+        for (TAPNNetworkTraceStep step : trace) {
+            TimedTransition transition = transitionOf(step);
+            if (transition == null) {
+                continue;
+            }
+            sawTransition = true;
+            if (transition.model() == null || transition.model().parentNetwork() != network) {
+                return false;
+            }
+        }
+        return sawTransition;
+    }
+
+    private static TimedTransition transitionOf(TAPNNetworkTraceStep step) {
+        if (step instanceof TAPNNetworkTimedTransitionStep timedStep) {
+            return timedStep.getTransition();
+        }
+        if (step instanceof TAPNNetworkColoredTransitionStep coloredStep) {
+            return coloredStep.getTransition();
+        }
+        return null;
+    }
+
+    private static String composedBaseName(String rawId, Map<String, TimedTransition> byComposedName) {
+        if (byComposedName.containsKey(rawId)) {
+            return rawId;
+        }
+        int doubleSplit = rawId.lastIndexOf("__");
+        if (doubleSplit >= 0 && rawId.substring(doubleSplit + 2).matches("\\d+")) {
+            String baseName = rawId.substring(0, doubleSplit);
+            if (byComposedName.containsKey(baseName)) {
+                return baseName;
+            }
+        }
+        int split = rawId.lastIndexOf('_');
+        if (split > 0 && rawId.substring(split + 1).matches("\\d+")) {
+            String baseName = rawId.substring(0, split);
+            if (byComposedName.containsKey(baseName)) {
+                return baseName;
+            }
+        }
+        return null;
+    }
+
+    private static Map<Variable, Color> resolveBindings(TimedArcPetriNetNetwork original, Map<String, String> variableToColor) {
+        Map<Variable, Color> bindings = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : variableToColor.entrySet()) {
+            Variable variable = original.getVariableById(entry.getKey());
+            if (variable == null) {
+                variable = original.getVariableByName(entry.getKey());
+            }
+            Color color = original.getColorByName(entry.getValue());
+            if (variable == null || color == null) {
+                throw new IllegalStateException(
+                    "Unknown binding " + entry.getKey() + " -> " + entry.getValue());
+            }
+            bindings.put(variable, color);
+        }
+        return bindings;
+    }
+
+    private static final class OriginalColoredStep {
+        private final TimedTransition transition;
+        private final Map<Variable, Color> bindings;
+
+        private OriginalColoredStep(TimedTransition transition, Map<Variable, Color> bindings) {
+            this.transition = transition;
+            this.bindings = bindings;
+        }
+    }
 
     private Tuple<NameMapping, TimedArcPetriNetNetwork> resolveMappingAndNetwork(
         VerificationResult<TimedArcPetriNetTrace> result, 

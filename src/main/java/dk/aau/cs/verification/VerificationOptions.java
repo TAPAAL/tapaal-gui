@@ -68,4 +68,8 @@ public abstract class VerificationOptions {
     public boolean traceInOriginalNet() {
         return traceInOriginalNet;
     }
+
+    public void setTraceInOriginalNet(boolean traceInOriginalNet) {
+        this.traceInOriginalNet = traceInOriginalNet;
+    }
 }

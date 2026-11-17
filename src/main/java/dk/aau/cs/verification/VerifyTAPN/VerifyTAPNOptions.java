@@ -131,6 +131,19 @@ public class VerifyTAPNOptions extends VerificationOptions{
 	public void setUnfold(boolean unfold) {
 		this.unfold = unfold;
 	}
+
+	public void useUnfoldedModel() {
+		setTraceInOriginalNet(false);
+		setUnfold(true);
+		if (unfoldedModelPath == null && !useRawVerification) {
+			try {
+				unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+				unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+			} catch (IOException e) {
+				new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+			}
+		}
+	}
 	
 	@Override
 	public String toString() {

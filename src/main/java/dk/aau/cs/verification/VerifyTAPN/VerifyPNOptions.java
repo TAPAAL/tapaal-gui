@@ -35,7 +35,6 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
 	private final boolean useSiphontrap;
 	private final QueryReductionTime queryReductionTime;
 	private final boolean useStubbornReduction;
-	private final boolean unfold;
 	private final boolean colored;
 	private final boolean useTarOption;
 	private final boolean partition;
@@ -305,7 +304,27 @@ public class VerifyPNOptions extends VerifyTAPNOptions{
         return useExplicitSearch;
     }
 
+    @Override
     public void setTraceInOriginalNet(boolean traceInOriginalNet) {
         this.traceInOriginalNet = colored && traceInOriginalNet;
+    }
+
+    @Override
+    public void useUnfoldedModel() {
+        setTraceInOriginalNet(false);
+        setUnfold(true);
+        if (unfoldedModelPath == null && !useRawVerification && !useExplicitSearch) {
+            try {
+                if (Platform.isWindows()) {
+                    unfoldedModelPath = "\"" + File.createTempFile("unfolded-", ".pnml").getAbsolutePath() + "\"";
+                    unfoldedQueriesPath = "\"" + File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath() + "\"";
+                } else {
+                    unfoldedModelPath = File.createTempFile("unfolded-", ".pnml").getAbsolutePath();
+                    unfoldedQueriesPath = File.createTempFile("unfoldedQueries-", ".xml").getAbsolutePath();
+                }
+            } catch (IOException e) {
+                new MessengerImpl().displayErrorMessage(e.getMessage(), "Error");
+            }
+        }
     }
 }
