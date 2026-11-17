@@ -1897,6 +1897,9 @@ public class QueryDialog extends JPanel {
         }
 
         disableSymmetryUpdate = false;
+        if (!lens.isTimed()) {
+            refreshTraceRefinement();
+        }
     }
 
     private boolean hasNonzeroInitialTokenAges() {
@@ -6595,6 +6598,10 @@ public class QueryDialog extends JPanel {
     }
 
     private void refreshTraceRefinement() {
+        // The engine list is empty while it is rebuilt, and that listener must not clear the box.
+        if (disableSymmetryUpdate) {
+            return;
+        }
         ReductionOption reduction = getReductionOption();
 
         boolean isSupported = queryType.getSelectedIndex() == 0 && !lens.isGame() &&
