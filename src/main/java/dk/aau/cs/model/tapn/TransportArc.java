@@ -200,7 +200,6 @@ public class TransportArc extends TAPNElement {
         vecColorExpr.add(userOperatorExpression);
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setInputExpression(numbExpr);
-        setWeight(new IntWeight(1));
     }
 
     public void createNewOutputArcExpression() {
@@ -209,7 +208,6 @@ public class TransportArc extends TAPNElement {
         vecColorExpr.add(userOperatorExpression);
         NumberOfExpression numbExpr = new NumberOfExpression(1, vecColorExpr);
         setOutputExpression(numbExpr);
-        setWeight(new IntWeight(1));
     }
 	
 	@Override
