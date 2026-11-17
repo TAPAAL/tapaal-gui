@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import dk.aau.cs.model.tapn.TimedToken;
+import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Require;
 import dk.aau.cs.verification.VerifyTAPN.TraceType;
 import org.jetbrains.annotations.NotNull;
@@ -98,18 +99,27 @@ public class TimedArcPetriNetTrace implements Iterable<PetriNetStep> {
 	public void reduceTraceForOriginalNet(String matchForTransition, String matchTokenRemoval) {
 		for (PetriNetStep step : steps){
 			if (step instanceof TimedTransitionStep) {
-				if (((TimedTransitionStep) step).transition().name().contains(matchForTransition)) {
-					((TimedTransitionStep) step).transition().setName(((TimedTransitionStep) step).transition().name().substring(0, ((TimedTransitionStep) step).transition().name().indexOf(matchForTransition)));
-				}
-				if(((TimedTransitionStep) step).consumedTokens() != null){
-					for (TimedToken token : ((TimedTransitionStep) step).consumedTokens()){
+				TimedTransitionStep transitionStep = (TimedTransitionStep) step;
+				renameTraceNetTransition(transitionStep.transition(), matchForTransition);
+				if(transitionStep.consumedTokens() != null){
+					for (TimedToken token : transitionStep.consumedTokens()){
 						if(token.place().name().contains(matchTokenRemoval)){
-							((TimedTransitionStep) step).consumedTokens().remove(token);
+							transitionStep.consumedTokens().remove(token);
 							break;
 						}
 					}
 				}
+			} else if (step instanceof ColoredTransitionStep) {
+				renameTraceNetTransition(((ColoredTransitionStep) step).transition(), matchForTransition);
 			}
+		}
+	}
+
+	private void renameTraceNetTransition(TimedTransition transition, String matchForTransition) {
+		String name = transition.name();
+		int suffix = name.indexOf(matchForTransition);
+		if (suffix >= 0) {
+			transition.setName(name.substring(0, suffix));
 		}
 	}
 	
