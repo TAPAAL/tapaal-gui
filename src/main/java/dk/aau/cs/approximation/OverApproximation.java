@@ -171,13 +171,12 @@ public class OverApproximation implements ITAPNApproximation {
 					delayIsLoopStep = true;
 				}				
 			}
-			if (step instanceof TAPNNetworkTimedTransitionStep) {
-				//TimedTransition firedTransition = net.getTransitionByName(reversedNameMap.get(((TAPNNetworkTimedTransitionStep) step).getTransition().name()));
-				TAPNNetworkTimedTransitionStep tmpStep = (TAPNNetworkTimedTransitionStep)step;
+			TimedTransition stepTransition = firedTransition(step);
+			if (stepTransition != null) {
 				//If the transition in step is shared, use "" as model for lookup in namemap
 				Tuple<String, String> key = new Tuple<String, String>(
-						(((TAPNNetworkTimedTransitionStep) step).getTransition().sharedTransition() == null ? tmpStep.getTransition().model().name() : ""), 
-						tmpStep.getTransition().name()); 
+						(stepTransition.sharedTransition() == null ? stepTransition.model().name() : ""),
+						stepTransition.name());
 				TimedTransition firedTransition = net.getTransitionByName(nameMap.get(key));
 				TimedTransition copyTransition = new TimedTransition(firedTransition.name() + "_traceNet_" + Integer.toString(++transitionInteger), firedTransition.isUrgent(), null);
 				
@@ -241,6 +240,16 @@ public class OverApproximation implements ITAPNApproximation {
 		}           
 	}
 
+	// Colored steps carry the fired transition for uncolored nets as well as colored ones.
+	private TimedTransition firedTransition(TAPNNetworkTraceStep step) {
+		if (step instanceof TAPNNetworkTimedTransitionStep) {
+			return ((TAPNNetworkTimedTransitionStep) step).getTransition();
+		}
+		if (step instanceof TAPNNetworkColoredTransitionStep) {
+			return ((TAPNNetworkColoredTransitionStep) step).getTransition();
+		}
+		return null;
+	}
 
 	private void modifyQuery(dk.aau.cs.model.tapn.TAPNQuery query, LocalTimedPlace blockPlace) {
 		TCTLAbstractProperty topNode = query.getProperty();

@@ -130,6 +130,10 @@ public class TAPNTraceDecomposer {
             for (var entry : step.getPostMarking().getPlacesToTokensMap().entrySet()) {
                 var entryName = entry.getKey().name();
                 var mappedPlace = mapping.map(entryName);
+                // PTRACE and PBLOCK exist only on the trace net.
+                if (mappedPlace == null) {
+                    continue;
+                }
                 var isSharedPlace = (mappedPlace.value1() == null || mappedPlace.value1().isEmpty());
                 TimedPlace place = isSharedPlace ? 
                     tapnNetwork.getSharedPlaceByName(mappedPlace.value2()) : 
