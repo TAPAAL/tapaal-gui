@@ -766,6 +766,8 @@ public class Animator {
     }
 
     private void updateBindings(int stepIdx) {
+        if (!tab.getLens().isColored()) return;
+
         resetBindings();
         if (stepIdx < actionHistory.size() && stepIdx >= 0) {
             TAPNNetworkTraceStep step = actionHistory.get(stepIdx);

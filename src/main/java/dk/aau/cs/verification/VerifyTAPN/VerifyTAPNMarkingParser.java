@@ -27,7 +27,7 @@ public class VerifyTAPNMarkingParser {
         LocalTimedMarking marking = new LocalTimedMarking();
         
         parseTokensForPlaces(element, 
-            placeId -> tapn.getPlaceByName(placeId),
+            placeId -> EngineNameResolver.findPlace(tapn, placeId),
             (place, token) -> marking.add(token),
             tapn.parentNetwork()
         );

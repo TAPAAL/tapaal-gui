@@ -286,7 +286,7 @@ public class InteractiveHandle {
             } else {
                 transition = null;
                 for (var template : network.allTemplates()) {
-                    transition = template.getTransitionByName(transitionId);
+                    transition = EngineNameResolver.findTransition(template, transitionId);
                     if (transition != null) {
                         break;
                     }

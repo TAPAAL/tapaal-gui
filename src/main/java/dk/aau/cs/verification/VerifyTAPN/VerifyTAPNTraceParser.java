@@ -217,7 +217,9 @@ public class VerifyTAPNTraceParser {
     }
 
 	private TimedTransitionStep parseTransitionStep(Element element) {
-		TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
+        String transitionId = element.getAttribute("id");
+        TimedTransition transition = EngineNameResolver.findTransition(tapn, transitionId);
+
 		NodeList tokenNodes = element.getChildNodes();
 		List<TimedToken> consumedTokens = new ArrayList<TimedToken>(tokenNodes.getLength());
 		for (int i = 0; i < tokenNodes.getLength(); ++i) {
@@ -226,7 +228,9 @@ public class VerifyTAPNTraceParser {
 				Element tokenElement = (Element)node;
                 if (!tokenElement.getTagName().equals("token")) continue;
 
-				TimedPlace place = tapn.getPlaceByName(tokenElement.getAttribute("place"));
+                String placeId = tokenElement.getAttribute("place");
+                TimedPlace place = EngineNameResolver.findPlace(tapn, placeId);
+                
 				BigDecimal age = new BigDecimal(tokenElement.getAttribute("age"));
 				boolean greaterThanOrEqual = Boolean.parseBoolean(tokenElement.getAttribute("greaterThanOrEqual"));
 				consumedTokens.add(new TraceToken(place, age, greaterThanOrEqual, ColorType.COLORTYPE_DOT.getFirstColor()));
@@ -238,7 +242,7 @@ public class VerifyTAPNTraceParser {
     private ColoredTransitionStep parseColoredTransitionStep(Element element) {
         ColorBindingParser colorBindingParser = new ColorBindingParser();
         Node bindingsNode = element.getElementsByTagName("bindings").item(0);
-        TimedTransition transition = tapn.getTransitionByName(element.getAttribute("id"));
+        TimedTransition transition = EngineNameResolver.findTransition(tapn, element.getAttribute("id"));
         Map<Variable, Color> bindings = colorBindingParser.parseBindingsForSingleTransition(
             nodeToString(bindingsNode), transition.name(), tapn.parentNetwork()
         );
