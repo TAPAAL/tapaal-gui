@@ -30,14 +30,14 @@ public class UpdateColorTypeCommand implements Command {
     public void undo() {
         performUpdate(oldColorType, newColorType);
         network.colorTypes().set(index, oldColorType);
-        colorTypesListModel.updateName();
+        if (colorTypesListModel != null) colorTypesListModel.updateName();
     }
 
     @Override
     public void redo() {
         network.colorTypes().set(index, newColorType);
         performUpdate(newColorType, oldColorType);
-        colorTypesListModel.updateName();
+        if (colorTypesListModel != null) colorTypesListModel.updateName();
     }
 
     private void performUpdate(ColorType targetType, ColorType sourceType) {
@@ -58,27 +58,27 @@ public class UpdateColorTypeCommand implements Command {
 
                 if (place.getColorType().equals(sourceType)) {
                     if(place.getTokensAsExpression() != null) {
-                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));
+                        place.setTokenExpression(convertArcExpression(place.getTokensAsExpression(), sourceType, targetType));
                     }
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     place.setColorType(targetType);
                     List<TimedToken> newTokens = new ArrayList<>();
                     for (TimedToken token : oldTokens) {
                         if (targetType.contains(token.getColor())) {
-                            newTokens.add(new TimedToken(place, token.age(), targetType.getColorByName(token.getColor().getName())));
+                            newTokens.add(new TimedToken(place, token.age(), rebindColor(token.getColor(), sourceType, targetType)));
                         }
                     }
                     
                     place.updateTokens(newTokens, place.getTokensAsExpression());
                 } else if (isModifiedProductType) {
                     if (place.getTokensAsExpression() != null) {
-                        place.setTokenExpression(place.getTokensAsExpression().getExprConverted(sourceType, targetType));
+                        place.setTokenExpression(convertArcExpression(place.getTokensAsExpression(), sourceType, targetType));
                     }
                     List<TimedToken> oldTokens = new ArrayList<>(place.tokens());
                     List<TimedToken> newTokens = new ArrayList<>();
                     for (TimedToken token : oldTokens) {
                         Color oldColor = token.getColor();
-                        Color newColor = updateColorRecursive(oldColor, sourceType, targetType);
+                        Color newColor = rebindColor(oldColor, sourceType, targetType);
                         newTokens.add(new TimedToken(place, token.age(), newColor));
                     }
                     place.updateTokens(newTokens, place.getTokensAsExpression());
@@ -86,27 +86,29 @@ public class UpdateColorTypeCommand implements Command {
             }
             for (TimedInputArc arc : tapn.inputArcs()) {
                 if (arc.getArcExpression() != null) {
-                    arc.setExpression(arc.getArcExpression().getExprConverted(sourceType, targetType));
+                    arc.setExpression(convertArcExpression(arc.getArcExpression(), sourceType, targetType));
                 }
+                arc.setColorTimeIntervals(rebindIntervals(arc.getColorTimeIntervals(), sourceType, targetType));
             }
             for (TimedOutputArc arc : tapn.outputArcs()) {
                 if (arc.getExpression() != null) {
-                    arc.setExpression(arc.getExpression().getExprConverted(sourceType, targetType));
+                    arc.setExpression(convertArcExpression(arc.getExpression(), sourceType, targetType));
                 }
             }
 
             for (var arc : tapn.inhibitorArcs()) {
                 if (arc.getArcExpression() != null) {
-                    arc.setExpression(arc.getArcExpression().getExprConverted(sourceType, targetType));
+                    arc.setExpression(convertArcExpression(arc.getArcExpression(), sourceType, targetType));
                 }
             }
 
             for (var arc : tapn.transportArcs()) {
+                arc.setColorTimeIntervals(rebindIntervals(arc.getColorTimeIntervals(), sourceType, targetType));
                 if (arc.getInputExpression() != null) {
-                    arc.setInputExpression(arc.getInputExpression().getExprConverted(sourceType, targetType));
+                    arc.setInputExpression(convertArcExpression(arc.getInputExpression(), sourceType, targetType));
                 }
                 if (arc.getOutputExpression() != null) {
-                    arc.setOutputExpression(arc.getOutputExpression().getExprConverted(sourceType, targetType));
+                    arc.setOutputExpression(convertArcExpression(arc.getOutputExpression(), sourceType, targetType));
                 }
             }
 
@@ -122,7 +124,7 @@ public class UpdateColorTypeCommand implements Command {
             }
         }
 
-        eval(targetType);
+        eval(targetType, sourceType);
 
         for (Variable var : network.variables()) {
             if (var.getColorType().equals(sourceType)) {
@@ -131,32 +133,57 @@ public class UpdateColorTypeCommand implements Command {
         }
     }
 
-    private Color updateColorRecursive(Color color, ColorType sourceType, ColorType targetType) {
+    // Rebinds a color (or the elements of a tuple color) of the source type to the color with the same name
+    // in the target type. Matching is by type name, since Color.equals also compares color type names.
+    private Color rebindColor(Color color, ColorType sourceType, ColorType targetType) {
         if (color == null) return null;
-        if (color.getColorType().equals(sourceType)) {
-            if (targetType.contains(color)) {
-                return targetType.getColorByName(color.getName());
+
+        if (color.getTuple() == null) {
+            if (color.getColorType() != null && color.getColorType().getName().equals(sourceType.getName())) {
+                Color newColor = targetType.getColorByName(color.getName());
+                if (newColor != null) return newColor;
             }
+            return color;
         }
 
-        if (color.getTuple() != null) {
-            Vector<Color> newTuple = new Vector<>();
-            boolean changed = false;
-            for (Color c : color.getTuple()) {
-                Color newC = updateColorRecursive(c, sourceType, targetType);
-                newTuple.add(newC);
-                if (newC != c) changed = true;
-            }
-            if (changed) {
-                return new Color(color.getColorType(), color.getId(), newTuple);
+        Vector<Color> newTuple = new Vector<>();
+        boolean changed = false;
+        for (Color c : color.getTuple()) {
+            Color newC = rebindColor(c, sourceType, targetType);
+            newTuple.add(newC);
+            if (newC != c) changed = true;
+        }
+        return changed ? new Color(color.getColorType(), color.getId(), newTuple) : color;
+    }
+
+    private List<ColoredTimeInterval> rebindIntervals(List<ColoredTimeInterval> intervals, ColorType sourceType, ColorType targetType) {
+        List<ColoredTimeInterval> result = new ArrayList<>();
+        for (ColoredTimeInterval cti : intervals) {
+            Color newColor = rebindColor(cti.getColor(), sourceType, targetType);
+            if (newColor != cti.getColor()) {
+                result.add(new ColoredTimeInterval(cti.isLowerBoundNonStrict(), cti.lowerBound(), cti.upperBound(), cti.isUpperBoundNonStrict(), newColor));
+            } else {
+                result.add(cti);
             }
         }
-        
-        return color;
+        return result;
     }
-    
+
+    private ArcExpression convertArcExpression(ArcExpression expr, ColorType sourceType, ColorType targetType) {
+        Expression converted = updateExpressionRecursively(expr.getExprConverted(sourceType, targetType), sourceType, targetType);
+        return converted instanceof ArcExpression ? (ArcExpression) converted : expr;
+    }
+
     private Expression updateExpressionRecursively(Expression expr, ColorType oldCt, ColorType newCt) {
         if (expr == null) return null;
+
+        if (expr instanceof AllExpression) {
+            AllExpression allExpr = (AllExpression) expr;
+            if (allExpr.getSort().getName().equals(oldCt.getName())) {
+                return new AllExpression(newCt);
+            }
+            return expr;
+        }
 
         if (expr instanceof UserOperatorExpression) {
             UserOperatorExpression uoe = (UserOperatorExpression) expr;
@@ -178,7 +205,7 @@ public class UpdateColorTypeCommand implements Command {
         return result;
     }
 
-    private void eval(ColorType colorType) {
+    private void eval(ColorType colorType, ColorType sourceType) {
         for (TimedArcPetriNet tapn : network.allTemplates()) {
             for (TimedPlace place : tapn.places()) {
                 ArcExpression expression = place.getExprWithNewColorType(colorType);
@@ -196,8 +223,9 @@ public class UpdateColorTypeCommand implements Command {
 
                 ArrayList<ColoredTimeInvariant> invariantsToAdd = new ArrayList<>();
                 for (ColoredTimeInvariant invariant : place.getCtiList()) {
-                    if (colorType.contains(invariant.getColor())) {
-                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), colorType.getColorByName(invariant.getColor().getColorName())));
+                    Color newColor = rebindColor(invariant.getColor(), sourceType, colorType);
+                    if (newColor != invariant.getColor()) {
+                        invariantsToAdd.add(new ColoredTimeInvariant(invariant.isUpperNonstrict(), invariant.upperBound(), newColor));
                     } else {
                         invariantsToAdd.add(invariant);
                     }
