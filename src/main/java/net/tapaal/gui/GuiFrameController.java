@@ -157,6 +157,17 @@ public final class GuiFrameController implements GuiFrameControllerActions{
 
     }
 
+    @Override
+    public void reorderTab(PetriNetTab tab, int newIndex) {
+        int oldIndex = tabs.indexOf(tab);
+        if (oldIndex < 0 || oldIndex == newIndex) {
+            return;
+        }
+
+        tabs.remove(oldIndex);
+        tabs.add(Math.max(0, Math.min(newIndex, tabs.size())), tab);
+    }
+
     //TODO: 2018-05-07 //kyrke Create CloseTab function, used to close a tab
     //XXX: Temp solution to call getCurrentTab to get new new selected tab (should use index) --kyrke 2019-07-08
     @Override

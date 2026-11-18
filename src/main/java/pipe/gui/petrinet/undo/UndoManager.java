@@ -27,6 +27,8 @@ public class UndoManager {
     private int normalSizeOfBuffer = 0;
     private int normalStartOfBuffer = 0;
     private int normalUndoneEdits = 0;
+    private boolean normalHistoryWasTruncated = false;
+    private boolean normalEditPending = false;
     private final ArrayList<ArrayList<Command>> normalEdits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
     // Animation mode undo stack
@@ -34,6 +36,7 @@ public class UndoManager {
     private int animSizeOfBuffer = 0;
     private int animStartOfBuffer = 0;
     private int animUndoneEdits = 0;
+    private boolean animEditPending = false;
     private final ArrayList<ArrayList<Command>> animEdits = new ArrayList<ArrayList<Command>>(UNDO_BUFFER_CAPACITY);
 
     private Reference<GuiFrameActions> app = new MutableReference<>();
@@ -106,21 +109,38 @@ public class UndoManager {
         }
     }
 
+    private boolean isEditPending() {
+        return tab != null && tab.isInAnimationMode() ? animEditPending : normalEditPending;
+    }
+
+    private void setEditPending(boolean value) {
+        if (tab != null && tab.isInAnimationMode()) {
+            animEditPending = value;
+        } else {
+            normalEditPending = value;
+        }
+    }
+
     private ArrayList<ArrayList<Command>> getEdits() {
         return tab != null && tab.isInAnimationMode() ? animEdits : normalEdits;
     }
 
     public void redo() {
+        if (isEditPending()) {
+            setEditPending(false);
+        }
+
         if (getUndoneEdits() > 0) {
             for (Command command : getEdits().get(getIndexOfNextAdd())) {
                 command.redo();
             }
 
             setIndexOfNextAdd((getIndexOfNextAdd() + 1) % UNDO_BUFFER_CAPACITY);
-            setSizeOfBuffer(getSizeOfBuffer() + 1);
+            setSizeOfBuffer(Math.min(UNDO_BUFFER_CAPACITY, getSizeOfBuffer() + 1));
             setUndoneEdits(getUndoneEdits() - 1);
         }
 
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
@@ -133,6 +153,12 @@ public class UndoManager {
     }
 
     public void undo() {
+        if (isEditPending()) {
+            setEditPending(false);
+            setUndoRedoStatus();
+            return;
+        }
+
         if (getSizeOfBuffer() > 0) {
             int indexOfNextAdd = getIndexOfNextAdd();
             if (--indexOfNextAdd < 0) {
@@ -150,7 +176,22 @@ public class UndoManager {
             }
         }
 
+        updateTabChangedState();
         setUndoRedoStatus();
+    }
+
+    private void updateTabChangedState() {
+        if (tab != null && !tab.isInAnimationMode()) {
+            tab.updateNetChangedFromUndoManager();
+        }
+    }
+
+    /**
+     * Returns whether the normal editing history still contains changes made
+     * since the last clear (normally the last save).
+     */
+    public boolean hasAppliedNormalEdits() {
+        return normalSizeOfBuffer > 0 || normalHistoryWasTruncated;
     }
 
     public void clear() {
@@ -159,49 +200,44 @@ public class UndoManager {
             animSizeOfBuffer = 0;
             animStartOfBuffer = 0;
             animUndoneEdits = 0;
+            animEditPending = false;
         } else {
             normalIndexOfNextAdd = 0;
             normalSizeOfBuffer = 0;
             normalStartOfBuffer = 0;
             normalUndoneEdits = 0;
+            normalHistoryWasTruncated = false;
+            normalEditPending = false;
         }
 
         setUndoRedoStatus();
     }
 
     public void undoAll() {
-        if (getSizeOfBuffer() > 0) {
-            int indexOfNextAdd = getIndexOfNextAdd();
-            int originalBufferSize = getSizeOfBuffer();
-            
-            setIndexOfNextAdd(0);
-            setSizeOfBuffer(0);
-            setUndoneEdits(getUndoneEdits() + originalBufferSize);
+        if (isEditPending()) {
+            setEditPending(false);
+        }
 
-            // The currentEdit to undo (reverse order)
-            for (int i = indexOfNextAdd - 1; i >= 0; i--) {
-                ArrayList<Command> currentEdit = getEdits().get(i);
-                for (int j = currentEdit.size() - 1; j >= 0; j--) {
-                    currentEdit.get(j).undo();
-                }
-            }
+        while (getSizeOfBuffer() > 0) {
+            undo();
         }
 
         setUndoRedoStatus();
     }
 
     public void newEdit() {
-        ArrayList<Command> lastEdit = getEdits().get(currentIndex());
-        if ((lastEdit != null) && (lastEdit.isEmpty())) {
+        if (isEditPending()) {
             return;
         }
 
-        setUndoneEdits(0);
+        // Delay allocating a history slot until a command is added. Dialogs
+        // commonly start a transaction before validation, and those empty
+        // transactions must not make the model look dirty.
+        setEditPending(true);
+    }
 
-        //XXX this is properly not the place to set net changed, can be null as also used in batch processor undo/redo
-        if (tab != null) {
-            tab.setNetChanged(true);
-        }
+    private void beginPendingEdit() {
+        setUndoneEdits(0);
 
         ArrayList<Command> compoundEdit = new ArrayList<Command>();
         getEdits().set(getIndexOfNextAdd(), compoundEdit);
@@ -209,15 +245,29 @@ public class UndoManager {
         if (getSizeOfBuffer() < UNDO_BUFFER_CAPACITY) {
             setSizeOfBuffer(getSizeOfBuffer() + 1);
         } else {
+            if (tab == null || !tab.isInAnimationMode()) {
+                normalHistoryWasTruncated = true;
+            }
             setStartOfBuffer((getStartOfBuffer() + 1) % UNDO_BUFFER_CAPACITY);
         }
 
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
     public void addEdit(Command undoableEdit) {
+        if (isEditPending()) {
+            beginPendingEdit();
+            setEditPending(false);
+        }
+
         ArrayList<Command> compoundEdit = getEdits().get(currentIndex());
+        if (compoundEdit == null) {
+            beginPendingEdit();
+            compoundEdit = getEdits().get(currentIndex());
+        }
         compoundEdit.add(undoableEdit);
+        updateTabChangedState();
         // debug();
     }
 
@@ -235,15 +285,28 @@ public class UndoManager {
     }
 
     public void removeCurrentEdit() {
-        if (getSizeOfBuffer() > 0 && currentIndex() >= 0 && currentIndex() < getEdits().size()) {
-            getEdits().set(currentIndex(), null);
-            setSizeOfBuffer(getSizeOfBuffer() - 1);
-            setIndexOfNextAdd(getIndexOfNextAdd() - 1);
+        if (isEditPending()) {
+            setEditPending(false);
+        } else if (getSizeOfBuffer() > 0 && currentIndex() >= 0 && currentIndex() < getEdits().size()) {
+            int currentIndex = currentIndex();
+            ArrayList<Command> currentEdit = getEdits().get(currentIndex);
+            if (currentEdit != null && currentEdit.isEmpty()) {
+                getEdits().set(currentIndex, null);
+                setSizeOfBuffer(getSizeOfBuffer() - 1);
+                setIndexOfNextAdd(currentIndex);
+            }
         }
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
     public void undoAndRemoveCurrentEdit() {
+        if (isEditPending()) {
+            setEditPending(false);
+            setUndoRedoStatus();
+            return;
+        }
+
         int currentIdx = currentIndex();
     
         undo();
@@ -252,11 +315,11 @@ public class UndoManager {
         if (getUndoneEdits() > 0) {
             setUndoneEdits(getUndoneEdits() - 1);
         }
-        
+        updateTabChangedState();
         setUndoRedoStatus();
     }
 
     public boolean currentEditIsEmpty() {
-        return getEdits().get(currentIndex()).isEmpty();
+        return isEditPending() || getEdits().get(currentIndex()) == null || getEdits().get(currentIndex()).isEmpty();
     }
 }

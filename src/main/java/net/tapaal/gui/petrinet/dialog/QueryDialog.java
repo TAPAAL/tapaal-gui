@@ -674,7 +674,9 @@ public class QueryDialog extends JPanel {
         this.lens = lens;
         this.tab = tab;
         inclusionPlaces = queryToCreateFrom == null ? new InclusionPlaces() : queryToCreateFrom.inclusionPlaces();
-        newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty();
+        // The editor mutates this tree while the dialog is open. Keep the
+        // query stored in the tab untouched until the replacement is saved.
+        newProperty = queryToCreateFrom == null ? new TCTLPathPlaceHolder() : queryToCreateFrom.getProperty().copy();
         rootPane = me.getRootPane();
         var composer = new TAPNComposer(new MessengerImpl(), false);
         var composedModel = composer.transformModel(tapnNetwork).value1();
@@ -7095,8 +7097,6 @@ public class QueryDialog extends JPanel {
                     // save();
                     if (checkIfSomeReductionOption()) {
                         querySaved = true;
-                        // Now if a query is saved, the net is marked as modified
-                        tab.setNetChanged(true);
                         exit();
                         TAPNQuery query = getQuery();
                         if (isNewQuery) {
@@ -7116,8 +7116,6 @@ public class QueryDialog extends JPanel {
                     }
 
                     querySaved = true;
-                    // Now if a query is saved and verified, the net is marked as modified
-                    tab.setNetChanged(true);
                     exit();
                     TAPNQuery query = getQuery();
                     if (isNewQuery) {
@@ -7244,8 +7242,6 @@ public class QueryDialog extends JPanel {
             openReducedNetButton.addActionListener(e -> {
                 if (checkIfSomeReductionOption()) {
                     querySaved = true;
-                    // Now if a query is saved and verified, the net is marked as modified
-                    tab.setNetChanged(true);
 
                     TAPNQuery query = getQuery();
                     if (query.getReductionOption() != ReductionOption.VerifyPN) {
