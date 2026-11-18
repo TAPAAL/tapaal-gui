@@ -272,12 +272,32 @@ public class TupleExpression extends ColorExpression {
     public TupleExpression getExprWithNewColorType(ColorType ct) {
         Vector<ColorExpression> colorExpressions = new Vector<>();
         for (ColorExpression colorExpression : colors) {
-            if (colorExpression.colorType.getName().equals(ct.getName())) {
+            if (colorExpression.colorType != null && colorExpression.colorType.getName().equals(ct.getName())) {
                 colorExpressions.add(colorExpression.getExprWithNewColorType(ct));
             } else {
                 colorExpressions.add(colorExpression);
             }
         }
-        return new TupleExpression(colorExpressions, ct);
+        // A constituent rename passes the simple type. Keep the product type.
+        // Marking tuples are stored without one (see LoadTACPN.cleanColorExpression);
+        // filling that gap with the simple type makes the tuple look like ProcessR.
+        ColorType tupleType = colorType;
+        if (ct instanceof ProductType || (colorType != null && colorType.getName().equals(ct.getName()))) {
+            tupleType = ct;
+        }
+        return new TupleExpression(colorExpressions, tupleType);
+    }
+
+    @Override
+    public ColorExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        Vector<ColorExpression> converted = new Vector<>();
+        for (ColorExpression child : colors) {
+            converted.add(child.getExprConverted(oldCt, newCt));
+        }
+        ColorType tupleType = colorType;
+        if (colorType != null && colorType.getName().equals(oldCt.getName()) && newCt instanceof ProductType) {
+            tupleType = newCt;
+        }
+        return new TupleExpression(converted, tupleType);
     }
 }
