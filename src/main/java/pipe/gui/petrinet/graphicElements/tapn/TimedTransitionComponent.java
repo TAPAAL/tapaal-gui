@@ -299,6 +299,7 @@ public class TimedTransitionComponent extends Transition {
 		TimedTransitionComponent transitionComponent = new TimedTransitionComponent(getOriginalX(), getOriginalY(), id, getNameOffsetX(), getNameOffsetY(), getAngle(), lens);
 		transitionComponent.setUnderlyingTransition(tapn.getTransitionByName(transition.name()));
         transitionComponent.setUncontrollable(isUncontrollable());
+        transitionComponent.setAttributesVisible(getAttributesVisible());
 
 		return transitionComponent;
 	}
