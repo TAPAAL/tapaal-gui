@@ -203,6 +203,78 @@ public class ColorBindingParser extends DefaultHandler {
         return result;
     }
 
+    /**
+     * The engine prints one bindings block for every unfolded transition when {@code --bindings} is set.
+     * Keys are the raw unfolded transition ids. Values keep variable order.
+     */
+    public static Map<String, LinkedHashMap<String, String>> parseUnfoldedBindings(String output) {
+        Map<String, LinkedHashMap<String, String>> parsed = new LinkedHashMap<>();
+        if (output == null) {
+            return parsed;
+        }
+
+        int start = output.indexOf("<bindings>");
+        if (start == -1) {
+            return parsed;
+        }
+        int end = output.indexOf("</bindings>", start);
+        if (end == -1) {
+            return parsed;
+        }
+
+        String xml = output.substring(start, end + "</bindings>".length());
+        DefaultHandler handler = new DefaultHandler() {
+            private String currentElement = "";
+            private String transitionId = "";
+            private String variableId = "";
+            private final StringBuilder color = new StringBuilder();
+            private LinkedHashMap<String, String> currentBindings;
+
+            @Override
+            public void startElement(String uri, String localName, String qName, Attributes atts) {
+                currentElement = qName;
+                if ("transition".equals(qName)) {
+                    transitionId = atts.getValue("id");
+                    currentBindings = new LinkedHashMap<>();
+                } else if ("variable".equals(qName)) {
+                    variableId = atts.getValue("id");
+                    color.setLength(0);
+                }
+            }
+
+            @Override
+            public void characters(char[] ch, int start, int length) {
+                if ("color".equals(currentElement)) {
+                    color.append(ch, start, length);
+                }
+            }
+
+            @Override
+            public void endElement(String uri, String localName, String qName) {
+                if ("color".equals(qName) && currentBindings != null && variableId != null && !variableId.isEmpty()) {
+                    currentBindings.put(variableId, color.toString().trim());
+                } else if ("transition".equals(qName) && transitionId != null && !transitionId.isEmpty()) {
+                    parsed.put(transitionId, currentBindings == null ? new LinkedHashMap<>() : currentBindings);
+                    transitionId = "";
+                    currentBindings = null;
+                } else if ("variable".equals(qName)) {
+                    variableId = "";
+                    color.setLength(0);
+                }
+                currentElement = "";
+            }
+        };
+
+        try (InputStream stream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))) {
+            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+            parser.parse(new InputSource(new InputStreamReader(stream, StandardCharsets.UTF_8)), handler);
+        } catch (SAXException | ParserConfigurationException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return parsed;
+    }
+
     @Override
     public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
         currentElement = qName;
