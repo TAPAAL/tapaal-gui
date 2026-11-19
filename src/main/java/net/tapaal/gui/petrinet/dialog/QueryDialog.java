@@ -514,7 +514,8 @@ public class QueryDialog extends JPanel {
     private static boolean hasForcedDisabledTimeDarts = false;
     private static boolean hasForcedDisabledStubbornReduction = false;
     private static boolean hasForcedDisabledGCD = false;
-    private static boolean disableSymmetryUpdate = false;
+    private boolean hasForcedDisabledTraceRefinement = false;
+    private boolean disableSymmetryUpdate = false;
     private boolean wasCTLType = true;
     private boolean wasLTLType = true;
     private boolean wasHyperLTLType = true;
@@ -1801,6 +1802,17 @@ public class QueryDialog extends JPanel {
         ArrayList<String> options = new ArrayList<String>();
 
         disableSymmetryUpdate = true;
+        try {
+            rebuildReductionOptions(reductionOptionString, options);
+        } finally {
+            disableSymmetryUpdate = false;
+        }
+        if (!lens.isTimed()) {
+            refreshTraceRefinement();
+        }
+    }
+
+    private void rebuildReductionOptions(String reductionOptionString, ArrayList<String> options) {
         EnumSet<EngineFeature> requiredFeatures = EnumSet.noneOf(EngineFeature.class);
         if (fastestTraceRadioButton.isSelected()) requiredFeatures.add(EngineFeature.FASTEST_TRACE);
         if (queryHasDeadlock() && (newProperty.toString().contains("EF") || newProperty.toString().contains("AG")) && highestNetDegree <= 2) requiredFeatures.add(EngineFeature.DEADLOCK_NET_DEGREE_2_EXP);
@@ -1894,11 +1906,6 @@ public class QueryDialog extends JPanel {
             }else if(trace == TraceOption.FASTEST && fastestTraceRadioButton.isEnabled()){
                 fastestTraceRadioButton.setSelected(true);
             }
-        }
-
-        disableSymmetryUpdate = false;
-        if (!lens.isTimed()) {
-            refreshTraceRefinement();
         }
     }
 
@@ -2566,6 +2573,7 @@ public class QueryDialog extends JPanel {
 
     private void setupTarOptionsFromQuery(TAPNQuery queryToCreateFrom) {
         if (queryToCreateFrom.isTarOptionEnabled()) {
+            hasForcedDisabledTraceRefinement = false;
             useTraceRefinement.setSelected(true);
         }
     }
@@ -2646,6 +2654,7 @@ public class QueryDialog extends JPanel {
         useQueryReduction.setSelected(queryToCreateFrom.isQueryReductionEnabled());
         useStubbornReduction.setSelected(queryToCreateFrom.isStubbornReductionEnabled());
         useReduction.setSelected(queryToCreateFrom.useReduction());
+        hasForcedDisabledTraceRefinement = false;
         useTraceRefinement.setSelected(queryToCreateFrom.isTarOptionEnabled());
         useTarjan.setSelected(queryToCreateFrom.isTarjan());
 
@@ -6611,7 +6620,14 @@ public class QueryDialog extends JPanel {
 
         useTraceRefinement.setEnabled(isSupported);
         if (!isSupported) {
+            // Remember a forced uncheck so the user's choice comes back once the option is supported again.
+            if (useTraceRefinement.isSelected()) {
+                hasForcedDisabledTraceRefinement = true;
+            }
             useTraceRefinement.setSelected(false);
+        } else if (hasForcedDisabledTraceRefinement) {
+            hasForcedDisabledTraceRefinement = false;
+            useTraceRefinement.setSelected(true);
         }
     }
 
