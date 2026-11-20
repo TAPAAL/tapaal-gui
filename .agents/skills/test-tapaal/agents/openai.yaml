@@ -1,0 +1,3 @@
+interface:
+  display_name: "Test TAPAAL"
+  short_description: "Run TAPAAL tests safely under Xvfb"
