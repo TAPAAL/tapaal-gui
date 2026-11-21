@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <constant name="Limit" value="4"/>
+  <net active="true" id="Flow" type="P/T net">
+    <place id="Start" name="Start" displayName="true" initialMarking="1"
+           invariant="&lt; inf" positionX="60" positionY="90"/>
+    <place id="Ready" name="Ready" displayName="true" initialMarking="0"
+           invariant="&lt; inf" positionX="240" positionY="90"/>
+    <transition id="Go" name="Go" displayName="true" positionX="150" positionY="90"/>
+    <arc id="unrestricted" source="Start" target="Go" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="restricted" source="Ready" target="Go" type="timed" inscription="[0,4]" weight="1"/>
+    <arc id="output" source="Go" target="Ready" type="normal" inscription="1" weight="1"/>
+  </net>
+  <net active="true" id="Backup" type="P/T net">
+    <place id="Buffer" name="Buffer" displayName="true" initialMarking="3"
+           invariant="&lt; inf" positionX="60" positionY="90"/>
+  </net>
+  <net active="false" id="Spare" type="P/T net">
+    <place id="Reserve" name="Reserve" displayName="true" initialMarking="2"
+           invariant="&lt; inf" positionX="60" positionY="90"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false"/>
+</pnml>
