@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <shared-place name="P0" invariant="&lt; inf" initialMarking="1"/>
+  <shared-transition name="T0" urgent="false"/>
+  <net active="true" id="Producer" type="P/T net">
+    <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="-5" nameOffsetY="35" positionX="60" positionY="60"/>
+    <place id="P1" name="P1" initialMarking="0" invariant="&lt; inf" positionX="390" positionY="60"/>
+    <transition id="T0" name="T0" angle="0" positionX="270" positionY="60"/>
+    <arc id="T0 to P1" source="T0" target="P1" type="normal" inscription="1"/>
+  </net>
+  <net active="true" id="Consumer" type="P/T net">
+    <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="-5" nameOffsetY="35" positionX="180" positionY="90"/>
+    <transition id="T0" name="T0" angle="0" positionX="270" positionY="90"/>
+  </net>
+  <feature isColored="false" isGame="false" isStochastic="false" isTimed="true"/>
+</pnml>

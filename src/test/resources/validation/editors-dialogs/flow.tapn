@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <constant name="deadline" value="5"/>
+  <net active="true" id="Flow" type="P/T net">
+    <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="-5" nameOffsetY="35" positionX="60" positionY="60"/>
+    <place displayName="true" id="P1" initialMarking="0" invariant="&lt;= deadline" name="P1" nameOffsetX="-5" nameOffsetY="35" positionX="390" positionY="60"/>
+    <transition angle="0" displayName="true" distribution="constant" firingMode="Random" id="T0" infiniteServer="false" name="T0" nameOffsetX="-5" nameOffsetY="35" player="0" positionX="270" positionY="60" priority="0" urgent="false" value="1.0" weight="1.0"/>
+    <arc id="P0 to T0" inscription="[0,deadline]" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="timed" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="90" yCoord="75"/>
+      <arcpath arcPointType="false" id="1" xCoord="280" yCoord="76"/>
+    </arc>
+    <arc id="T0 to P1" inscription="1" nameOffsetX="0" nameOffsetY="0" source="T0" target="P1" type="normal" weight="1">
+      <arcpath arcPointType="false" id="0" xCoord="290" yCoord="75"/>
+      <arcpath arcPointType="false" id="1" xCoord="390" yCoord="75"/>
+    </arc>
+  </net>
+  <feature isColored="false" isGame="false" isStochastic="false" isTimed="true"/>
+</pnml>
