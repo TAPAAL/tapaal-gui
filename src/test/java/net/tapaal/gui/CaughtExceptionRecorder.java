@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
  * Use {@link #allow} for catches that are expected in the test environment, and {@link #take}
  * when the test provokes a failure and asserts on it.
  */
-final class CaughtExceptionRecorder implements BeforeEachCallback, AfterEachCallback {
-    record Caught(String site, Throwable failure, String thread) {
+public final class CaughtExceptionRecorder implements BeforeEachCallback, AfterEachCallback {
+    public record Caught(String site, Throwable failure, String thread) {
         @Override
         public String toString() {
             return site + " on " + thread + ": " + failure;
@@ -36,13 +36,13 @@ final class CaughtExceptionRecorder implements BeforeEachCallback, AfterEachCall
     private CaughtExceptions.Installation installation;
 
     /** Accepts any number of failures of this type at this site, including none. */
-    CaughtExceptionRecorder allow(String site, Class<? extends Throwable> type, String reason) {
+    public CaughtExceptionRecorder allow(String site, Class<? extends Throwable> type, String reason) {
         allowances.add(new Allowance(site, type, reason));
         return this;
     }
 
     /** Removes and returns the failures recorded at this site so far. */
-    synchronized List<Caught> take(String site) {
+    public synchronized List<Caught> take(String site) {
         var taken = recorded.stream().filter(caught -> caught.site().equals(site)).collect(Collectors.toList());
         recorded.removeAll(taken);
         return taken;

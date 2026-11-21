@@ -79,21 +79,20 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform {
-        excludeTags 'gui-smoke'
-    }
+    useJUnitPlatform()
+    // GUI scenarios share static application state, so they run in guiSmokeTest instead.
+    exclude 'net/tapaal/gui/smoke/**'
 }
 
 tasks.register('guiSmokeTest', Test) {
-    description = 'Runs the GUI workflow prototype on a Linux virtual display.'
+    description = 'Runs the GUI scenarios in net.tapaal.gui.smoke on a display, one JVM per test class.'
     group = 'verification'
     testClassesDirs = sourceSets.test.output.classesDirs
     classpath = sourceSets.test.runtimeClasspath
-    useJUnitPlatform {
-        includeTags 'gui-smoke'
-    }
-    // Limit class discovery before forking; JUnit filters tags inside each worker.
-    include 'net/tapaal/gui/GuiWorkflowSmokeTest.class', 'net/tapaal/gui/PlaceDragSaveRegressionTest.class'
+    useJUnitPlatform()
+    // Every *Test class in the smoke package is a scenario; nothing else needs registering.
+    // Helpers are left out so that forkEvery does not start a JVM for each of them.
+    include 'net/tapaal/gui/smoke/**/*Test.class'
     // The application keeps its window and tabs in static state, so each class gets a fresh JVM.
     forkEvery = 1
     def artifacts = layout.buildDirectory.dir('reports/gui-smoke')
@@ -104,6 +103,8 @@ tasks.register('guiSmokeTest', Test) {
     }
     systemProperty 'tapaal.smoke.artifacts', artifacts.get().asFile.absolutePath
     systemProperty 'java.util.prefs.userRoot', new File(temporaryDir, "preferences").absolutePath
+    // A hung scenario fails instead of blocking the build; @Timeout on a test overrides this.
+    systemProperty 'junit.jupiter.execution.timeout.testable.method.default', '60 s'
     // Keep the automatic version check offline during this workflow.
     systemProperty 'http.proxyHost', '127.0.0.1'
     systemProperty 'http.proxyPort', '1'

@@ -17,12 +17,12 @@ import javax.xml.transform.URIResolver;
  */
 public final class UnavailableTransformerFactory extends TransformerFactory {
     static final String PROPERTY = TransformerFactory.class.getName();
-    static final String MESSAGE = "Transformer disabled by test";
+    public static final String MESSAGE = "Transformer disabled by test";
 
     private final TransformerFactory platform = TransformerFactory.newDefaultInstance();
 
     /** Selects this factory until the returned handle is closed. */
-    static AutoCloseable select() {
+    public static AutoCloseable select() {
         String previous = System.setProperty(PROPERTY, UnavailableTransformerFactory.class.getName());
         return () -> {
             if (previous == null) {

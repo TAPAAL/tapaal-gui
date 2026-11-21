@@ -20,7 +20,7 @@ import java.util.TreeSet;
  * quoting, the XML declaration, comments, CDATA wrapping and character escaping. Everything else
  * is compared exactly, including element order, attribute values and non-whitespace text.
  */
-final class TapnXmlComparison {
+public final class TapnXmlComparison {
     private static final int MAX_DIFFERENCES = 50;
 
     private final List<String> differences = new ArrayList<>();
@@ -28,13 +28,13 @@ final class TapnXmlComparison {
     private TapnXmlComparison() { }
 
     /** Returns one line per difference, each naming the path of the element or attribute. */
-    static List<String> differences(Path expected, Path actual) throws Exception {
+    public static List<String> differences(Path expected, Path actual) throws Exception {
         try (var expectedStream = Files.newInputStream(expected); var actualStream = Files.newInputStream(actual)) {
             return differences(expectedStream, actualStream);
         }
     }
 
-    static List<String> differences(InputStream expected, InputStream actual) throws Exception {
+    public static List<String> differences(InputStream expected, InputStream actual) throws Exception {
         var comparison = new TapnXmlComparison();
         Element expectedRoot = parse(expected).getDocumentElement();
         Element actualRoot = parse(actual).getDocumentElement();
