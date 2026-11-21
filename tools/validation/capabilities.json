@@ -1,0 +1,57 @@
+{
+  "baseline": [
+    "Run the existing Gradle build and tests under Xvfb",
+    "Run the GUI open/edit/undo/redo/save/reopen smoke"
+  ],
+  "broad": [
+    "Run serialization round-trips and compatibility fixtures",
+    "Exercise query configuration, export and result handling at the GUI boundary",
+    "Exercise query configuration, execution and trace/simulation workflows"
+  ],
+  "capabilities": [
+    {
+      "id": "editor",
+      "paths": ["src/main/java/pipe/gui/GuiFrame.java", "src/main/java/pipe/gui/canvas/*", "src/main/java/pipe/gui/petrinet/graphicElements/*", "src/main/java/net/tapaal/gui/GuiFrameController.java", "src/main/java/net/tapaal/gui/petrinet/model/*", "src/main/java/net/tapaal/gui/petrinet/undo/*", "src/main/java/pipe/gui/petrinet/undo/*"],
+      "impact": "Editing or undo may leave the visual and semantic nets out of sync.",
+      "severity": "high",
+      "invariant": "The editor and net model agree after each edit, undo and redo.",
+      "tests": ["Exercise named editor workflows and verify matching canvas and model state after undo/redo."],
+      "history": ["https://github.com/TAPAAL/tapaal-gui/pull/393"]
+    },
+    {
+      "id": "serialization",
+      "paths": ["src/main/java/dk/aau/cs/io/ModelLoader.java", "src/main/java/dk/aau/cs/io/*XmlLoader.java", "src/main/java/dk/aau/cs/io/PNML*", "src/main/java/dk/aau/cs/io/*Writer.java", "src/main/java/dk/aau/cs/model/tapn/TransportArc.java"],
+      "impact": "Existing documents can load or save with altered weights, markings or queries.",
+      "severity": "high",
+      "invariant": "Opening and saving a supported document preserves markings, arc semantics and query definitions.",
+      "tests": ["Run TapnXmlLoaderTest and PNMLoaderTest, including the legacy weighted-transport round trip for PR 388."],
+      "history": ["https://github.com/TAPAAL/tapaal-gui/pull/388", "https://github.com/TAPAAL/tapaal-gui/pull/382"]
+    },
+    {
+      "id": "verification",
+      "paths": ["src/main/java/dk/aau/cs/verification/*", "src/main/java/net/tapaal/gui/petrinet/verification/*", "src/main/java/net/tapaal/gui/petrinet/dialog/QueryDialog.java", "src/main/java/dk/aau/cs/TCTL/*", "src/main/javacc/*", "src/main/java/dk/aau/cs/approximation/*", "src/main/java/dk/aau/cs/model/tapn/*"],
+      "impact": "The intended query or model semantics can change between the editor and the engine, which can yield a wrong verdict.",
+      "severity": "critical",
+      "invariant": "The selected model, query and options reach the adapter intact and its response is associated with the originating tab.",
+      "tests": ["Run QueryDialogArithmeticTest for query-expression changes.", "For model changes, assert the GUI exports the intended net and query. For protocol changes, exercise verdict, error and trace handling with recorded responses."],
+      "history": ["https://github.com/TAPAAL/tapaal-gui/pull/388", "https://github.com/TAPAAL/tapaal-gui/pull/387", "https://github.com/TAPAAL/tapaal-gui/pull/385", "https://github.com/TAPAAL/tapaal-gui/pull/386"]
+    },
+    {
+      "id": "simulation",
+      "paths": ["src/main/java/pipe/gui/petrinet/animation/*", "src/main/java/dk/aau/cs/model/tapn/*", "src/main/java/dk/aau/cs/verification/*Trace*.java", "src/main/java/dk/aau/cs/io/TraceImportExport.java"],
+      "impact": "Enabledness, token age or a replayed marking may no longer match the transition semantics.",
+      "severity": "high",
+      "invariant": "Trace replay follows the displayed marking and transport arcs preserve token ages.",
+      "tests": ["Exercise transition firing and trace replay, including token-age preservation for transport arcs when relevant."],
+      "history": ["https://github.com/TAPAAL/tapaal-gui/pull/390", "https://github.com/TAPAAL/tapaal-gui/pull/380"]
+    }
+  ],
+  "shared_paths": [
+    "src/main/java/pipe/gui/petrinet/PetriNetTab.java",
+    "src/main/java/pipe/gui/TAPAALGUI.java",
+    "src/main/java/net/tapaal/gui/petrinet/TAPNLens.java",
+    "src/main/java/dk/aau/cs/model/tapn/*",
+    "build.gradle",
+    ".github/workflows/*"
+  ]
+}
