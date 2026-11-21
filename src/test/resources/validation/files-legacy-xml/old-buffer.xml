@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="OldBuffer" type="P/T net" active="true">
+    <place id="Queued" initialMarking="2" invariant="&lt;= 9" positionX="60" positionY="60"/>
+  </net>
+</pnml>

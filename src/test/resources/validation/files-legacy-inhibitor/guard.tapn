@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="OldGuard" type="P/T net" active="true">
+    <place id="placeId" name="Guard" initialMarking="2" invariant="&lt; inf" positionX="60" positionY="60"/>
+    <transition id="transitionId" name="Release" positionX="210" positionY="60"/>
+    <arc id="guard-arc" source="placeId" target="transitionId" type="tapnInhibitor" inscription="[0,inf)"/>
+  </net>
+</pnml>
