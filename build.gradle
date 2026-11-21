@@ -102,7 +102,12 @@ tasks.register('guiSmokeTest', Test) {
         delete(artifacts)
     }
     systemProperty 'tapaal.smoke.artifacts', artifacts.get().asFile.absolutePath
-    systemProperty 'java.util.prefs.userRoot', new File(temporaryDir, "preferences").absolutePath
+    // GuiHarness gives each JVM a fresh preferences store below this directory.
+    def preferences = new File(temporaryDir, "preferences")
+    doFirst {
+        delete(preferences)
+    }
+    systemProperty 'tapaal.smoke.preferences', preferences.absolutePath
     // A hung scenario fails instead of blocking the build; @Timeout on a test overrides this.
     systemProperty 'junit.jupiter.execution.timeout.testable.method.default', '60 s'
     // Keep the automatic version check offline during this workflow.

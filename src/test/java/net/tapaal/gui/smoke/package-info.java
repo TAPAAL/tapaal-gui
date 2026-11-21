@@ -3,14 +3,17 @@
  *
  * <p>To add one:
  * <ol>
- *   <li>Put the input model, and the expected saved model if the scenario saves, in
- *       {@code src/test/resources/validation/<case>/}.</li>
- *   <li>Add a class named {@code <Something>Test} to this package with a
+ *   <li>Put the input model in {@code src/test/resources/validation/<case>/}.</li>
+ *   <li>Add a class named {@code <Area><Behaviour>Test} to this package with a
  *       {@code @RegisterExtension final GuiHarness gui = new GuiHarness();} field and one {@code @Test}.
- *       {@code PlaceDragSaveRegressionTest} is the recipe for comparing a saved file and
- *       {@code GuiWorkflowSmokeTest} the recipe for checking editor state.</li>
- *   <li>Run it with {@code xvfb-run -a ./gradlew guiSmokeTest --tests '*Something*'}.</li>
+ *       Copy the demonstration closest to your scenario.</li>
+ *   <li>Drive the editor with the harness's mouse, keyboard, menu and dialog methods. Assert on editor state after
+ *       each step, and compare a saved file or snapshot with a reviewed expected document.</li>
+ *   <li>Run it with {@code xvfb-run -a -s '-screen 0 1280x900x24' ./gradlew guiSmokeTest --tests '*Something*'}.</li>
  * </ol>
+ *
+ * <p>{@code tools/validation/gui-harness.md} lists the verified harness methods and the production route each one
+ * uses. It also covers isolation and speed and the scenarios the harness does not support.
  *
  * <p>Nothing needs registering: {@code guiSmokeTest} runs every {@code *Test} class in this package,
  * each in a fresh JVM, and the ordinary {@code test} task skips this package. Give helpers here a
