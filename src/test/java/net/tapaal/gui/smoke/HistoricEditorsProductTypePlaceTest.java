@@ -21,9 +21,9 @@ import static net.tapaal.gui.smoke.GuiHarness.find;
 import static net.tapaal.gui.smoke.GuiHarness.labelled;
 import static net.tapaal.gui.smoke.GuiHarness.place;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class HistoricEditorsProductTypePlaceTest {
     @RegisterExtension
@@ -63,7 +63,8 @@ class HistoricEditorsProductTypePlaceTest {
         });
 
         // Launchpad #1988734
-        gui.doubleClickObject(tab, "state");
+        gui.rightClickObject(tab, "state");
+        gui.clickPopupItem("Edit Place");
         var placeEditor = gui.awaitDialog("Edit Place");
         gui.clickButton(placeEditor, "OK");
         gui.awaitClosed(placeEditor);

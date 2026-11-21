@@ -9,7 +9,7 @@ TAPAAL_GUI_KNOWN_ISSUES=true xvfb-run -a -s '-screen 0 1280x900x24' ./gradlew --
 TAPAAL_GUI_KNOWN_ISSUES=true xvfb-run -a -s '-screen 0 1280x900x24' ./gradlew --no-daemon guiSmokeTest --tests '*KnownIssuePopupDeleteTarget*'
 ```
 
-All three use the fixture `src/test/resources/validation/known-issue-workbench/two-places.tapn`, which contains places P0 and P1 and transition T0.
+The first three cases use `src/test/resources/validation/known-issue-workbench/two-places.tapn`. The colored editor case uses `src/test/resources/validation/historic-canvas-place-editor-undo/before.tapn`.
 
 When you fix one of these bugs, remove the `@EnabledIfEnvironmentVariable` line and rename the class to the ordinary `<Area><Behaviour>Test` form. The test then joins the normal suite as a regression test. Do not change an assertion so that it accepts the bug.
 
@@ -22,6 +22,7 @@ Each reproducer failed the same way in 5 of 5 independent `guiSmokeTest` runs on
 | `KnownIssueFailedSaveKeepsChangesTest` | Drag P0, make the open file read-only, File > Save, then dismiss "File Output Error". | The file is unchanged. The net stays marked as changed and Edit > Undo is still enabled. | The file is unchanged and the error is shown, but `netChanged=false` and Undo is disabled. Closing the tab then discards the drag without a prompt. | `PetriNetTab.saveNet` clears the dirty flag and undo history after `writeNetToFile`, which catches the exception and shows the dialog itself. |
 | `KnownIssuePopupDeleteTargetTest` | Click P0, right-click P1, choose Delete. | P1 is deleted and P0 remains. | P0 is deleted and P1 remains (`{P1=0}`). | The right-click does not change the selection, because `GraphicalElement` sends only left presses to selection. The popup's Delete is the global delete action, which deletes the selection. |
 | `KnownIssuePopupNameVisibilityTest` | Right-click P0, choose Hide Place Name. | The written document stores `displayName="false"`. The net is marked as changed and Undo is enabled. | The document stores the change, but `netChanged=false` and Undo is disabled. | `ShowHideInfoAction` only toggles the flag. Edit Place records a `ChangeAllNamesVisibilityCommand` for the same change. |
+| `KnownIssueHistoricCanvasPlaceEditorUndoTest` | Add one token in a timed, colored place editor. Reopen the editor, accept it without edits, and invoke Undo. | One Undo removes the token added in the first dialog. | The second OK preserves the colored tokens and the serialized model. Undo enables Redo but the marking stays at `{P0=1}`. | This reproduces the symptom of [Launchpad #1870888](https://bugs.launchpad.net/tapaal/+bug/1870888) through the current colored editor. |
 
 The read-only file in the first test is a real file-system failure, so it needs no production hook. `PlaceDragSaveRegressionTest` injects a transformer failure that the writer swallows, and it deliberately only observes the dirty state. This test asserts the dirty state, using the path where the error does reach the user.
 

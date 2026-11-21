@@ -100,3 +100,20 @@ The suite has nine framework and smoke scenarios plus 15 regressions in each of 
 | `ViewQuery` | Query authoring and persistence, game conversion, trace options, workspace, statistics, zoom and visibility |
 
 Keep scenario and fixture names descriptive so contributors can find and run the affected checks. Give each test a distinct behavior to verify and add shared helpers as repeated actions become clear. If a case exposes a bug, keep the reproduction and expected result with its diagnostics so the fix can turn it into a regression test.
+
+## Launchpad regressions
+
+Run these with `guiSmokeTest --tests 'net.tapaal.gui.smoke.Historic*'`.
+
+| Report | Behavior covered |
+| --- | --- |
+| [#1947517](https://bugs.launchpad.net/tapaal/+bug/1947517) | The popup on an interior arc bend edits that point and supports undo and redo. |
+| [#1887759](https://bugs.launchpad.net/tapaal/+bug/1887759) | Undo restores an annotation's original size and text. Redo restores its resized geometry. |
+| [#1988737](https://bugs.launchpad.net/tapaal/+bug/1988737) | Colored arc labels keep their positions and offsets through save and reopen. |
+| [#1932286](https://bugs.launchpad.net/tapaal/+bug/1932286) | An uncolored net can create and save an integer constant. |
+| [#1959906](https://bugs.launchpad.net/tapaal/+bug/1959906) | Removing the last color-specific time guard preserves the rest of the arc. |
+| [#1932271](https://bugs.launchpad.net/tapaal/+bug/1932271) | Color-type removal and redo refresh selection and move controls. |
+| [#1964931](https://bugs.launchpad.net/tapaal/+bug/1964931) | A color type used by a variable is protected from removal. |
+| [#1988734](https://bugs.launchpad.net/tapaal/+bug/1988734) | Editing a constituent color type leaves the product-type place editor usable and preserves its tuple marking. |
+
+[Known GUI issues](gui-known-issues.md) documents opt-in tests for behavior that still fails.
