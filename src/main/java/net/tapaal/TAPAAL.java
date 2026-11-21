@@ -29,6 +29,7 @@ import org.apache.commons.cli.PosixParser;
 
 import net.tapaal.gui.petrinet.verification.TAPNQuery;
 import pipe.gui.TAPAALGUI;
+import dk.aau.cs.debug.CaughtExceptions;
 import dk.aau.cs.debug.Logger;
 import net.tapaal.gui.petrinet.verification.Verifier;
 
@@ -104,7 +105,7 @@ public class TAPAAL {
 					try {
                         TAPAALGUI.getAppGuiController().openTab(PetriNetTab.createNewTabFromFile(file));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
+						CaughtExceptions.report("TAPAAL.main/open-file", e);
 						e.printStackTrace();
 					}
 				} else if (file.exists()) {

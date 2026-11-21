@@ -79,7 +79,35 @@ dependencies {
 }
 
 test {
-    useJUnitPlatform()
+    useJUnitPlatform {
+        excludeTags 'gui-smoke'
+    }
+}
+
+tasks.register('guiSmokeTest', Test) {
+    description = 'Runs the GUI workflow prototype on a Linux virtual display.'
+    group = 'verification'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform {
+        includeTags 'gui-smoke'
+    }
+    // Limit class discovery before forking; JUnit filters tags inside each worker.
+    include 'net/tapaal/gui/GuiWorkflowSmokeTest.class', 'net/tapaal/gui/PlaceDragSaveRegressionTest.class'
+    // The application keeps its window and tabs in static state, so each class gets a fresh JVM.
+    forkEvery = 1
+    def artifacts = layout.buildDirectory.dir('reports/gui-smoke')
+    outputs.dir(artifacts)
+    outputs.upToDateWhen { false }
+    doFirst {
+        delete(artifacts)
+    }
+    systemProperty 'tapaal.smoke.artifacts', artifacts.get().asFile.absolutePath
+    systemProperty 'java.util.prefs.userRoot', new File(temporaryDir, "preferences").absolutePath
+    // Keep the automatic version check offline during this workflow.
+    systemProperty 'http.proxyHost', '127.0.0.1'
+    systemProperty 'http.proxyPort', '1'
+    testLogging.showStandardStreams = true
 }
 
 run {

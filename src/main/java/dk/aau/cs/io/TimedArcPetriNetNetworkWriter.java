@@ -20,6 +20,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import dk.aau.cs.TCTL.visitors.SMCQueryVisitor;
+import dk.aau.cs.debug.CaughtExceptions;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColoredTimeInterval;
 import dk.aau.cs.model.CPN.ColoredTimeInvariant;
@@ -141,6 +142,9 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 		savePNML(file, true);
 	}
 
+	/** Label for failures that savePNML(File) reports but does not throw. */
+	public static final String SAVE_FILE_SITE = "TimedArcPetriNetNetworkWriter.savePNML(File)";
+
 	public void savePNML(File file, boolean saveConstantNames) throws IOException, ParserConfigurationException, DOMException, TransformerException {
 		this.saveConstantNames = saveConstantNames;
 
@@ -152,22 +156,26 @@ public class TimedArcPetriNetNetworkWriter implements NetWriter {
 			fs.write(os.toByteArray());
 			fs.close();
 		} catch (ParserConfigurationException e) {
+			CaughtExceptions.report(SAVE_FILE_SITE, e);
 			System.out
 					.println("ParserConfigurationException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\"");
 		} catch (DOMException e) {
+			CaughtExceptions.report(SAVE_FILE_SITE, e);
 			System.out
 					.println("DOMException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath() + "\" transformer=\"");
 			e.printStackTrace();
 		} catch (TransformerConfigurationException e) {
+			CaughtExceptions.report(SAVE_FILE_SITE, e);
 			System.out
 					.println("TransformerConfigurationException thrown in savePNML() "
 							+ ": dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath()
 							+ "\" transformer=\"");
 		} catch (TransformerException e) {
+			CaughtExceptions.report(SAVE_FILE_SITE, e);
 			System.out
 					.println("TransformerException thrown in savePNML() : dataLayerWriter Class : dataLayer Package: filename=\""
 							+ file.getCanonicalPath()

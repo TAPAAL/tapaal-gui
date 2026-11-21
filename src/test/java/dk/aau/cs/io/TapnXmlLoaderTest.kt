@@ -3,12 +3,14 @@ package dk.aau.cs.io
 import dk.aau.cs.model.CPN.Expressions.AndExpression
 import dk.aau.cs.model.CPN.Expressions.GuardExpression
 import dk.aau.cs.model.CPN.Expressions.LeftRightGuardExpression
+import net.tapaal.gui.petrinet.Template
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.function.ThrowingSupplier
 import pipe.gui.petrinet.graphicElements.tapn.TimedInhibitorArcComponent
 import pipe.gui.petrinet.graphicElements.tapn.TimedPlaceComponent
+import pipe.gui.petrinet.graphicElements.tapn.TimedTransportArcComponent
 import java.math.BigDecimal
 
 
@@ -345,22 +347,38 @@ internal class TapnXmlLoaderTest {
 
     class TransportArc {
         @Test
-        fun `Transport Arc`() {
-            val net = xmlNet(
+        fun `Legacy transport arc weight survives load and save`() {
+            // Regression for Launchpad #2174715. Older files have weights but no hlinscription.
+            val fixture = xmlNet(
                 """
-                        <place displayName="true" id="P0" initialMarking="0" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
-                        <place displayName="true" id="P1" initialMarking="0" invariant="&lt; inf" name="P1" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <place displayName="true" id="P0" initialMarking="2" invariant="&lt; inf" name="P0" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="60"/>
+                        <place displayName="true" id="P1" initialMarking="0" invariant="&lt; inf" name="P1" nameOffsetX="0" nameOffsetY="0" positionX="360" positionY="60"/>
                         <transition angle="0" displayName="true" id="T0" infiniteServer="false" name="T0" nameOffsetX="0" nameOffsetY="0" positionX="240" positionY="60" priority="0" urgent="false"/>
-                        <arc id="T0 to P1" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="T0" target="P1" type="transport" weight="1"></arc>
-                        <arc id="P0 to T0" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="transport" weight="1"></arc>
+                        <arc id="T0 to P1" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="T0" target="P1" type="transport" weight="2"/>
+                        <arc id="P0 to T0" inscription="[0,inf):1" nameOffsetX="0" nameOffsetY="0" source="P0" target="T0" type="transport" weight="2"/>
                 """
-            ).asInpurtStream()
+            )
 
-            val tapnXmlLoader = TapnXmlLoader()
+            val loaded = TapnXmlLoader().load(fixture.byteInputStream())
+            assertWeightedTransport(loaded.templates().single())
 
-            val r = Assertions.assertDoesNotThrow(ThrowingSupplier {
-                tapnXmlLoader.load(net)
-            })
+            val writer = TimedArcPetriNetNetworkWriter(
+                loaded.network(), loaded.templates(), loaded.queries(), loaded.network().constants(), loaded.getLens()
+            )
+            val reopened = TapnXmlLoader().load(writer.savePNML().toByteArray().inputStream())
+            assertWeightedTransport(reopened.templates().single())
+        }
+
+        private fun assertWeightedTransport(template: Template) {
+            val transport = template.model().transportArcs().single()
+            Assertions.assertEquals(2, transport.getWeight().value())
+            Assertions.assertEquals("P0", transport.source().name())
+            Assertions.assertEquals("P1", transport.destination().name())
+            Assertions.assertEquals(2, transport.source().numberOfTokens())
+            Assertions.assertEquals(0, transport.destination().numberOfTokens())
+            val canvasWeights = template.guiModel().arcs.filterIsInstance<TimedTransportArcComponent>()
+                .map { it.weight.value() }
+            Assertions.assertEquals(listOf(2, 2), canvasWeights)
         }
 
         @Test @Disabled
