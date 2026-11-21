@@ -72,9 +72,9 @@ Escape hatches: `robot()` for other input such as the mouse wheel; call `settle(
 
 - **Native file dialogs.** These include File > Open, Save as, Save of a net that was never saved, and the Import and Export menus. Use `openFiles`, Save on an opened fixture or `snapshot` instead.
 - **File > Exit and closing the window.** Both call `System.exit` and end the test JVM.
-- **Verification and engines.** This covers Verify, the query pane's Verify button, batch processing and workflow analysis. No engine runs in this task. Building and editing queries in `QueryDialog` without verifying them is plausible but not verified.
+- **Verification and engines.** The suite exercises creating, editing and saving queries, including option eligibility and game conversion. Verify, batch processing and workflow analysis require a separate setup with engines.
 - **Help menu links.** Opening a browser shows an error dialog on Xvfb.
-- **Not exercised yet.** Colored, game and stochastic nets, including `ColoredSimulationDialog`, have no demonstration. Neither do the clipboard (copy, cut and paste), the mouse wheel, hover tooltips, zoom other than 100%, scrolling the canvas and the UI Scale menu, which needs a restart.
+- **Coverage gaps.** Timed simulation currently uses uncolored nets. Colored simulation, stochastic workflows, clipboard operations, mouse-wheel input, scrolling and the UI Scale menu need their own scenarios.
 - **Typing.** `type` covers letters, digits, space and `.-_:,/()[]<>=+` on the US layout.
 - **Focus-dependent shortcuts.** Keys go to the focused window, and canvas shortcuts such as `P` need the main window to have focus.
 
@@ -87,23 +87,16 @@ These may be worth a test or an issue. Their root causes have not been investiga
 3. **Save** clears the undo history (`PetriNetTab.saveNet`).
 4. The writer adds `hlinitialMarking` for a marking set in the place editor. It does not add one for a marking that was loaded from `initialMarking` and left unchanged. See `place-editor/expected.tapn`.
 
-## Instructions for five batch authors
+## Run an area
 
-Give each author one area and these rules.
+The suite has nine framework and smoke scenarios plus 15 regressions in each of five areas. Pass a class prefix to Gradle, for example `guiSmokeTest --tests 'net.tapaal.gui.smoke.Files*'`.
 
-| Batch | Area | Starting points |
-| --- | --- | --- |
-| 1 | Files and tabs | Unsaved-changes prompt (Yes saves, No discards, Cancel keeps the tab), dirty state after each kind of edit, tab titles, several tabs editing independently, reopening saved edits, Close with several tabs |
-| 2 | Canvas editing | Places, transitions, arcs, inhibitor and transport arcs, tokens added and removed, drag and Select all, delete with arcs, undo and redo chains, align to grid |
-| 3 | Editors and dialogs | Place, transition and arc editors (names, invariants, intervals, weights, urgency), validation errors such as a duplicate or invalid name, components (rename, copy, remove), shared places |
-| 4 | Simulator | Entering and leaving, firing, stepping back and forward, delay (W), several components, editing locked during simulation, markings restored afterwards |
-| 5 | Views, menus and query editing | View toggles and their menu state, zoom with `canvasPoint`, Net statistics, workspace menus, query pane New and Edit dialogs without verifying, the features panel |
+| Class prefix | Examples |
+| --- | --- |
+| `Files` | Save, Discard and Cancel, independent tab histories, reopening, legacy files, file-drop handling |
+| `Canvas` | Drawing and rejecting arcs, token edits, grid alignment, selection and movement, deletion, undo and redo |
+| `Editors` | Committed and rejected place, transition and arc edits, component copy and removal, shared elements |
+| `SimulationRegression` | Firing, delay and history, token ages, active components, edit locking, restoring the initial marking |
+| `ViewQuery` | Query authoring and persistence, game conversion, trace options, workspace, statistics, zoom and visibility |
 
-Rules:
-
-1. Work in your own checkout and Gradle home. Run only your classes, with `--tests 'net.tapaal.gui.smoke.<Prefix>*'`, under the fixed 1280x900 Xvfb display.
-2. Do not edit `GuiHarness`, `build.gradle`, shared fixtures or other batches' files. Prefix classes with your area, such as `FilesUnsavedPromptCancelTest`, and fixture directories too, such as `validation/files-unsaved-prompt/`. Build any helper you need as a private method in your test from harness methods. Report helpers that several tests would use as proposed harness additions.
-3. Write one `@Test` per class. Each test should guard one user-visible risk with a concrete expected outcome. Do not repeat the demonstrations or test only that a dialog opens.
-4. Use only the input methods in the table; `onEdt` is only for reading. If a scenario needs an unsupported route, skip it and list it.
-5. Review every `.actual.tapn` before you accept it, and keep comparisons strict. If a test shows behavior that looks wrong, keep the assertion of the correct behavior and confirm that it fails for that reason. Then mark it `@Disabled("Suspected bug: …")` and report it with the artifacts. Do not weaken the assertion to make it pass.
-6. Before handing off, run your classes three times in a row. Report pass counts, durations and any harness compensation lines from the log, such as "clicking its status bar" or "moving it to tell Swing".
+Keep scenario and fixture names descriptive so contributors can find and run the affected checks. Give each test a distinct behavior to verify and add shared helpers as repeated actions become clear. If a case exposes a bug, keep the reproduction and expected result with its diagnostics so the fix can turn it into a regression test.
