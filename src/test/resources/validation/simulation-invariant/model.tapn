@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="Deadline" type="P/T net" active="true">
+    <place id="Clock" name="Clock" initialMarking="1" invariant="&lt;= 2" positionX="75" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="Reset" name="Reset" positionX="240" positionY="60" nameOffsetY="35"/>
+    <arc id="ClockToReset" source="Clock" target="Reset" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="ResetToClock" source="Reset" target="Clock" type="normal" inscription="1" weight="1"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false" isStochastic="false"/>
+</pnml>

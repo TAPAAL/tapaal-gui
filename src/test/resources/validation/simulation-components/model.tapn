@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="First" type="P/T net" active="true">
+    <place id="Ready" name="Ready" initialMarking="1" invariant="&lt; inf" positionX="75" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <place id="Done" name="Done" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="Advance" name="Advance" positionX="240" positionY="60" nameOffsetY="35" urgent="false"/>
+    <arc id="ReadyToAdvance" source="Ready" target="Advance" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="AdvanceToDone" source="Advance" target="Done" type="normal" inscription="1" weight="1"/>
+  </net>
+  <net id="Second" type="P/T net" active="true">
+    <place id="Independent" name="Independent" initialMarking="2" invariant="&lt; inf" positionX="75" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <place id="Finished" name="Finished" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="Advance" name="Advance" positionX="240" positionY="60" nameOffsetY="35" urgent="false"/>
+    <arc id="IndependentToAdvance" source="Independent" target="Advance" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="AdvanceToFinished" source="Advance" target="Finished" type="normal" inscription="1" weight="1"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false" isStochastic="false"/>
+</pnml>
