@@ -567,11 +567,16 @@ void colorTypes() :
                     continue;
                 }
 
-                if (!colorTypes.containsKey(product)) {
+                ColorType constituent = colorTypes.get(product);
+                if (constituent == null) {
                     throw new ParseException("Color type with name \"" + product + "\" does not exist");
                 }
 
-                pct.addType(colorTypes.get(product));
+                if (constituent instanceof ProductType) {
+                    throw new ParseException("Product type \"" + id.image + "\" cannot contain the product type \"" + product + "\"");
+                }
+                
+                pct.addType(constituent);
             }
 
             ct = pct;
