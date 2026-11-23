@@ -63,6 +63,16 @@ public abstract class ColorExpression extends Expression {
 
     public abstract ColorExpression getExprWithNewColorType(ColorType ct);
 
+    // Rebind this expression from oldCt to newCt. A matching type name is enough:
+    // ColorType.equals also compares the color list, so a rename or an added color
+    // would not match. Tuples override this and walk their constituents.
+    public ColorExpression getExprConverted(ColorType oldCt, ColorType newCt) {
+        if (colorType != null && colorType.getName().equals(oldCt.getName())) {
+            return getExprWithNewColorType(newCt);
+        }
+        return this;
+    }
+
     public static ColorExpression resolveAgainst(ColorExpression expression, ColorExpression other) {
         var colorType = other.getColorType();
         if (colorType == null) {
