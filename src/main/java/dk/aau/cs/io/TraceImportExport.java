@@ -35,6 +35,7 @@ import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.ColoredTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkColoredTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
@@ -202,7 +203,9 @@ public class TraceImportExport {
 
             // A trace of the trace list carries its own ending; the action history ends like the shown trace
             Object traceSource = trace.getValue() instanceof TAPNNetworkTrace ? trace.getValue() : tab.getAnimator().getTrace();
-            if (traceSource instanceof TimedTAPNNetworkTrace timedTrace && timedTrace.getTraceType() == EG_DELAY_FOREVER) {
+            boolean delaysForever = (traceSource instanceof TimedTAPNNetworkTrace timedTrace && timedTrace.getTraceType() == EG_DELAY_FOREVER)
+                || (traceSource instanceof ColoredTAPNNetworkTrace coloredTrace && coloredTrace.getTraceType() == EG_DELAY_FOREVER);
+            if (delaysForever) {
                 Element delayForeverElement = document.createElement("delay");
                 traceRootNode.appendChild(delayForeverElement);
                 delayForeverElement.setTextContent("forever");

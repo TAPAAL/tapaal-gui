@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
@@ -36,15 +34,12 @@ import dk.aau.cs.model.CPN.Expressions.AllExpression;
 import dk.aau.cs.model.CPN.Expressions.Expression;
 import dk.aau.cs.model.CPN.Color;
 import dk.aau.cs.model.CPN.ColorType;
-import dk.aau.cs.model.CPN.ProductType;
 import dk.aau.cs.model.CPN.Variable;
 import dk.aau.cs.model.CPN.Expressions.AddExpression;
 import dk.aau.cs.model.CPN.Expressions.ArcExpression;
 import dk.aau.cs.model.CPN.Expressions.ColorExpression;
-import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
 import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
 import dk.aau.cs.model.CPN.Expressions.TupleExpression;
-import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedInputArc;
@@ -135,7 +130,7 @@ public class Animator {
 
     public void setTrace(TAPNNetworkTrace trace, Map<String, TAPNNetworkTrace> traceMap) {
         this.traceMap = traceMap;
-        setTrace(trace);
+        setTrace(trace, 0);
         tab.getAnimationController().updateTraceBox(traceMap);
     }
 
@@ -148,6 +143,8 @@ public class Animator {
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
+        resetTraceBox();
+        traceMap = null;
         setTrace(trace, 0);
     }
 
@@ -708,14 +705,10 @@ public class Animator {
     
                 List<TimedToken> tokens = placesToTokensCopy.get(place);
                 
-                place.updateTokens(tokens, tokensToExpression(tokens));
+                place.updateTokens(tokens, NetworkMarking.tokensToExpression(tokens));
                 placeComponent.setUnderlyingPlace(place);
             }
         }
-    }
-
-    private ArcExpression tokensToExpression(List<TimedToken> tokens) {
-        return NetworkMarking.tokensToExpression(tokens);
     }
 
     private boolean containsAllExpression(Expression expr) {
@@ -1270,6 +1263,7 @@ public class Animator {
         removeSetTrace(false);
         markings.add(initialMarking);
         tab.network().setMarking(initialMarking);
+        updateColoredMarking();
         tab.getAnimationHistorySidePanel().setLastShown(TraceType.NOT_EG);
     }
 
@@ -1286,6 +1280,7 @@ public class Animator {
 
         if(traceMap != null) {
             tab.getAnimationController().resetTraceBox(true);
+            traceMap = null;
         }
 
     }
@@ -1294,6 +1289,7 @@ public class Animator {
         if(tab.getAnimationController().getTraceBox().getModel().getSize() > 0) {
             tab.getAnimationController().resetTraceBox(true);
         }
+        traceMap = null;
     }
 
     private boolean removeSetTrace(boolean askUser){
