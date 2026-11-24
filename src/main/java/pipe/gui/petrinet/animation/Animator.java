@@ -715,34 +715,7 @@ public class Animator {
     }
 
     private ArcExpression tokensToExpression(List<TimedToken> tokens) {
-        Vector<ArcExpression> numberOfExpressions = new Vector<>();
-        Map<Color, Integer> numberOfMap = new HashMap<>();
-        for (TimedToken token : tokens) {
-            numberOfMap.merge(token.color(), 1, Integer::sum);
-        }
-
-        numberOfMap.entrySet().stream()
-            .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
-            .forEach(numberOfEntry -> {
-                Color color = numberOfEntry.getKey();
-                Vector<ColorExpression> colorExpressions = new Vector<>();
-                if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
-                    colorExpressions.add(new DotConstantExpression());
-                } else if (color.getColorType().isProductColorType()) {
-                    ProductType productType = (ProductType)color.getColorType();
-                    Vector<ColorExpression> subColorExpressions = new Vector<>();
-                    subColorExpressions.addAll(color.getTuple().stream()
-                        .map(UserOperatorExpression::new)
-                        .collect(Collectors.toList()));
-                    colorExpressions.add(new TupleExpression(subColorExpressions, productType));
-                } else {
-                    colorExpressions.add(new UserOperatorExpression(color));
-                }
-
-                numberOfExpressions.add(new NumberOfExpression(numberOfEntry.getValue(), colorExpressions));
-            });
-
-        return new AddExpression(numberOfExpressions);
+        return NetworkMarking.tokensToExpression(tokens);
     }
 
     private boolean containsAllExpression(Expression expr) {
