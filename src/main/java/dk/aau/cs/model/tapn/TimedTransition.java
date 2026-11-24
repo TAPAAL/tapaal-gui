@@ -183,7 +183,7 @@ public class TimedTransition extends TAPNElement {
 			if (!arc.interval().equals(TimeInterval.ZERO_INF))
 				return false;
             for (ColoredTimeInterval interval : arc.getColorTimeIntervals()) {
-                if (interval.getInterval().equals(TimeInterval.ZERO_INF.toString()))
+                if (!interval.getInterval().equals(TimeInterval.ZERO_INF.toString()))
                     return false;
             }
 		}
