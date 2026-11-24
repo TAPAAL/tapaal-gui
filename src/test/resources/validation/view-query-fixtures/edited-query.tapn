@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+      </declarations>
+    </structure>
+  </declaration>
+  <net active="true" id="Smoke" type="P/T net">
+    <place displayName="true" id="Start" initialMarking="1" invariant="&lt; inf" name="Start" nameOffsetX="0" nameOffsetY="0" positionX="60" positionY="90">
+      <type>
+        <text>dot</text>
+        <structure>
+          <usersort declaration="dot"/>
+        </structure>
+      </type>
+    </place>
+  </net>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="2" capacity="12" colorFixpoint="false" coloredReduction="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="null" gcd="true" hashTableSize="null" inclusionPlaces="*NONE*" name="Reach two" overApproximation="true" pTrie="true" partitioning="false" reduction="true" reductionOption="VerifyDTAPN" searchOption="DFS" symmetricVars="false" symmetry="true" timeDarts="true" traceInOriginalNet="false" traceOption="NONE" type="Default" useExplicitSearch="false" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="false" useTarOption="false" useTarjan="false">
+    <formula>
+      <exists-path>
+        <finally>
+          <integer-eq>
+            <tokens-count>
+              <place>Smoke.Start</place>
+            </tokens-count>
+            <integer-constant>2</integer-constant>
+          </integer-eq>
+        </finally>
+      </exists-path>
+    </formula>
+  </query>
+  <query active="true" algorithmOption="CERTAIN_ZERO" approximationDenominator="2" capacity="8" colorFixpoint="true" coloredReduction="false" discreteInclusion="false" enableOverApproximation="false" enableUnderApproximation="false" extrapolationOption="AUTOMATIC" gcd="false" hashTableSize="MB_16" inclusionPlaces="*NONE*" name="Avoid empty" overApproximation="true" pTrie="true" partitioning="true" reduction="true" reductionOption="VerifyDTAPN" searchOption="DFS" symmetricVars="true" symmetry="true" timeDarts="true" traceInOriginalNet="true" traceOption="NONE" type="CTL" useExplicitSearch="false" useQueryReduction="true" useSiphonTrapAnalysis="false" useStubbornReduction="true" useTarOption="false" useTarjan="false">
+    <formula>
+      <exists-path>
+        <globally>
+          <integer-eq>
+            <tokens-count>
+              <place>Smoke.Start</place>
+            </tokens-count>
+            <integer-constant>1</integer-constant>
+          </integer-eq>
+        </globally>
+      </exists-path>
+    </formula>
+  </query>
+  <feature isColored="false" isGame="false" isStochastic="false" isTimed="true"/>
+</pnml>

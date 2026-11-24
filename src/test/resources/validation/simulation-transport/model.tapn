@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="Transport" type="P/T net" active="true">
+    <place id="Source" name="Source" initialMarking="1" invariant="&lt; inf" positionX="75" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <place id="Destination" name="Destination" initialMarking="0" invariant="&lt;= 5" positionX="420" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="Carry" name="Carry" positionX="240" positionY="60" nameOffsetY="35" urgent="false"/>
+    <arc id="SourceToCarry" source="Source" target="Carry" type="transport" inscription="[0,inf):1" weight="1"/>
+    <arc id="CarryToDestination" source="Carry" target="Destination" type="transport" inscription="1" weight="1"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false" isStochastic="false"/>
+</pnml>

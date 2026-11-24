@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="Urgency" type="P/T net" active="true">
+    <place id="Ready" name="Ready" initialMarking="1" invariant="&lt; inf" positionX="75" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <place id="Done" name="Done" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="Immediate" name="Immediate" positionX="240" positionY="60" nameOffsetY="35" urgent="true"/>
+    <arc id="ReadyToImmediate" source="Ready" target="Immediate" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="ImmediateToDone" source="Immediate" target="Done" type="normal" inscription="1" weight="1"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false" isStochastic="false"/>
+</pnml>

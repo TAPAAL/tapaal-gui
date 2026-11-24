@@ -3,6 +3,7 @@ package pipe.gui;
 import java.awt.*;
 import java.io.InputStream;
 
+import dk.aau.cs.debug.CaughtExceptions;
 import dk.aau.cs.debug.Logger;
 import net.tapaal.TAPAAL;
 import net.tapaal.gui.GuiFrameController;
@@ -21,7 +22,8 @@ public class TAPAALGUI {
 
 	    try {
             Desktop.getDesktop().setAboutHandler(e -> appGuiController.showAbout());
-        } catch (SecurityException | UnsupportedOperationException ignored) {
+        } catch (SecurityException | UnsupportedOperationException e) {
+            CaughtExceptions.report("TAPAALGUI.init/native-about-handler", e);
             Logger.log("Failed to set native about handler");
         }
 
@@ -33,7 +35,8 @@ public class TAPAALGUI {
 	            }
 	        );
 
-        } catch (SecurityException | UnsupportedOperationException ignored) {
+        } catch (SecurityException | UnsupportedOperationException e) {
+	        CaughtExceptions.report("TAPAALGUI.init/native-quit-handler", e);
 	        Logger.log("Failed to set native quit handler");
         }
 
@@ -41,7 +44,8 @@ public class TAPAALGUI {
             Image appImage = ResourceManager.getIcon("icon.png").getImage();
             Taskbar.getTaskbar().setIconImage(appImage);
 
-        } catch (SecurityException | UnsupportedOperationException ignored) {
+        } catch (SecurityException | UnsupportedOperationException e) {
+            CaughtExceptions.report("TAPAALGUI.init/taskbar-icon", e);
             Logger.log("Failed to set DockIcon");
         }
 

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Smoke" type="P/T net">
+    <place id="Start" name="Start" displayName="true" initialMarking="1"
+           invariant="&lt; inf" positionX="60" positionY="90"/>
+  </net>
+  <feature isTimed="false" isGame="false" isColored="false"/>
+</pnml>

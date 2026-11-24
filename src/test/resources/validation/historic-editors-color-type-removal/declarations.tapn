@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Declarations" type="P/T net"/>
+  <declaration>
+    <structure>
+      <declarations>
+        <namedsort id="dot" name="dot">
+          <dot/>
+        </namedsort>
+        <namedsort id="A" name="A">
+          <cyclicenumeration>
+            <feconstant id="red" name="red"/>
+          </cyclicenumeration>
+        </namedsort>
+        <namedsort id="B" name="B">
+          <cyclicenumeration>
+            <feconstant id="blue" name="blue"/>
+          </cyclicenumeration>
+        </namedsort>
+      </declarations>
+    </structure>
+  </declaration>
+  <feature isColored="true" isGame="false" isTimed="true"/>
+</pnml>

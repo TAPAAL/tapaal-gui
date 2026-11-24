@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Canvas" type="P/T net">
+    <place id="P0" name="P0" displayName="true" initialMarking="1" invariant="&lt; inf" positionX="60" positionY="60"/>
+    <place id="P1" name="P1" displayName="true" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="60"/>
+    <transition id="T0" name="T0" displayName="true" positionX="240" positionY="60"/>
+    <transition id="T1" name="T1" displayName="true" positionX="240" positionY="210"/>
+    <arc id="P0 to T0" source="P0" target="T0" type="timed" inscription="[1,4]" weight="2"/>
+    <arc id="T0 to P1" source="T0" target="P1" type="normal" inscription="3" weight="3"/>
+    <arc id="P0 to T1" source="P0" target="T1" type="timed" inscription="[0,inf)" weight="1"/>
+  </net>
+  <feature isColored="false" isGame="false" isStochastic="false" isTimed="true"/>
+</pnml>

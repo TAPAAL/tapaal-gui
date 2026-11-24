@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="Branch" type="P/T net" active="true">
+    <place id="Source" name="Source" initialMarking="1" invariant="&lt; inf" positionX="75" positionY="150" nameOffsetX="-5" nameOffsetY="35"/>
+    <place id="Left" name="Left" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <place id="Right" name="Right" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="240" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="GoLeft" name="GoLeft" positionX="240" positionY="60" nameOffsetY="35" urgent="false"/>
+    <transition id="GoRight" name="GoRight" positionX="240" positionY="240" nameOffsetY="35" urgent="false"/>
+    <arc id="SourceToGoLeft" source="Source" target="GoLeft" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="SourceToGoRight" source="Source" target="GoRight" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="GoLeftToLeft" source="GoLeft" target="Left" type="normal" inscription="1" weight="1"/>
+    <arc id="GoRightToRight" source="GoRight" target="Right" type="normal" inscription="1" weight="1"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false" isStochastic="false"/>
+</pnml>

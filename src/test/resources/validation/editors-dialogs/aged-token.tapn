@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Flow" type="P/T net">
+    <place displayName="true" id="P0" initialMarking="1" invariant="&lt; inf" name="P0" nameOffsetX="-5" nameOffsetY="35" positionX="60" positionY="60">
+      <initialMarkingAge>
+        <token age="4"/>
+      </initialMarkingAge>
+    </place>
+  </net>
+  <feature isColored="false" isGame="false" isStochastic="false" isTimed="true"/>
+</pnml>

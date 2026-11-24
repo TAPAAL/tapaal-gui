@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net active="true" id="Smoke" type="P/T net">
+    <place id="Start" name="Start" displayName="true" initialMarking="1"
+           invariant="&lt; inf" positionX="60" positionY="90"/>
+  </net>
+  <query active="true" capacity="5" name="Reach Start" query="EF Smoke.Start = 1"
+         reductionOption="VerifyDTAPN" searchOption="DFS" traceOption="NONE"/>
+  <query active="true" capacity="8" name="Avoid empty" query="EG Smoke.Start = 1"
+         reductionOption="VerifyDTAPN" searchOption="DFS" traceOption="NONE"/>
+  <feature isTimed="true" isGame="false" isColored="false"/>
+</pnml>

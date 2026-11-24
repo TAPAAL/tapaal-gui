@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.informatik.hu-berlin.de/top/pnml/ptNetb">
+  <net id="Restore" type="P/T net" active="true">
+    <place id="Source" name="Source" initialMarking="1" invariant="&lt; inf" positionX="75" positionY="60" nameOffsetX="-5" nameOffsetY="35">
+      <initialMarkingAge>
+        <token age="2.5"/>
+      </initialMarkingAge>
+    </place>
+    <place id="Destination" name="Destination" initialMarking="0" invariant="&lt; inf" positionX="420" positionY="60" nameOffsetX="-5" nameOffsetY="35"/>
+    <transition id="Transfer" name="Transfer" positionX="240" positionY="60" nameOffsetY="35"/>
+    <arc id="SourceToTransfer" source="Source" target="Transfer" type="timed" inscription="[0,inf)" weight="1"/>
+    <arc id="TransferToDestination" source="Transfer" target="Destination" type="normal" inscription="1" weight="1"/>
+  </net>
+  <feature isTimed="true" isGame="false" isColored="false" isStochastic="false"/>
+</pnml>
