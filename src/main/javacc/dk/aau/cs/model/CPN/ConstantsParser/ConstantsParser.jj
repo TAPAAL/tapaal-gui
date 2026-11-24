@@ -102,78 +102,67 @@ public class ConstantsParser {
         for (Variable v : network.variables()) {
             List<String> messagesList = new ArrayList<String>();
             constantsMap.put(v.getName(), v);
-            boolean canBeEdited = true;
-            if (variables.containsKey(v.getName())) {
-                ColorType ct = variables.get(v.getName()).getColorType();
-                canBeEdited = ct.equals(v.getColorType());
-            }
-    
-            canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList) && canBeEdited);
+            canBeRemovedBitMap.put(v.getName(), network.canVariableBeRemoved(v, messagesList));
             messages.put(v.getName(), messagesList);
         }
 
+        // Color type updates are only applied once all declarations have been checked,
+        // so that a rejected edit leaves the net unchanged
+        List<ColorType[]> colorTypeUpdates = new ArrayList<ColorType[]>();
+
         // Generate error messages
         for (String key : canBeRemovedBitMap.keySet()) {
-            if (constants.containsKey(key) ||
-                realConstants.containsKey(key) ||
-                variables.containsKey(key) && canBeRemovedBitMap.get(key) ||
-                key.equals("dot")) {
-                continue;
-            } else if (variables.containsKey(key) && !canBeRemovedBitMap.get(key)) {
-                boolean skip = false;
-                for (Variable v : network.variables()) {
-                    if (v.getName().equals(key)) {
-                        skip = v.getColorType().getName().equals(variables.get(key).getColorType().getName());
-                        break;
-                    }
-                }
+            if (key.equals("dot")) continue;
 
-                if (skip) continue;
-            } else if (colorTypes.containsKey(key)) {
-                if (colorTypes.get(key).equals(constantsMap.get(key))) continue;
+            Object obj = constantsMap.get(key);
+            boolean canBeRemoved = canBeRemovedBitMap.get(key);
 
+            // A declaration is only kept if the same name is declared again with the same kind
+            boolean keptAsConstant = obj instanceof Constant && constants.containsKey(key);
+            boolean keptAsRealConstant = obj instanceof RealConstant && (realConstants.containsKey(key) || constants.containsKey(key));
+            boolean keptAsVariable = obj instanceof Variable && variables.containsKey(key);
+            boolean keptAsColorType = obj instanceof ColorType && colorTypes.containsKey(key);
+
+            if (keptAsConstant || keptAsRealConstant) continue;
+
+            if (keptAsVariable) {
+                // An unused variable can be changed freely; a used one must keep its color type
+                if (canBeRemoved) continue;
+
+                Variable oldVariable = (Variable)obj;
+                if (oldVariable.getColorType().getName().equals(variables.get(key).getColorType().getName())) continue;
+            } else if (keptAsColorType) {
+                ColorType ct = (ColorType)obj;
                 ColorType newCt = colorTypes.get(key);
-                ColorType ct = (ColorType)constantsMap.get(key);
 
-                if (ct instanceof ProductType) {
+                if (newCt.equals(ct)) continue;
+
+                if (ct instanceof ProductType && newCt instanceof ProductType) {
                     ProductType pct = (ProductType)ct;
                     ProductType newPct = (ProductType)newCt;
 
                     boolean isSimiliar = pct.getProductColorTypes().size() == newPct.getProductColorTypes().size() && pct.containsTypes(newPct.getColorTypes());
                     if (isSimiliar) {
-                        updateColorTypes(pct, newPct);
+                        colorTypeUpdates.add(new ColorType[] { pct, newPct });
                         continue;
                     }
-                } else {
-    
-                    List<Color> removedColors = new ArrayList<Color>();
+                } else if (!(ct instanceof ProductType) && !(newCt instanceof ProductType)) {
+                    List<String> colorMessages = new ArrayList<String>();
                     for (Color color : ct.getColors()) {
                         if (!newCt.contains(color)) {
-                            removedColors.add(color);
+                            network.canColorBeRemoved(color, colorMessages);
                         }
                     }
-                    
-                    int removeableColors = 0;
-                    for (Color c : removedColors) {
-                        List<String> newMessagesList = new ArrayList<String>();
-                        boolean colorCanBeRemoved = network.canColorBeRemoved(c, newMessagesList);
-                        if (colorCanBeRemoved) {
-                            ++removeableColors;
-                        } else {
-                            List<String> messagesList = new ArrayList<String>();
-                            messagesList.addAll(newMessagesList);
-                            messages.put(key, messagesList);
-                        }
-                    }
-                    
-                    if (removeableColors >= removedColors.size()) {
-                        updateColorTypes(ct, newCt);
+
+                    if (colorMessages.isEmpty()) {
+                        colorTypeUpdates.add(new ColorType[] { ct, newCt });
                         continue;
                     }
-                }
-            }
 
-            Object obj = constantsMap.get(key);
+                    messages.put(key, colorMessages);
+                }
+                // Switching between a product type and a simple type is treated as a replacement
+            }
 
             // If the object is a ColorType, check if all dependent variables are being removed
             if (obj instanceof ColorType) {
@@ -206,13 +195,10 @@ public class ConstantsParser {
                 }
             }
 
-            if (!canBeRemovedBitMap.get(key)) {
+            if (!canBeRemoved) {
                 String message = "Could not ";
                 String title = "Could not ";
-                if (obj instanceof ColorType && 
-                    colorTypes.containsKey(key) ||
-                    obj instanceof Variable &&
-                    variables.containsKey(key)) {
+                if (keptAsColorType || keptAsVariable) {
                     message += "modify ";
                     title += "modify constant";
                 } else {
@@ -231,8 +217,14 @@ public class ConstantsParser {
                 message += " \"" + key + "\"";
 
                 if (!(obj instanceof SMCParameterConstant)) {
+                    List<String> reasons = new ArrayList<String>();
+                    for (String reason : messages.getOrDefault(key, new ArrayList<String>())) {
+                        if (!reason.isBlank()) {
+                            reasons.add(reason.strip());
+                        }
+                    }
                     message += " for the following reasons:  \n\n";
-                    message += String.join("", messages.get(key));
+                    message += String.join("\n", reasons);
                 } else {
                     message += " because it is in use";
                 }
@@ -243,6 +235,10 @@ public class ConstantsParser {
             }
         }
 
+        for (ColorType[] update : colorTypeUpdates) {
+            updateColorTypes(update[0], update[1]);
+        }
+
         network.getConstantStore().clear();
         network.setConstants(constantsList);
         network.setRealConstants(new ArrayList<RealConstant>(realConstants.values()));
@@ -250,8 +246,17 @@ public class ConstantsParser {
             network.setColorTypes(colorTypesList);
             network.setVariables(variablesList);
         }
+        network.rebindConstantRefs();
 
         return true;
+    }
+
+    private static int parseIntValue(String value) throws ParseException {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException e) {
+            throw new ParseException("Integer value " + value + " is out of range");
+        }
     }
 
     private static void idExists(String id) throws ParseException {
@@ -527,14 +532,14 @@ void intConstant() :
     (
         value = <INTEGER> { 
             idExists(id.image);
-            constants.put(id.image, new Constant(id.image, Integer.parseInt(value.image)));
+            constants.put(id.image, new Constant(id.image, parseIntValue(value.image)));
         }
     |
         <LCURLY> intSet(values) <RCURLY> {
             idExists(id.image);
             LinkedHashSet<Integer> setVals = new LinkedHashSet<Integer>();
             for (String s : values) {
-                setVals.add(Integer.parseInt(s));
+                setVals.add(parseIntValue(s));
             }
             constants.put(id.image, new Constant(id.image, setVals));
         }
@@ -582,8 +587,8 @@ void colorTypes() :
             ct = pct;
         } else if (isIntList.value) {
             ct = new ColorType(id.image);
-            int lowerBound = Integer.parseInt(values.get(0));
-            int upperBound = Integer.parseInt(values.get(1));
+            int lowerBound = parseIntValue(values.get(0));
+            int upperBound = parseIntValue(values.get(1));
             
             if (lowerBound > upperBound) {
                 throw new ParseException("Lower bound must be lower than or equal to upper bound");

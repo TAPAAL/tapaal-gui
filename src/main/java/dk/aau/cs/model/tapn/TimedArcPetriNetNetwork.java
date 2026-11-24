@@ -327,10 +327,12 @@ public class TimedArcPetriNetNetwork {
 
 			for (TimedInputArc inputArc : tapn.inputArcs()) {
 				updateTimeIntervalAndWeight(oldName, newConstant, inputArc.interval(), inputArc.getWeight());
+				updateColoredTimeIntervals(oldName, newConstant, inputArc.getColorTimeIntervals());
 			}
 
 			for (TransportArc transArc : tapn.transportArcs()) {
 				updateTimeIntervalAndWeight(oldName, newConstant, transArc.interval(), transArc.getWeight());
+				updateColoredTimeIntervals(oldName, newConstant, transArc.getColorTimeIntervals());
 			}
 
 			for (TimedInhibitorArc inhibArc : tapn.inhibitorArcs()) {
@@ -346,12 +348,36 @@ public class TimedArcPetriNetNetwork {
 
 	private void updatePlaceInvariant(String oldName, Constant newConstant, TimedPlace place) {
 		updateBound(oldName, newConstant, place.invariant().upperBound());
+		for (ColoredTimeInvariant cti : place.getCtiList()) {
+			updateBound(oldName, newConstant, cti.upperBound());
+		}
 	}
 
 	private void updateTimeIntervalAndWeight(String oldName, Constant newConstant, TimeInterval interval, Weight weight) {
 		updateBound(oldName, newConstant, interval.lowerBound());
 		updateBound(oldName, newConstant, interval.upperBound());
 		updateWeight(oldName, newConstant, weight);
+	}
+
+	private void updateColoredTimeIntervals(String oldName, Constant newConstant, List<ColoredTimeInterval> intervals) {
+		if (intervals == null) return;
+		for (ColoredTimeInterval interval : intervals) {
+			updateBound(oldName, newConstant, interval.lowerBound());
+			updateBound(oldName, newConstant, interval.upperBound());
+		}
+	}
+
+	/**
+	 * Rebinds all references to constants (bounds, weights, probabilities and distribution parameters)
+	 * to the constant objects currently in the constant store, e.g. after the store has been replaced
+	 * with freshly created constants.
+	 */
+	public void rebindConstantRefs() {
+		for (Constant c : new ArrayList<>(constants.getConstants())) {
+			updateGuardsAndWeightsWithNewConstant(c.name(), c);
+		}
+		rebindDistributionRefs();
+		buildConstraints();
 	}
 
 	private void updateBound(String oldName, Constant newConstant, Bound bound) {

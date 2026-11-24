@@ -28,6 +28,7 @@ public class EditConstantsCommand implements Command {
         network.setRealConstants(oldState.getRealConstants());
         network.setColorTypes(oldState.getColorTypes());
         network.setVariables(oldState.getVariables());
+        network.rebindConstantRefs();
         TAPAALGUI.getCurrentTab().updateConstantsList();
         colorTypesListModel.updateName();
         variablesListModel.updateName();
@@ -40,6 +41,7 @@ public class EditConstantsCommand implements Command {
         network.setRealConstants(newState.getRealConstants());
         network.setColorTypes(newState.getColorTypes());
         network.setVariables(newState.getVariables());
+        network.rebindConstantRefs();
         TAPAALGUI.getCurrentTab().updateConstantsList();
         colorTypesListModel.updateName();
         variablesListModel.updateName();

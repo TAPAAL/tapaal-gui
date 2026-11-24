@@ -141,8 +141,8 @@ public class ProductType extends ColorType {
     public boolean containsTypes(Vector<ColorType> colorTypes) {
         if (constituents.equals(colorTypes)) return true;
 
-        boolean containsType = false;
         for (ColorType constituent : constituents) {
+            boolean containsType = false;
             for (ColorType ct : colorTypes) {
                 if (constituent.getName().equals(ct.getName())) {
                     containsType = true;
