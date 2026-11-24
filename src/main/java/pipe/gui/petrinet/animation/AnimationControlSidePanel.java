@@ -157,6 +157,10 @@ public class AnimationControlSidePanel extends JPanel {
         c.gridx = 0;
         c.gridy = 2;
         add(animationToolBar, c);
+
+        // The panel is already shown: lay it out again so the trace box appears right away
+        revalidate();
+        repaint();
     }
 
     public void resetPlacementOfAnimationToolBar() {
@@ -172,6 +176,8 @@ public class AnimationControlSidePanel extends JPanel {
     private void showTraceBox(boolean shouldShow) {
 	    traceBox.setEnabled(shouldShow);
 	    traceBox.setVisible(shouldShow);
+	    revalidate();
+	    repaint();
     }
 
     public void resetTraceBox(boolean shouldHideTraceBox) {
