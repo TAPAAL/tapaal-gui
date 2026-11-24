@@ -137,7 +137,7 @@ public class TraceImportExport {
                     trace.getValue().spliterator(), false)
                     .anyMatch(step -> step instanceof TAPNNetworkColoredTransitionStep);
             if (isColoredTrace) {
-                NetworkMarking initialMarking = tab.network().marking();
+                NetworkMarking initialMarking = tab.getAnimator().getInitialMarking();
                 Element initialMarkingElement = initialMarking.toXmlElement(document, composer);
                 traceRootNode.appendChild(initialMarkingElement);
             }
@@ -199,14 +199,14 @@ public class TraceImportExport {
                     traceRootNode.appendChild(markingElement);
                 }
             }
-        }
 
-        TAPNNetworkTrace trace = tab.getAnimator().getTrace();
-        boolean isTimedTrace = trace instanceof TimedTAPNNetworkTrace;
-        if (tab.getAnimator().getTrace() != null && isTimedTrace && ((TimedTAPNNetworkTrace)trace).getTraceType() == EG_DELAY_FOREVER) {
-            Element delayForeverElement = document.createElement("delay");
-            traceRootNode.appendChild(delayForeverElement);
-            delayForeverElement.setTextContent("forever");
+            // A trace of the trace list carries its own ending; the action history ends like the shown trace
+            Object traceSource = trace.getValue() instanceof TAPNNetworkTrace ? trace.getValue() : tab.getAnimator().getTrace();
+            if (traceSource instanceof TimedTAPNNetworkTrace timedTrace && timedTrace.getTraceType() == EG_DELAY_FOREVER) {
+                Element delayForeverElement = document.createElement("delay");
+                traceRootNode.appendChild(delayForeverElement);
+                delayForeverElement.setTextContent("forever");
+            }
         }
 
         document.normalize();
