@@ -519,20 +519,30 @@ public class GuiModelManager {
 
     public void toggleUrgentTrans() {
         ArrayList<PetriNetObject> selection = tabContent.drawingSurface().getSelectionObject().getSelection();
-        tabContent.getUndoManager().newEdit();
-
+        ArrayList<TimedTransitionComponent> transitions = new ArrayList<>();
         for (PetriNetObject o : selection) {
             if (o instanceof TimedTransitionComponent) {
-                TimedTransitionComponent transition = (TimedTransitionComponent) o;
-                if (!transition.underlyingTransition().hasUntimedPreset()) {
-                    JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                Command cmd = new ToggleTransitionUrgentCommand(transition.underlyingTransition(), tabContent);
-                cmd.redo();
-                tabContent.getUndoManager().addEdit(cmd);
+                transitions.add((TimedTransitionComponent) o);
             }
+        }
+        if (transitions.isEmpty()) {
+            return;
+        }
+
+        // Check every transition that would become urgent before changing anything,
+        // so the toggle never stops halfway. Making a transition non-urgent is always allowed.
+        for (TimedTransitionComponent transition : transitions) {
+            if (!transition.underlyingTransition().isUrgent() && !transition.underlyingTransition().hasUntimedPreset()) {
+                JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "Incoming arcs to urgent transitions must have the interval [0,\u221e).", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
+        tabContent.getUndoManager().newEdit();
+        for (TimedTransitionComponent transition : transitions) {
+            Command cmd = new ToggleTransitionUrgentCommand(transition.underlyingTransition(), tabContent);
+            cmd.redo();
+            tabContent.getUndoManager().addEdit(cmd);
         }
         tabContent.repaint();
     }
