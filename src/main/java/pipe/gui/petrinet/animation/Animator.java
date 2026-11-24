@@ -1306,6 +1306,7 @@ public class Animator {
         if(keepInitial && initialMarking != null){
             markings.add(initialMarking);
             tab.network().setMarking(initialMarking);
+            updateColoredMarking();
             currentAction = -1;
             updateFireableTransitions();
         }
