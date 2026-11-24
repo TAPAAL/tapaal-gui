@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
@@ -111,7 +112,9 @@ public class TimeInterval {
 	public static TimeInterval parse(String interval, ConstantStore constants) {
 		Pattern pattern = Pattern.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
 		Matcher matcher = pattern.matcher(interval);
-		matcher.find();
+		if (!matcher.find()) {
+			throw new FormatException("Invalid time interval \"" + interval + "\" (expected e.g. [0,inf))");
+		}
 
 		String leftBracket = matcher.group(1);
 		String lowerBoundAsString = matcher.group(2);

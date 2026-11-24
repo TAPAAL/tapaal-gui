@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import pipe.gui.Constants;
 
 import dk.aau.cs.model.tapn.Bound.InfBound;
+import dk.aau.cs.util.FormatException;
 import dk.aau.cs.util.IntervalOperations;
 import dk.aau.cs.util.Require;
 
@@ -45,7 +46,9 @@ public class TimeInvariant {
 	public static TimeInvariant parse(String invariant, ConstantStore constants) {
 		Pattern pattern = Pattern.compile("^(<|<=)\\s*(\\w+)$");
 		Matcher matcher = pattern.matcher(invariant);
-		matcher.find();
+		if (!matcher.find()) {
+			throw new FormatException("Invalid invariant \"" + invariant + "\" (expected e.g. < inf or <= 5)");
+		}
 
 		String operator = matcher.group(1);
 		String boundAsString = matcher.group(2);
