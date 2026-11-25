@@ -8,6 +8,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Vector;
+import java.util.stream.Collectors;
+import dk.aau.cs.model.CPN.Color;
+import dk.aau.cs.model.CPN.ColorType;
+import dk.aau.cs.model.CPN.ProductType;
+import dk.aau.cs.model.CPN.Expressions.AddExpression;
+import dk.aau.cs.model.CPN.Expressions.ArcExpression;
+import dk.aau.cs.model.CPN.Expressions.ColorExpression;
+import dk.aau.cs.model.CPN.Expressions.DotConstantExpression;
+import dk.aau.cs.model.CPN.Expressions.NumberOfExpression;
+import dk.aau.cs.model.CPN.Expressions.TupleExpression;
+import dk.aau.cs.model.CPN.Expressions.UserOperatorExpression;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -367,6 +379,38 @@ public class NetworkMarking implements TimedMarking {
         }   
     }
 
+    /** The multiset of colors of the given tokens, as an expression such as (1'red + 2'green). */
+    public static ArcExpression tokensToExpression(List<TimedToken> tokens) {
+        Vector<ArcExpression> numberOfExpressions = new Vector<>();
+        Map<Color, Integer> numberOfMap = new HashMap<>();
+        for (TimedToken token : tokens) {
+            numberOfMap.merge(token.color(), 1, Integer::sum);
+        }
+
+        numberOfMap.entrySet().stream()
+            .sorted((e1, e2) -> e1.getKey().toString().compareTo(e2.getKey().toString()))
+            .forEach(numberOfEntry -> {
+                Color color = numberOfEntry.getKey();
+                Vector<ColorExpression> colorExpressions = new Vector<>();
+                if (color.getColorType().equals(ColorType.COLORTYPE_DOT)) {
+                    colorExpressions.add(new DotConstantExpression());
+                } else if (color.getColorType().isProductColorType()) {
+                    ProductType productType = (ProductType)color.getColorType();
+                    Vector<ColorExpression> subColorExpressions = new Vector<>();
+                    subColorExpressions.addAll(color.getTuple().stream()
+                        .map(UserOperatorExpression::new)
+                        .collect(Collectors.toList()));
+                    colorExpressions.add(new TupleExpression(subColorExpressions, productType));
+                } else {
+                    colorExpressions.add(new UserOperatorExpression(color));
+                }
+
+                numberOfExpressions.add(new NumberOfExpression(numberOfEntry.getValue(), colorExpressions));
+            });
+
+        return new AddExpression(numberOfExpressions);
+    }
+
     public Element toXmlElement(Document document, TAPNComposer composer) {
         Map<TimedPlace, List<TimedToken>> allPlaces = new HashMap<>();
         for (var entry : markings.entrySet()) {
@@ -394,14 +438,15 @@ public class NetworkMarking implements TimedMarking {
         }
 
         if (network != null && !composer.getLens().isTimed()) {
+            // The tokens of this marking, not the places' token expressions (those hold the marking shown).
+            // Empty places are left out: a place without tokens is empty, and verifypn crashes on an empty <place/>.
             for (var entry : allPlaces.entrySet()) {
-                var place = entry.getKey();
+                var tokens = entry.getValue();
+                if (tokens == null || tokens.isEmpty() || writer == null) continue;
+
                 var placeElement = document.createElement("place");
                 placeElement.setAttribute("id", composer.composedPlaceName(entry.getKey()));
-                if (place.getTokensAsExpression() != null && writer != null) {
-                    writer.parseArcExpression(place.getTokensAsExpression(), document, placeElement);
-                }
-                
+                writer.parseArcExpression(tokensToExpression(tokens), document, placeElement);
                 markingElement.appendChild(placeElement);
             }
 

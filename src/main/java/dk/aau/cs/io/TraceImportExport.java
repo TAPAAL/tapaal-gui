@@ -35,6 +35,7 @@ import dk.aau.cs.model.tapn.NetworkMarking;
 import dk.aau.cs.model.tapn.TimedArcPetriNet;
 import dk.aau.cs.model.tapn.TimedToken;
 import dk.aau.cs.model.tapn.TimedTransition;
+import dk.aau.cs.model.tapn.simulation.ColoredTAPNNetworkTrace;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkColoredTransitionStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimeDelayStep;
 import dk.aau.cs.model.tapn.simulation.TAPNNetworkTimedTransitionStep;
@@ -104,12 +105,7 @@ public class TraceImportExport {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         document = builder.newDocument();
 
-        Map<String, Iterable<TAPNNetworkTraceStep>> traces = new LinkedHashMap<>();
-        if (tab.getAnimator().getTraceMap() != null) {
-            traces.putAll(tab.getAnimator().getTraceMap());
-        } else {
-            traces.put("T1", tab.getAnimator().getActionHistory());
-        }
+        Map<String, Iterable<TAPNNetworkTraceStep>> traces = tab.getAnimator().getTracesToExport();
 
         boolean hasMultipleTraces = traces.size() > 1; 
         
@@ -137,7 +133,7 @@ public class TraceImportExport {
                     trace.getValue().spliterator(), false)
                     .anyMatch(step -> step instanceof TAPNNetworkColoredTransitionStep);
             if (isColoredTrace) {
-                NetworkMarking initialMarking = tab.network().marking();
+                NetworkMarking initialMarking = tab.getAnimator().getInitialMarking();
                 Element initialMarkingElement = initialMarking.toXmlElement(document, composer);
                 traceRootNode.appendChild(initialMarkingElement);
             }
@@ -199,14 +195,16 @@ public class TraceImportExport {
                     traceRootNode.appendChild(markingElement);
                 }
             }
-        }
 
-        TAPNNetworkTrace trace = tab.getAnimator().getTrace();
-        boolean isTimedTrace = trace instanceof TimedTAPNNetworkTrace;
-        if (tab.getAnimator().getTrace() != null && isTimedTrace && ((TimedTAPNNetworkTrace)trace).getTraceType() == EG_DELAY_FOREVER) {
-            Element delayForeverElement = document.createElement("delay");
-            traceRootNode.appendChild(delayForeverElement);
-            delayForeverElement.setTextContent("forever");
+            // A trace of the trace list carries its own ending; the steps taken end like the shown trace
+            Object traceSource = trace.getValue() instanceof TAPNNetworkTrace ? trace.getValue() : tab.getAnimator().getTrace();
+            boolean delaysForever = (traceSource instanceof TimedTAPNNetworkTrace timedTrace && timedTrace.getTraceType() == EG_DELAY_FOREVER)
+                || (traceSource instanceof ColoredTAPNNetworkTrace coloredTrace && coloredTrace.getTraceType() == EG_DELAY_FOREVER);
+            if (delaysForever) {
+                Element delayForeverElement = document.createElement("delay");
+                traceRootNode.appendChild(delayForeverElement);
+                delayForeverElement.setTextContent("forever");
+            }
         }
 
         document.normalize();
