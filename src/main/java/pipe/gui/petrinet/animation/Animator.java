@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -76,6 +77,8 @@ public class Animator {
     private static boolean isUrgentTransitionEnabled = false;
 
     private Map<String, TAPNNetworkTrace> traceMap;
+    // The trace of traceMap that was shown when the user left it by firing or delaying: its steps are the action history
+    private String editedTraceName;
 
     private InteractiveHandle interactiveEngine;
     private boolean isUsingInteractiveEngine;
@@ -130,6 +133,7 @@ public class Animator {
 
     public void setTrace(TAPNNetworkTrace trace, Map<String, TAPNNetworkTrace> traceMap) {
         this.traceMap = traceMap;
+        editedTraceName = null;
         setTrace(trace, 0);
         tab.getAnimationController().updateTraceBox(traceMap);
     }
@@ -138,13 +142,48 @@ public class Animator {
         return this.traceMap;
     }
 
+    /** The traces to export: the trace list, where a trace the user has left holds the steps taken instead. */
+    public Map<String, Iterable<TAPNNetworkTraceStep>> getTracesToExport() {
+        Map<String, Iterable<TAPNNetworkTraceStep>> traces = new LinkedHashMap<>();
+        if (traceMap == null) {
+            traces.put("T1", actionHistory);
+            return traces;
+        }
+
+        for (var entry : traceMap.entrySet()) {
+            boolean isEdited = entry.getKey().equals(editedTraceName);
+            traces.put(entry.getKey(), isEdited ? actionHistory : entry.getValue());
+        }
+        return traces;
+    }
+
+    /** Keeps the steps taken as the trace the user left, so switching back to it shows them. */
+    private void storeEditedTrace() {
+        if (editedTraceName == null || traceMap == null) return;
+
+        TAPNNetworkTrace edited;
+        if (tab.getLens().isColored()) {
+            var coloredTrace = new ColoredTAPNNetworkTrace();
+            actionHistory.forEach(coloredTrace::add);
+            edited = coloredTrace;
+        } else {
+            var timedTrace = new TimedTAPNNetworkTrace(-1);
+            timedTrace.setTraceType(TraceType.NOT_EG);
+            actionHistory.forEach(timedTrace::add);
+            edited = timedTrace;
+        }
+
+        traceMap.put(editedTraceName, edited);
+        editedTraceName = null;
+    }
+
     public void switchTrace(TAPNNetworkTrace trace) {
+        storeEditedTrace();
         setTrace(trace, currentMarkingIndex);
     }
 
     public void setTrace(TAPNNetworkTrace trace) {
         resetTraceBox();
-        traceMap = null;
         setTrace(trace, 0);
     }
 
@@ -1281,6 +1320,7 @@ public class Animator {
         if(traceMap != null) {
             tab.getAnimationController().resetTraceBox(true);
             traceMap = null;
+            editedTraceName = null;
         }
 
     }
@@ -1290,6 +1330,7 @@ public class Animator {
             tab.getAnimationController().resetTraceBox(true);
         }
         traceMap = null;
+        editedTraceName = null;
     }
 
     private boolean removeSetTrace(boolean askUser){
@@ -1314,7 +1355,13 @@ public class Animator {
     private boolean clearStepsForward(){
         boolean answer = true;
         if(!isDisplayingUntimedTrace){
+            boolean wasShowingTrace = trace != null;
             answer = removeSetTrace(true);
+            // The shown trace of a trace list is abandoned: its entry becomes the steps taken, the other traces stay
+            if(answer && wasShowingTrace && traceMap != null){
+                Object selected = tab.getAnimationController().getTraceBox().getSelectedItem();
+                editedTraceName = selected == null ? null : selected.toString();
+            }
         }
 
         if(answer){

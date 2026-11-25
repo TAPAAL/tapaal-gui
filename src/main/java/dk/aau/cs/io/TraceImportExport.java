@@ -105,12 +105,7 @@ public class TraceImportExport {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         document = builder.newDocument();
 
-        Map<String, Iterable<TAPNNetworkTraceStep>> traces = new LinkedHashMap<>();
-        if (tab.getAnimator().getTraceMap() != null) {
-            traces.putAll(tab.getAnimator().getTraceMap());
-        } else {
-            traces.put("T1", tab.getAnimator().getActionHistory());
-        }
+        Map<String, Iterable<TAPNNetworkTraceStep>> traces = tab.getAnimator().getTracesToExport();
 
         boolean hasMultipleTraces = traces.size() > 1; 
         
@@ -201,7 +196,7 @@ public class TraceImportExport {
                 }
             }
 
-            // A trace of the trace list carries its own ending; the action history ends like the shown trace
+            // A trace of the trace list carries its own ending; the steps taken end like the shown trace
             Object traceSource = trace.getValue() instanceof TAPNNetworkTrace ? trace.getValue() : tab.getAnimator().getTrace();
             boolean delaysForever = (traceSource instanceof TimedTAPNNetworkTrace timedTrace && timedTrace.getTraceType() == EG_DELAY_FOREVER)
                 || (traceSource instanceof ColoredTAPNNetworkTrace coloredTrace && coloredTrace.getTraceType() == EG_DELAY_FOREVER);
