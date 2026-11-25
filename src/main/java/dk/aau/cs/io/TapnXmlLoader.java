@@ -103,7 +103,7 @@ public class TapnXmlLoader {
         } catch (FormatException | NullPointerException e) {
             throw e;
         } catch (Exception e) {
-            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type");
+            throw new Exception("One or more necessary attributes were not found\n  - One or more attribute values have an incorrect type", e);
         }
 	}
 	
@@ -461,13 +461,22 @@ public class TapnXmlLoader {
 			AnnotationNote note = parseAnnotation(element);
 			template.guiModel().addPetriNetObject(note);
 		} else if ("place".equals(element.getNodeName())) {
-			TimedPlaceComponent place = parsePlace(element, network, template.model(), constants);
+			TimedPlaceComponent place;
+			try {
+				place = parsePlace(element, network, template.model(), constants);
+			} catch (FormatException e) {
+				throw new FormatException("Error in place " + element.getAttribute("id") + " of component " + template.model().name() + ": " + e.getMessage(), e);
+			}
 			template.guiModel().addPetriNetObject(place);
 		} else if ("transition".equals(element.getNodeName())) {
 			TimedTransitionComponent transition = parseTransition(element, network, template.model(), constants);
 			template.guiModel().addPetriNetObject(transition);
 		} else if (element.getNodeName().matches("arc|outputArc|inputArc|inhibitorArc|transportArc")) {
-            parseAndAddArc(element, template, constants, network);
+            try {
+                parseAndAddArc(element, template, constants, network);
+            } catch (FormatException e) {
+                throw new FormatException("Error in arc " + element.getAttribute("id") + " of component " + template.model().name() + ": " + e.getMessage(), e);
+            }
         }
 	}
 

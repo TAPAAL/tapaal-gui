@@ -1,6 +1,7 @@
 package dk.aau.cs.model.CPN;
 
 import dk.aau.cs.model.tapn.*;
+import dk.aau.cs.util.FormatException;
 
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -34,7 +35,9 @@ public class ColoredTimeInterval extends TimeInterval {
 
         Pattern pattern = Pattern.compile("^(\\[|\\()\\s*(\\w+)\\s*,\\s*(\\w+)(\\]|\\))$");
         Matcher matcher = pattern.matcher(interval);
-        matcher.find();
+        if (!matcher.find()) {
+            throw new FormatException("Invalid time interval \"" + interval + "\" (expected e.g. [0,inf))");
+        }
 
         String leftBracket = matcher.group(1);
         String lowerBoundAsString = matcher.group(2);

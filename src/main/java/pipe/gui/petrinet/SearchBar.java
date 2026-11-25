@@ -17,6 +17,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dk.aau.cs.model.tapn.SharedTransition;
 import dk.aau.cs.model.tapn.TimedPlace;
 import dk.aau.cs.model.tapn.TimedTransition;
 import dk.aau.cs.util.Tuple;
@@ -242,7 +243,10 @@ public class SearchBar extends JPanel {
             for (int i = 0; i < matches.size(); i++) {
                 Tuple<?, String> match = matches.get(i);
                 Object firstElem = match.value1();
-                boolean isShared = firstElem instanceof TimedPlace && ((TimedPlace)firstElem).isShared() ||
+                boolean isSharedTransition = firstElem instanceof SharedTransition;
+                boolean isTransition = firstElem instanceof TimedTransition || isSharedTransition;
+                boolean isShared = isSharedTransition ||
+                                   firstElem instanceof TimedPlace && ((TimedPlace)firstElem).isShared() ||
                                    firstElem instanceof TimedTransition && ((TimedTransition) firstElem).isShared();
     
                 String firstElemStr = firstElem.toString();
@@ -251,7 +255,7 @@ public class SearchBar extends JPanel {
                 }
     
                 String matchStr;
-                if (firstElem instanceof TimedTransition) {
+                if (isTransition) {
                     if (isShared) {
                         matchStr = (useSharedPrefix ? match.value2() + "." : "") + firstElemStr + " (shared transition)";
                     } else {
