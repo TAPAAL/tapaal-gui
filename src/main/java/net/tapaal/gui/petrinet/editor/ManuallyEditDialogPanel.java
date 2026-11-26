@@ -194,7 +194,7 @@ public class ManuallyEditDialogPanel extends EscapableDialog {
                 undoManager.addNewEdit(command);
                 SwingUtilities.invokeLater(this::dispose);
             }
-        } catch (ParseException | TokenMgrError e) {
+        } catch (ParseException | TokenMgrError | NumberFormatException e) {
             SwingUtilities.invokeLater(() ->
                 JOptionPane.showMessageDialog(TAPAALGUI.getApp(), e.getMessage(), "Error during parsing", JOptionPane.ERROR_MESSAGE)
             );
