@@ -5282,7 +5282,10 @@ public class QueryDialog extends JPanel {
 
         Vector<Object> items = new Vector<>(tapnNetwork.activeTemplates().size()+1);
         items.addAll(tapnNetwork.activeTemplates());
-        if(tapnNetwork.numberOfSharedPlaces() > 0) items.add(SHARED);
+        // Transitions can only be used in queries of untimed nets
+        if (tapnNetwork.numberOfSharedPlaces() > 0 || (!lens.isTimed() && tapnNetwork.numberOfSharedTransitions() > 0)) {
+            items.add(SHARED);
+        }
 
 
         templateBox = new JComboBox<>(new DefaultComboBoxModel<>(items));
@@ -5350,8 +5353,10 @@ public class QueryDialog extends JPanel {
             searchableItems.add(new Tuple<>(place, SHARED.toString()));
         }
 
-        for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
-            searchableItems.add(new Tuple<>(transition, SHARED.toString()));
+        if (!lens.isTimed()) {
+            for (SharedTransition transition : tapnNetwork.sharedTransitions()) {
+                searchableItems.add(new Tuple<>(transition, SHARED.toString()));
+            }
         }
 
         searcher = new Searcher<>(searchableItems, obj -> {
@@ -5390,6 +5395,8 @@ public class QueryDialog extends JPanel {
                 isShared = ((TimedPlace)result.value1()).isShared();
             } else if (result.value1() instanceof TimedTransition) {
                 isShared = ((TimedTransition)result.value1()).isShared();
+            } else if (result.value1() instanceof SharedTransition) {
+                isShared = true;
             }
 
             if (isShared) {
