@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     id 'java'
     id 'application'
@@ -6,11 +9,10 @@ plugins {
     id "org.javacc.javacc" version "4.0.3"
 }
 
-group 'net.tapaal'
-version '4.0-SNAPSHOT'
+group = 'net.tapaal'
+version = '4.0-SNAPSHOT'
 
 var targetJavaVersion = "17"
-var targetKotlinVersion = "2.0"
 
 java {
     sourceCompatibility = targetJavaVersion
@@ -22,10 +24,10 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        jvmTarget = targetJavaVersion
-        apiVersion = targetKotlinVersion
-        languageVersion = targetKotlinVersion
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget(targetJavaVersion)
+        apiVersion = KotlinVersion.KOTLIN_2_0
+        languageVersion = KotlinVersion.KOTLIN_2_0
     }
 }
 

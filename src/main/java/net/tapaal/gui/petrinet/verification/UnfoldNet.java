@@ -197,10 +197,16 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
             Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));
             thread.start();
-            while(thread.isAlive()){
-                if(isCancelled()){
-                    thread.stop();
+            while (thread.isAlive() && !isCancelled()) {
+                try {
+                    thread.join(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    break;
                 }
+            }
+            if (thread.isAlive()) {
+                thread.interrupt();
             }
 
             ColorBindingParser parser = new ColorBindingParser();
@@ -208,9 +214,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         } catch (FormatException e) {
             e.printStackTrace();
             error.append(e.getMessage());
-            return error.toString();
-        } catch (ThreadDeath d){
-            error.append(d.getMessage());
             return error.toString();
         }
 

@@ -19,6 +19,8 @@ class UndoRedoSpy : JFrame() {
     private val treeRoot = DefaultMutableTreeNode("root")
     private val tree = JTree(treeRoot)
 
+    // Reads UndoManager internals via reflection (casts are unchecked) using the debug-only getCurrentTab().
+    @Suppress("DEPRECATION", "UNCHECKED_CAST")
     private fun reloadUndoRedoStack() {
         val m = tree.model as DefaultTreeModel
         treeRoot.removeAllChildren()

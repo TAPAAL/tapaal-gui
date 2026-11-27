@@ -367,7 +367,7 @@ public class VerifyDTAPN implements ModelChecker{
                             }
                         }
 
-                    } catch (ThreadDeath | Exception e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                         return null;
                     }

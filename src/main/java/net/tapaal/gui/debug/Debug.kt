@@ -14,6 +14,8 @@ import javax.swing.KeyStroke
 fun noOp() {}
 object DEBUG {
 
+    // getCurrentTab()/getApp() are deprecated for production code; fine in this debug-only menu.
+    @Suppress("DEPRECATION")
     @JvmStatic fun buildMenuDEBUG(): JMenu {
 
         val debugMenu = JMenu("DEBUG")
@@ -29,13 +31,13 @@ object DEBUG {
             })
 
             add(object : AbstractAction("Show undo/redo stack") {
-                override fun actionPerformed(e: ActionEvent) = UndoRedoSpy().show()
+                override fun actionPerformed(e: ActionEvent) = UndoRedoSpy().setVisible(true)
             })
 
             add(object : GuiAction(
                 "Verify save/load",
                 "Verify save/load",
-                KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)
+                KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMaskEx or InputEvent.SHIFT_DOWN_MASK)
             ) {
                 override fun actionPerformed(e: ActionEvent?) {
                     val tab = TAPAALGUI.getCurrentTab();

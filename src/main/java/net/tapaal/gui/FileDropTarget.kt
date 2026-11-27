@@ -42,7 +42,7 @@ abstract class FileDropTarget(private val supportedFileExtension: Array<String> 
 
     @Throws(UnsupportedFlavorException::class, IOException::class)
     private fun getDraggedFileOrNull(transferable: Transferable): List<File> {
-        val files = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
+        val files = (transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<*>).filterIsInstance<File>()
 
         return files.filter {
                 file -> supportedFileExtension.contains(file.extension)
