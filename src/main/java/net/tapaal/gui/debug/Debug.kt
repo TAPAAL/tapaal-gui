@@ -29,14 +29,15 @@ object DEBUG {
             })
 
             add(object : AbstractAction("Show undo/redo stack") {
-                override fun actionPerformed(e: ActionEvent) = UndoRedoSpy().show()
+                override fun actionPerformed(e: ActionEvent) { UndoRedoSpy().isVisible = true }
             })
 
             add(object : GuiAction(
                 "Verify save/load",
                 "Verify save/load",
-                KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMask + InputEvent.SHIFT_MASK)
+                KeyStroke.getKeyStroke('L'.code, Toolkit.getDefaultToolkit().menuShortcutKeyMaskEx + InputEvent.SHIFT_DOWN_MASK)
             ) {
+                @Suppress("DEPRECATION")
                 override fun actionPerformed(e: ActionEvent?) {
                     val tab = TAPAALGUI.getCurrentTab();
                     val tmpFile = kotlin.io.path.createTempFile("tapaalSaveTest", ".tapn").toFile()

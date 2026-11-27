@@ -196,7 +196,6 @@ TCTLAbstractStateProperty NotExpr() :
 {
 	<NOT> "(" child = OrExpr() ")" { return new TCTLNotNode(child); }
 	| child = Factor() { return child; }
-        | "(" childConverter = AbstractPathProperty() ")" { return new TCTLPathToStateConverter(childConverter); }
 }
 
 TCTLAbstractStateProperty Factor() :

@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,6 +57,9 @@ public class UnfoldNet extends SwingWorker<String, Void> {
     //if the unfolded net is too big, do not try to load it
     private final int maxNetSize = Constants.MAX_NET_SIZE;
     private boolean netTooBig = false;
+    private volatile ProcessRunner runner;
+    // set once the unfolded tab starts opening; a later cancel no longer interrupts the unfolding
+    private volatile boolean tabOpening = false;
 
     public UnfoldNet(ModelChecker modelChecker, Messenger messenger, HashMap<TimedArcPetriNet, DataLayer> guiModels, boolean partition, boolean computeColorFixpoint, boolean useSymmetricVars) {
         super();
@@ -131,7 +135,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         mapQueryToNewNames(test, transformedModel.value2());
         clonedQueries.add(test);
 
-        ProcessRunner runner;
         try{
             PrintStream queryStream = new PrintStream(queryFile);
             CTLQueryVisitor XMLVisitor = new CTLQueryVisitor();
@@ -156,6 +159,10 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
         runner = new ProcessRunner(modelChecker.getPath(), createUnfoldArgumentString(modelFile.getAbsolutePath(), queryFile.getAbsolutePath(), unfoldTACPNOptions));
         runner.run();
+        if (isCancelled()) {
+            runner.kill();
+            return null;
+        }
 
         List<String> outputLines = new ArrayList<>();
         BufferedReader reader = runner.standardOutput();
@@ -190,16 +197,32 @@ public class UnfoldNet extends SwingWorker<String, Void> {
                 error.append("Unfolded model could not be loaded");
                 return error.toString();
             }
+            if (isCancelled()) {
+                return null;
+            }
 
             // addLocation(loadedModel, composer); // We can not get coords from server
             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false, oldTab.getLens().isStochastic()));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
+            if (isCancelled()) {
+                return null;
+            }
 
-            Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));
-            thread.start();
-            while(thread.isAlive()){
-                if(isCancelled()){
-                    thread.stop();
+            tabOpening = true;
+            // Swing components must only be touched on the EDT; opening the tab elsewhere races with painting
+            CountDownLatch tabOpened = new CountDownLatch(1);
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    TAPAALGUI.getAppGuiController().openTab(newTab);
+                } finally {
+                    tabOpened.countDown();
+                }
+            });
+            while (tabOpened.getCount() > 0) {
+                try {
+                    tabOpened.await();
+                } catch (InterruptedException ignored) {
+                    // cancel(true) interrupts this worker; let the tab finish opening
                 }
             }
 
@@ -208,9 +231,6 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         } catch (FormatException e) {
             e.printStackTrace();
             error.append(e.getMessage());
-            return error.toString();
-        } catch (ThreadDeath d){
-            error.append(d.getMessage());
             return error.toString();
         }
 
@@ -327,9 +347,17 @@ public class UnfoldNet extends SwingWorker<String, Void> {
 
         } else {
             modelChecker.kill();
+            ProcessRunner unfoldRunner = runner;
+            if (unfoldRunner != null) {
+                unfoldRunner.kill();
+            }
 
             if (netTooBig) {
                 netTooBig = false;
+                return;
+            }
+
+            if (tabOpening) {
                 return;
             }
 

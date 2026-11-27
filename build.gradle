@@ -6,8 +6,8 @@ plugins {
     id "org.javacc.javacc" version "4.0.3"
 }
 
-group 'net.tapaal'
-version '4.0-SNAPSHOT'
+group = 'net.tapaal'
+version = '4.0-SNAPSHOT'
 
 var targetJavaVersion = "17"
 var targetKotlinVersion = "2.0"
