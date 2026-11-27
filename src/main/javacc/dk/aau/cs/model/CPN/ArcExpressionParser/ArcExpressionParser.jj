@@ -99,7 +99,7 @@ ArcExpression AddExpression() :
 {
     left = ScalarExpression()
     (
-        (op = <PLUS> | op = <SUB>) 
+        LOOKAHEAD(1) (op = <PLUS> | op = <SUB>) 
         right = ScalarExpression()
         {
             if (op.kind == PLUS) {

@@ -19,6 +19,7 @@ class UndoRedoSpy : JFrame() {
     private val treeRoot = DefaultMutableTreeNode("root")
     private val tree = JTree(treeRoot)
 
+    @Suppress("DEPRECATION")
     private fun reloadUndoRedoStack() {
         val m = tree.model as DefaultTreeModel
         treeRoot.removeAllChildren()
@@ -28,11 +29,13 @@ class UndoRedoSpy : JFrame() {
         // Normal edits
         val normalEditsField = UndoManager::class.java.getDeclaredField("normalEdits")
         normalEditsField.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
         val normalEdits = normalEditsField.get(undoManager) as ArrayList<ArrayList<Command>?>
         
         // Animation edits
         val animEditsField = UndoManager::class.java.getDeclaredField("animEdits")
         animEditsField.isAccessible = true
+        @Suppress("UNCHECKED_CAST")
         val animEdits = animEditsField.get(undoManager) as ArrayList<ArrayList<Command>?>
 
         val normalNode = DefaultMutableTreeNode("Normal Mode")

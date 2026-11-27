@@ -42,6 +42,7 @@ abstract class FileDropTarget(private val supportedFileExtension: Array<String> 
 
     @Throws(UnsupportedFlavorException::class, IOException::class)
     private fun getDraggedFileOrNull(transferable: Transferable): List<File> {
+        @Suppress("UNCHECKED_CAST")
         val files = transferable.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
 
         return files.filter {
