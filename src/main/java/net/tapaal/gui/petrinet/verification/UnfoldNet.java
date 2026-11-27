@@ -30,6 +30,7 @@ import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -169,8 +170,8 @@ public class UnfoldNet extends SwingWorker<String, Void> {
         int netSize = readUnfoldedSize(outputLines);
 
         if(netSize > maxNetSize){
-            //We make a thread so the workers doesn't cancel itself before showing the dialog
-            new Thread(() -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded")).start();
+            //Show the dialog asynchronously on the EDT so the worker can cancel itself without waiting for it
+            SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(TAPAALGUI.getApp(), "The unfolded net is too large to be loaded"));
             netTooBig = true;
             cancel(true);
             return null;
@@ -195,22 +196,32 @@ public class UnfoldNet extends SwingWorker<String, Void> {
             newTab = new PetriNetTab(loadedModel.network(), loadedModel.templates(), loadedModel.queries(), new TAPNLens(oldTab.getLens().isTimed(), oldTab.getLens().isGame(), false, oldTab.getLens().isStochastic()));
             newTab.setInitialName(oldTab.getTabTitle().replace(".tapn", "") + "-unfolded");
 
-            Thread thread = new Thread(() -> TAPAALGUI.getAppGuiController().openTab(newTab));
-            thread.start();
-            while (thread.isAlive() && !isCancelled()) {
-                try {
-                    thread.join(100);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    break;
-                }
-            }
-            if (thread.isAlive()) {
-                thread.interrupt();
-            }
-
+            // Add the bindings before the tab is shown, so the model is not modified while the GUI uses it
             ColorBindingParser parser = new ColorBindingParser();
             parser.addBindings(loadedModel, String.join(System.lineSeparator(), outputLines));
+
+            if (isCancelled()) {
+                return null;
+            }
+
+            // Open the tab on the EDT. Cancelling also happens on the EDT, so checking isCancelled() there
+            // guarantees that the tab is never opened after the user has cancelled the unfolding.
+            try {
+                SwingUtilities.invokeAndWait(() -> {
+                    if (!isCancelled()) {
+                        TAPAALGUI.getAppGuiController().openTab(newTab);
+                    }
+                });
+            } catch (InterruptedException e) {
+                // The worker was cancelled while waiting; the queued task will see isCancelled() and skip opening
+                Thread.currentThread().interrupt();
+                return null;
+            } catch (InvocationTargetException e) {
+                Throwable cause = e.getCause();
+                if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+                if (cause instanceof Error) throw (Error) cause;
+                throw e;
+            }
         } catch (FormatException e) {
             e.printStackTrace();
             error.append(e.getMessage());
